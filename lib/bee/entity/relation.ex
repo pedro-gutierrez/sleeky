@@ -1,5 +1,6 @@
 defmodule Bee.Entity.Relation do
   alias Bee.Entity
+  alias Bee.Entity.Aliases
   alias Bee.Entity.ForeignKey
   alias Bee.Entity.Summary
 
@@ -10,6 +11,7 @@ defmodule Bee.Entity.Relation do
     :target,
     :column,
     :foreign_key,
+    aliases: [],
     required: true,
     immutable: false,
     computed: false
@@ -23,6 +25,7 @@ defmodule Bee.Entity.Relation do
     |> with_summary_target()
     |> with_column()
     |> with_foreign_key()
+    |> with_aliases()
   end
 
   def inverse(%{kind: :child} = rel) do
@@ -73,5 +76,9 @@ defmodule Bee.Entity.Relation do
       |> ForeignKey.new()
 
     %{rel | foreign_key: fk}
+  end
+
+  defp with_aliases(rel) do
+    Aliases.new(rel)
   end
 end

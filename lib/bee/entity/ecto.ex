@@ -5,7 +5,8 @@ defmodule Bee.Entity.Ecto do
   @generators [
     Bee.Entity.Ecto.FieldAttributes,
     Bee.Entity.Ecto.Schema,
-    Bee.Entity.Ecto.Changesets
+    Bee.Entity.Ecto.Changesets,
+    Bee.Entity.Ecto.FieldSpecs
   ]
 
   def ast(entity) do

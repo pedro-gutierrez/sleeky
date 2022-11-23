@@ -27,7 +27,9 @@ defmodule Bee.Entity.Ecto.Schema do
   end
 
   defp ecto_schema_attributes(entity) do
-    for attr <- Enum.filter(entity.attributes, &(!&1.virtual && &1.name != :id)) do
+    attrs = Enum.reject(entity.attributes, &(&1.virtual || &1.implied))
+
+    for attr <- attrs do
       name = attr.name
       kind = attr.kind
 

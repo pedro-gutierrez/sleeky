@@ -1,5 +1,6 @@
 defmodule Bee.Entity.Attribute do
   @moduledoc false
+  alias Bee.Entity.Aliases
   alias Bee.Entity.Summary
 
   defstruct [
@@ -8,6 +9,8 @@ defmodule Bee.Entity.Attribute do
     :entity,
     :default,
     :storage,
+    aliases: [],
+    implied: false,
     column: nil,
     unique: false,
     required: true,
@@ -22,6 +25,8 @@ defmodule Bee.Entity.Attribute do
     |> with_summary_entity()
     |> with_column()
     |> with_storage()
+    |> with_aliases()
+    |> maybe_implied()
   end
 
   def id?(attr) do
@@ -44,5 +49,14 @@ defmodule Bee.Entity.Attribute do
       kind ->
         %{attr | storage: kind}
     end
+  end
+
+  defp with_aliases(attr) do
+    Aliases.new(attr)
+  end
+
+  defp maybe_implied(attr) do
+    implied = attr.name in [:id, :inserted_at, :updated_at]
+    %{attr | implied: implied}
   end
 end

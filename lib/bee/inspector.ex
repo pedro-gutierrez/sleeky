@@ -16,6 +16,20 @@ defmodule Bee.Inspector do
     |> Enum.reject(&is_nil/1)
   end
 
+  def atoms(l) when is_list(l) do
+    Enum.map(l, &atoms/1)
+  end
+
+  def atoms(a) when is_binary(a), do: String.to_atom(a)
+  def atoms(a) when is_atom(a), do: a
+
+  def strings(l) when is_list(l) do
+    Enum.map(l, &strings/1)
+  end
+
+  def strings(a) when is_binary(a), do: a
+  def strings(a) when is_atom(a), do: to_string(a)
+
   def as_list(items) when is_list(items), do: items
   def as_list(single), do: [single]
 

@@ -18,6 +18,12 @@ defmodule Bee.Entity do
     virtual?: false
   ]
 
+  @implied_attributes [
+    [name: :id, kind: :string],
+    [name: :inserted_at, kind: :datetime],
+    [name: :updated_at, kind: :datetime]
+  ]
+
   def new(module) do
     name = name(module)
     plural = plural(name)
@@ -66,9 +72,12 @@ defmodule Bee.Entity do
     entity = new(module)
 
     entity =
-      [name: :id, kind: :string, entity: entity]
-      |> Attribute.new()
-      |> add_to(:attributes, entity)
+      Enum.reduce(@implied_attributes, entity, fn attr, e ->
+        attr
+        |> Keyword.put(:entity, entity)
+        |> Attribute.new()
+        |> add_to(:attributes, e)
+      end)
 
     Module.register_attribute(module, :entity, persist: true, accumulate: false)
     Module.put_attribute(module, :entity, entity)
