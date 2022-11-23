@@ -14,6 +14,7 @@ defmodule Bee.Entity do
     attributes: [],
     parents: [],
     children: [],
+    keys: [],
     virtual?: false
   ]
 
@@ -32,16 +33,27 @@ defmodule Bee.Entity do
     }
   end
 
-  def with_attribute(entity, attr) do
-    %{entity | attributes: entity.attributes ++ [attr]}
+  def add_to(item, key, entity) do
+    values = Map.get(entity, key) ++ [item]
+    Map.put(entity, key, values)
   end
 
-  def with_parent(entity, rel) do
-    %{entity | parents: entity.parents ++ [rel]}
+  def fields!(names, entity) do
+    Enum.map(names, &field!(&1, entity))
   end
 
-  def with_child(entity, rel) do
-    %{entity | children: entity.children ++ [rel]}
+  def field!(name, entity) do
+    f = field(name, entity)
+
+    unless f do
+      raise "No such field #{inspect(name)} in #{inspect(entity.name)}"
+    end
+
+    f
+  end
+
+  def field(name, entity) do
+    Enum.find(entity.attributes ++ entity.parents, &(&1.name == name))
   end
 
   def entity(entity) do
@@ -51,10 +63,12 @@ defmodule Bee.Entity do
   defmacro __using__(_) do
     module = __CALLER__.module
 
+    entity = new(module)
+
     entity =
-      module
-      |> new()
-      |> with_attribute(Attribute.new(name: :id, kind: :string))
+      [name: :id, kind: :string, entity: entity]
+      |> Attribute.new()
+      |> add_to(:attributes, entity)
 
     Module.register_attribute(module, :entity, persist: true, accumulate: false)
     Module.put_attribute(module, :entity, entity)

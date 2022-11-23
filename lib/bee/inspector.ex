@@ -16,6 +16,9 @@ defmodule Bee.Inspector do
     |> Enum.reject(&is_nil/1)
   end
 
+  def as_list(items) when is_list(items), do: items
+  def as_list(single), do: [single]
+
   def name(entity) do
     entity
     |> Module.split()

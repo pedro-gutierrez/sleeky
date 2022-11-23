@@ -1,6 +1,7 @@
 defmodule Bee.Entity.Relation do
   alias Bee.Entity
   alias Bee.Entity.ForeignKey
+  alias Bee.Entity.Summary
 
   defstruct [
     :name,
@@ -17,23 +18,23 @@ defmodule Bee.Entity.Relation do
   def new(fields) do
     __MODULE__
     |> struct(fields)
-    |> with_simple_entity()
     |> with_target()
+    |> with_summary_entity()
+    |> with_summary_target()
     |> with_column()
+    |> with_foreign_key()
   end
 
   def inverse(%{kind: :child} = rel) do
-    new(name: rel.entity.name, kind: :parent, entity: rel.entity)
+    new(name: rel.entity.name, kind: :parent, target: rel.entity, entity: rel.target)
   end
 
-  defp with_simple_entity(rel) do
-    entity =
-      rel.entity
-      |> Map.put(:attributes, [])
-      |> Map.put(:parents, [])
-      |> Map.put(:children, [])
+  defp with_summary_entity(rel) do
+    %{rel | entity: Summary.new(rel.entity)}
+  end
 
-    %{rel | entity: entity}
+  defp with_summary_target(rel) do
+    %{rel | target: Summary.new(rel.target)}
   end
 
   defp with_target(rel) do
@@ -53,10 +54,24 @@ defmodule Bee.Entity.Relation do
 
   defp with_column(%{kind: :parent} = rel) do
     column = String.to_atom("#{rel.name}_id")
-    fk = ForeignKey.new(rel)
 
-    %{rel | foreign_key: fk, column: column}
+    %{rel | column: column}
   end
 
   defp with_column(rel), do: rel
+
+  defp with_foreign_key(%{kind: :parent} = rel) do
+    fk = ForeignKey.new(rel)
+
+    %{rel | foreign_key: fk}
+  end
+
+  defp with_foreign_key(%{kind: :child} = rel) do
+    fk =
+      rel
+      |> inverse()
+      |> ForeignKey.new()
+
+    %{rel | foreign_key: fk}
+  end
 end
