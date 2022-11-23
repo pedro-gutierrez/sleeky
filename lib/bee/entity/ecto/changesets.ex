@@ -28,6 +28,7 @@ defmodule Bee.Entity.Ecto.Changesets do
       ),
       delete_changeset(entity)
     ]
+    |> print()
   end
 
   defp insert_changeset(
@@ -135,15 +136,17 @@ defmodule Bee.Entity.Ecto.Changesets do
   end
 
   defp max_length_fields_changeset(entity) do
-    attrs = Enum.filter(entity.attributes, &(&1.kind == :string && !&1.storage == :text))
+    attrs = Enum.filter(entity.attributes, &(&1.kind == :string))
 
     for attr <- attrs do
       name = attr.name
 
       quote do
         changes =
-          changes
-          |> validate_length(unquote(name), max: 255, message: "should be at most 255 characters")
+          validate_length(changes, unquote(name),
+            max: 255,
+            message: "should be at most 255 characters"
+          )
       end
     end
   end

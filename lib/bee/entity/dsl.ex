@@ -64,6 +64,37 @@ defmodule Bee.Entity.Dsl do
     Module.put_attribute(module, :entity, entity)
   end
 
+  defmacro slug(fields, opts \\ nil) do
+    module = __CALLER__.module
+    entity = Entity.entity(module)
+
+    slug_module = Bee.Entity.Ecto.Slug.module(entity)
+
+    fields = as_list(fields)
+
+    attribute =
+      [
+        name: :slug,
+        kind: :string,
+        entity: entity,
+        computed: true,
+        using: slug_module,
+        plugin: {Bee.Entity.Ecto.Slug, fields}
+      ]
+      |> Attribute.new()
+      |> with_opts(opts)
+
+    entity = add_to(attribute, :attributes, entity)
+
+    entity =
+      [fields: [attribute], entity: entity]
+      |> Key.new()
+      |> with_opts(opts)
+      |> add_to(:keys, entity)
+
+    Module.put_attribute(module, :entity, entity)
+  end
+
   defmacro immutable do
   end
 end

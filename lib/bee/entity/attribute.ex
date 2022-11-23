@@ -9,6 +9,7 @@ defmodule Bee.Entity.Attribute do
     :entity,
     :default,
     :storage,
+    :plugin,
     aliases: [],
     implied: false,
     column: nil,
@@ -44,7 +45,10 @@ defmodule Bee.Entity.Attribute do
   defp with_storage(attr) do
     case attr.kind do
       :text ->
-        %{attr | kind: :string, storage: :text}
+        %{attr | storage: :string}
+
+      :datetime ->
+        %{attr | storage: :utc_datetime}
 
       kind ->
         %{attr | storage: kind}

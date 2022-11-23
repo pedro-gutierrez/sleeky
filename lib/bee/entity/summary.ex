@@ -7,11 +7,6 @@ defmodule Bee.Entity.Summary do
     |> Map.put(:attributes, [])
     |> Map.put(:parents, [])
     |> Map.put(:children, [])
-  end
-
-  def new(other) do
-    IO.inspect(other: other)
-
-    raise "plop"
+    |> Map.put(:keys, [])
   end
 end

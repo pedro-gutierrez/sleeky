@@ -6,7 +6,8 @@ defmodule Bee.Entity.Ecto do
     Bee.Entity.Ecto.FieldAttributes,
     Bee.Entity.Ecto.Schema,
     Bee.Entity.Ecto.Changesets,
-    Bee.Entity.Ecto.FieldSpecs
+    Bee.Entity.Ecto.FieldSpecs,
+    Bee.Entity.Ecto.Slug
   ]
 
   def ast(entity) do

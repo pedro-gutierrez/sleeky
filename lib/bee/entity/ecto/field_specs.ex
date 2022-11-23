@@ -13,7 +13,6 @@ defmodule Bee.Entity.Ecto.FieldSpecs do
          ])
        ))
     end
-    |> print(entity.module == Blog.User)
   end
 
   defp attributes(entity) do

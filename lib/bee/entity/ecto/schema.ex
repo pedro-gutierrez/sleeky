@@ -18,6 +18,7 @@ defmodule Bee.Entity.Ecto.Schema do
          ))
       end
     end
+    |> print()
   end
 
   defp ecto_schema_timestamps do
@@ -31,17 +32,17 @@ defmodule Bee.Entity.Ecto.Schema do
 
     for attr <- attrs do
       name = attr.name
-      kind = attr.kind
+      storage = attr.storage
 
       case attr.default do
         nil ->
           quote do
-            field(unquote(name), unquote(kind))
+            field(unquote(name), unquote(storage))
           end
 
         default ->
           quote do
-            field(unquote(name), unquote(kind), default: unquote(default))
+            field(unquote(name), unquote(storage), default: unquote(default))
           end
       end
     end

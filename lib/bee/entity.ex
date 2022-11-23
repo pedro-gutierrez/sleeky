@@ -19,7 +19,7 @@ defmodule Bee.Entity do
   ]
 
   @implied_attributes [
-    [name: :id, kind: :string],
+    [name: :id, kind: :id],
     [name: :inserted_at, kind: :datetime],
     [name: :updated_at, kind: :datetime]
   ]

@@ -4,6 +4,8 @@ defmodule Blog.Post do
   attribute :subject, :string do
   end
 
+  slug(:subject)
+
   belongs_to(:user)
   has_many(:comments)
   has_many(:tags)
