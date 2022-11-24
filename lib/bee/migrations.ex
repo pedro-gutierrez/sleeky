@@ -21,12 +21,9 @@ defmodule Bee.Migrations do
     Migration.diff(existing, new, version: next_version)
   end
 
+  defp next_version([]), do: 1
+
   defp next_version(migrations) do
-    migrations
-    |> List.last()
-    |> case do
-      nil -> 1
-      m -> m.version + 1
-    end
+    List.last(migrations).version + 1
   end
 end

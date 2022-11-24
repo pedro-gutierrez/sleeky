@@ -8,6 +8,10 @@ defmodule Bee.Migrations.Table do
     constraints: []
   ]
 
+  def new(opts) do
+    struct(__MODULE__, opts)
+  end
+
   def from_entity(entity) do
     %__MODULE__{name: entity.table()}
   end

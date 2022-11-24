@@ -3,6 +3,8 @@ defmodule Bee.Migrations.State do
   alias Bee.Migrations.Migration
   alias Bee.Migrations.Table
 
+  @type t :: %__MODULE__{}
+
   defstruct tables: %{}
 
   def table?(state, name) do
@@ -12,7 +14,7 @@ defmodule Bee.Migrations.State do
   def from_migrations(migrations) do
     migrations
     |> Enum.reject(& &1.skip)
-    |> Enum.reduce(%__MODULE__{}, &Migration.into/2)
+    |> Enum.reduce(%__MODULE__{}, &Migration.aggregate/2)
   end
 
   def from_schema(schema) do
@@ -24,15 +26,17 @@ defmodule Bee.Migrations.State do
   defp with_entity(entity, state) do
     entity
     |> Table.from_entity()
-    |> add_to(:tables, state)
+    |> add_new!(:tables, state)
   end
 
-  defp add_to(item, key, state) do
-    items =
-      state
-      |> Map.get(key, %{})
-      |> Map.put(item.name, item)
+  def add_new!(item, key, state) do
+    items = Map.fetch!(state, key)
 
+    if Map.has_key?(items, item.name) do
+      raise "Item #{inspect(item)} already exists in state: #{Map.keys(items)}"
+    end
+
+    items = Map.put(items, item.name, item)
     Map.put(state, key, items)
   end
 end

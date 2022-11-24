@@ -23,7 +23,7 @@ defmodule Mix.Tasks.Bee.Migrations do
     |> Migrations.existing()
     |> Migrations.missing(schema)
     |> case do
-      nil ->
+      %{steps: []} ->
         Mix.shell().info("No migrations to write")
 
       m ->

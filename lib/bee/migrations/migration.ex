@@ -1,6 +1,7 @@
 defmodule Bee.Migrations.Migration do
   @moduledoc false
   import Bee.Inspector
+  import Bee.Migrations.Ecto
 
   @mutations [
     Bee.Migrations.CreateTable
@@ -9,6 +10,7 @@ defmodule Bee.Migrations.Migration do
   defstruct [
     :version,
     :ts,
+    name: "bee",
     skip: false,
     steps: []
   ]
@@ -34,7 +36,7 @@ defmodule Bee.Migrations.Migration do
   end
 
   def filename(m) do
-    [m.timestamp, "_v", m.version, ".exs"]
+    [m.timestamp, "_", m.name, "_v", m.version, ".exs"]
     |> Enum.map(&to_string/1)
     |> Enum.join("")
   end
@@ -46,27 +48,39 @@ defmodule Bee.Migrations.Migration do
   end
 
   def encode(migration) do
-    Enum.reduce(migration.steps, [], fn step, code ->
-      code ++ step.__struct__.encode(migration)
-    end)
-    |> flatten()
+    body =
+      migration.steps
+      |> Enum.reduce([], fn step, code ->
+        code ++ [step.__struct__.encode(step)]
+      end)
+      |> flatten()
+
+    migration(migration.version, body)
   end
 
-  def decode({:defmodule, _, [{:__aliases__, _, _}, [do: {:__block__, [], steps}]]}) do
-    Enum.reduce(@mutations, new(), fn mutation, m ->
+  def decode(migration) do
+    version = version(migration)
+    steps = steps(migration)
+
+    Enum.reduce(@mutations, new(version: version), fn mutation, m ->
       Enum.reduce(steps, m, fn step, m2 ->
-        mutation.decode(step, m2)
+        step
+        |> mutation.decode()
+        |> with_step(m2)
       end)
     end)
   end
 
-  def into(%{steps: steps}, state) do
-    Enum.reduce(steps, state, & &1.__struct__.into(&1, &2))
+  def aggregate(%{steps: steps}, state) do
+    Enum.reduce(steps, state, & &1.__struct__.aggregate(&1, &2))
   end
 
   def diff(old, new, opts) do
     Enum.reduce(@mutations, new(opts), fn mutation, m ->
-      mutation.diff(old, new, m)
+      old
+      |> mutation.diff(new)
+      |> flatten()
+      |> Enum.reduce(m, &with_step/2)
     end)
   end
 
