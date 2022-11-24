@@ -18,7 +18,6 @@ defmodule Bee.Entity.Ecto.Schema do
          ))
       end
     end
-    |> print()
   end
 
   defp ecto_schema_timestamps do

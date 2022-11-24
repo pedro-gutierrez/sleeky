@@ -19,6 +19,9 @@ defmodule Bee.Entity.Ecto do
       @primary_key {:id, :binary_id, autogenerate: false}
       @timestamps_opts [type: :utc_datetime]
 
+      def virtual?, do: false
+      def table, do: unquote(entity.table)
+
       unquote_splicing(
         @generators
         |> Enum.map(& &1.ast(entity))

@@ -3,6 +3,7 @@ defmodule Bee.Entity.Virtual do
 
   def ast(_entity) do
     quote do
+      def virtual?, do: true
     end
   end
 end

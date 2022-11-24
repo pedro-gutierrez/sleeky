@@ -9,7 +9,13 @@ defmodule Bee.Schema do
   end
 
   defmacro __before_compile__(_env) do
-    _schema = __CALLER__.module
+    schema = __CALLER__.module
+    entities = entities(schema)
+    Module.delete_attribute(schema, :entities)
+
+    quote do
+      def entities, do: unquote(entities)
+    end
   end
 
   def entities(schema), do: Module.get_attribute(schema, :entities)

@@ -3,4 +3,7 @@ defmodule Blog.Schema do
 
   add(Blog.User)
   add(Blog.Post)
+  add(Blog.Comment)
+  add(Blog.Tag)
+  add(Blog.Vote)
 end

@@ -28,7 +28,6 @@ defmodule Bee.Entity.Ecto.Changesets do
       ),
       delete_changeset(entity)
     ]
-    |> print()
   end
 
   defp insert_changeset(
