@@ -8,6 +8,7 @@ defmodule Bee.Migrations.Ecto do
   def steps({:defmodule, _, [{:__aliases__, _, _}, [do: {:__block__, [], steps}]]}) do
     Enum.flat_map(steps, fn
       {:def, _, [{:up, _, _}, [do: {:__block__, _, steps}]]} -> steps
+      {:def, _, [{:up, _, _}, [do: {_, _, _} = step]]} -> [step]
       {:use, _, [{:__aliases__, _, [:Ecto, :Migration]}]} -> []
       {:def, _, [{:down, _, _}, [do: _]]} -> []
     end)

@@ -4,7 +4,8 @@ defmodule Bee.Migrations.Migration do
   import Bee.Migrations.Ecto
 
   @mutations [
-    Bee.Migrations.CreateTable
+    Bee.Migrations.CreateTable,
+    Bee.Migrations.DropTable
   ]
 
   defstruct [
@@ -66,7 +67,7 @@ defmodule Bee.Migrations.Migration do
       Enum.reduce(steps, m, fn step, m2 ->
         step
         |> mutation.decode()
-        |> with_step(m2)
+        |> into(m2)
       end)
     end)
   end
@@ -80,11 +81,13 @@ defmodule Bee.Migrations.Migration do
       old
       |> mutation.diff(new)
       |> flatten()
-      |> Enum.reduce(m, &with_step/2)
+      |> Enum.reduce(m, &into/2)
     end)
   end
 
-  def with_step(step, migration) do
+  def into(nil, migration), do: migration
+
+  def into(step, migration) do
     steps = migration.steps ++ [step]
     %{migration | steps: steps}
   end

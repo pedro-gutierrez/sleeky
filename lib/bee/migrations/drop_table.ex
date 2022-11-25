@@ -1,4 +1,4 @@
-defmodule Bee.Migrations.CreateTable do
+defmodule Bee.Migrations.DropTable do
   @moduledoc false
   alias Bee.Migrations.State
   alias Bee.Migrations.Step
@@ -13,8 +13,8 @@ defmodule Bee.Migrations.CreateTable do
   end
 
   @impl Step
-  def decode({:create, _, [{:table, _, [name, _opts]}, [do: {:__block__, _, columns}]]}) do
-    [name: name, columns: columns]
+  def decode({:drop_if_exists, _, [{:table, _, [name]}]}) do
+    [name: name]
     |> Table.new()
     |> new()
   end
@@ -23,24 +23,21 @@ defmodule Bee.Migrations.CreateTable do
 
   @impl Step
   def encode(%__MODULE__{} = step) do
-    {:create, [line: 1],
+    {:drop_if_exists, [line: 1],
      [
-       {:table, [line: 1], [step.table.name, [primary_key: false]]},
-       [
-         do: {:__block__, [], []}
-       ]
+       {:table, [line: 1], [step.table.name]}
      ]}
   end
 
   @impl Step
   def aggregate(%__MODULE__{} = step, state) do
-    State.add_new!(step.table, :tables, state)
+    State.remove_existing!(step.table, :tables, state)
   end
 
   @impl Step
   def diff(old, new) do
-    Enum.map(new.tables, fn {_, table} ->
-      if !State.table?(old, table.name) do
+    Enum.map(old.tables, fn {_, table} ->
+      if !State.table?(new, table.name) do
         new(table)
       else
         nil

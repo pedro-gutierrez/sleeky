@@ -33,10 +33,23 @@ defmodule Bee.Migrations.State do
     items = Map.fetch!(state, key)
 
     if Map.has_key?(items, item.name) do
-      raise "Item #{inspect(item)} already exists in state: #{Map.keys(items)}"
+      raise "Cannot add into #{inspect(key)}. Item #{inspect(item)} already exists in state: #{Map.keys(items)}"
     end
 
     items = Map.put(items, item.name, item)
+    Map.put(state, key, items)
+  end
+
+  def remove_existing!(item, key, state) do
+    items = Map.fetch!(state, key)
+
+    if !Map.has_key?(items, item.name) do
+      keys = Map.keys(items)
+
+      raise "Cannot remove from #{inspect(key)}. Item #{inspect(item.name)} does not exist in state: #{inspect(keys)}"
+    end
+
+    items = Map.drop(items, [item.name])
     Map.put(state, key, items)
   end
 end
