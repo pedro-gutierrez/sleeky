@@ -11,6 +11,10 @@ defmodule Bee.Entity.Ecto do
   ]
 
   def ast(entity) do
+    attributes = entity.attributes
+    parents = entity.parents
+    children = entity.children
+
     quote do
       use Ecto.Schema
       import Ecto.Changeset
@@ -21,6 +25,9 @@ defmodule Bee.Entity.Ecto do
 
       def virtual?, do: false
       def table, do: unquote(entity.table)
+      def attributes, do: unquote(Macro.escape(attributes))
+      def parents, do: unquote(Macro.escape(parents))
+      def children, do: unquote(Macro.escape(children))
 
       unquote_splicing(
         @generators

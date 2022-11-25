@@ -17,7 +17,8 @@ defmodule Bee.Entity.Attribute do
     required: true,
     immutable: false,
     virtual: false,
-    computed: false
+    computed: false,
+    timestamp: false
   ]
 
   def new(fields) do
@@ -28,6 +29,7 @@ defmodule Bee.Entity.Attribute do
     |> with_storage()
     |> with_aliases()
     |> maybe_implied()
+    |> maybe_timestamp()
   end
 
   def id?(attr) do
@@ -44,6 +46,9 @@ defmodule Bee.Entity.Attribute do
 
   defp with_storage(attr) do
     case attr.kind do
+      :id ->
+        %{attr | storage: :uuid}
+
       :text ->
         %{attr | storage: :string}
 
@@ -61,6 +66,13 @@ defmodule Bee.Entity.Attribute do
 
   defp maybe_implied(attr) do
     implied = attr.name in [:id, :inserted_at, :updated_at]
+
     %{attr | implied: implied}
+  end
+
+  defp maybe_timestamp(attr) do
+    timestamp = attr.name in [:inserted_at, :updated_at]
+
+    %{attr | timestamp: timestamp}
   end
 end

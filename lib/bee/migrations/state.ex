@@ -33,7 +33,9 @@ defmodule Bee.Migrations.State do
     items = Map.fetch!(state, key)
 
     if Map.has_key?(items, item.name) do
-      raise "Cannot add into #{inspect(key)}. Item #{inspect(item)} already exists in state: #{Map.keys(items)}"
+      keys = Map.keys(items)
+
+      raise "Cannot add into #{inspect(key)}. Item #{inspect(item.name)} already exists in state: #{inspect(keys)}"
     end
 
     items = Map.put(items, item.name, item)

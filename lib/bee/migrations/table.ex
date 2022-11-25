@@ -1,11 +1,10 @@
 defmodule Bee.Migrations.Table do
   @moduledoc false
+  alias Bee.Migrations.Column
 
   defstruct [
     :name,
-    columns: [],
-    indices: [],
-    constraints: []
+    columns: []
   ]
 
   def new(opts) do
@@ -13,6 +12,9 @@ defmodule Bee.Migrations.Table do
   end
 
   def from_entity(entity) do
-    %__MODULE__{name: entity.table()}
+    name = entity.table()
+    columns = Column.all_for_entity(entity)
+
+    %__MODULE__{name: name, columns: columns}
   end
 end
