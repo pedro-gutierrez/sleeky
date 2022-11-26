@@ -22,7 +22,7 @@ defmodule Bee.Migrations.Step do
     quote do
       @behaviour Bee.Migrations.Step
       alias Bee.Migrations.Step
-      alias Bee.Database.ForeignKey
+      alias Bee.Database.Constraint
       alias Bee.Database.State
       alias Bee.Database.Table
 

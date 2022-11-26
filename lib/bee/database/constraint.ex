@@ -1,4 +1,4 @@
-defmodule Bee.Database.ForeignKey do
+defmodule Bee.Database.Constraint do
   @moduledoc false
   import Bee.Inspector
   alias Bee.Entity.Relation
@@ -7,7 +7,6 @@ defmodule Bee.Database.ForeignKey do
 
   def new(%Relation{kind: :parent} = rel) do
     new(
-      name: rel.name,
       table: rel.entity.table,
       column: rel.column,
       target: rel.target.table,
@@ -21,9 +20,13 @@ defmodule Bee.Database.ForeignKey do
     |> with_name()
   end
 
-  defp with_name(foreign_key) do
-    name = join([foreign_key.table, foreign_key.column])
-    %{foreign_key | name: name}
+  defp with_name(constraint) do
+    if is_nil(constraint.name) do
+      name = join([constraint.table, constraint.column, "fkey"])
+      %{constraint | name: name}
+    else
+      constraint
+    end
   end
 
   def from_entity(entity) do

@@ -1,7 +1,7 @@
 defmodule Bee.Migrations do
   @moduledoc false
   alias Bee.Migrations.Migration
-  alias Bee.Database.ForeignKey
+  alias Bee.Database.Constraint
   alias Bee.Database.State
   alias Bee.Database.Table
 
@@ -19,8 +19,6 @@ defmodule Bee.Migrations do
     new_state = state_from_schema(schema)
     old_state = state_from_migrations(migrations)
     next_version = next_version(migrations)
-
-    IO.inspect(old_state: old_state, new_state: new_state)
 
     Migration.diff(old_state, new_state, version: next_version)
   end
@@ -44,8 +42,8 @@ defmodule Bee.Migrations do
       |> State.add_new!(:tables, state)
 
     entity
-    |> ForeignKey.from_entity()
-    |> Enum.reduce(state, &State.add_new!(&1, :foreign_keys, &2))
+    |> Constraint.from_entity()
+    |> Enum.reduce(state, &State.add_new!(&1, :constraints, &2))
   end
 
   defp next_version([]), do: 1

@@ -1,11 +1,11 @@
-defmodule Bee.Migrations.CreateForeignKey do
+defmodule Bee.Migrations.CreateConstraint do
   @moduledoc false
   use Bee.Migrations.Step
 
-  defstruct [:foreign_key]
+  defstruct [:constraint]
 
   def new(key) do
-    %__MODULE__{foreign_key: key}
+    %__MODULE__{constraint: key}
   end
 
   @impl Step
@@ -15,7 +15,7 @@ defmodule Bee.Migrations.CreateForeignKey do
       ) do
     [table: table, column: column, target: other]
     |> Keyword.merge(opts)
-    |> ForeignKey.new()
+    |> Constraint.new()
     |> new()
   end
 
@@ -25,19 +25,19 @@ defmodule Bee.Migrations.CreateForeignKey do
   def encode(step) do
     {:alter, [line: 1],
      [
-       {:table, [line: 1], [step.foreign_key.table]},
+       {:table, [line: 1], [step.constraint.table]},
        [
          do:
            {:modify, [line: 1],
             [
-              step.foreign_key.column,
+              step.constraint.column,
               {:references, [line: 1],
                [
-                 step.foreign_key.target,
+                 step.constraint.target,
                  [
-                   type: step.foreign_key.type,
-                   null: step.foreign_key.null,
-                   on_delete: step.foreign_key.on_delete
+                   type: step.constraint.type,
+                   null: step.constraint.null,
+                   on_delete: step.constraint.on_delete
                  ]
                ]}
             ]}
@@ -47,9 +47,9 @@ defmodule Bee.Migrations.CreateForeignKey do
 
   @impl Step
   def diff(old, new) do
-    new.foreign_keys
+    new.constraints
     |> Map.values()
-    |> Enum.reject(&State.has?(old, :foreign_keys, &1.name))
+    |> Enum.reject(&State.has?(old, :constraints, &1.name))
     |> Enum.map(&new/1)
   end
 end
