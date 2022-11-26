@@ -1,11 +1,11 @@
 defmodule Bee.Migrations.CreateTable do
   @moduledoc false
-  alias Bee.Migrations.State
-  alias Bee.Migrations.Step
-  alias Bee.Migrations.Table
-  alias Bee.Migrations.Column
+  use Bee.Migrations.Step
 
-  @behaviour Bee.Migrations.Step
+  alias Bee.Database.State
+  alias Bee.Database.Table
+  alias Bee.Database.Column
+  alias Bee.Migrations.Step
 
   defstruct [:table]
 
@@ -15,13 +15,15 @@ defmodule Bee.Migrations.CreateTable do
 
   @impl Step
   def decode({:create, _, [{:table, _, [name, _opts]}, [do: {:__block__, _, columns}]]}) do
+    columns = Column.decode(columns)
+
     [name: name, columns: columns]
     |> Table.new()
     |> new()
   end
 
   def decode({:create, _, [{:table, _, [name, _opts]}, [do: column]]}) do
-    [name: name, columns: [column]]
+    [name: name, columns: [Column.decode(column)]]
     |> Table.new()
     |> new()
   end
@@ -32,9 +34,7 @@ defmodule Bee.Migrations.CreateTable do
   def encode(%__MODULE__{} = step) do
     columns =
       Enum.map(step.table.columns, fn col ->
-        args = Column.encode_args(col)
-
-        {:add, [line: 1], args}
+        {:add, [line: 1], Column.encode(col)}
       end)
 
     {:create, [line: 1],
@@ -47,18 +47,10 @@ defmodule Bee.Migrations.CreateTable do
   end
 
   @impl Step
-  def aggregate(%__MODULE__{} = step, state) do
-    State.add_new!(step.table, :tables, state)
-  end
-
-  @impl Step
   def diff(old, new) do
-    Enum.map(new.tables, fn {_, table} ->
-      if !State.table?(old, table.name) do
-        new(table)
-      else
-        nil
-      end
-    end)
+    new.tables
+    |> Map.values()
+    |> Enum.reject(&State.has?(old, :tables, &1.name))
+    |> Enum.map(&new/1)
   end
 end

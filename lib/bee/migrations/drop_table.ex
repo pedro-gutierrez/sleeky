@@ -1,10 +1,6 @@
 defmodule Bee.Migrations.DropTable do
   @moduledoc false
-  alias Bee.Migrations.State
-  alias Bee.Migrations.Step
-  alias Bee.Migrations.Table
-
-  @behaviour Bee.Migrations.Step
+  use Bee.Migrations.Step
 
   defstruct [:table]
 
@@ -30,14 +26,9 @@ defmodule Bee.Migrations.DropTable do
   end
 
   @impl Step
-  def aggregate(%__MODULE__{} = step, state) do
-    State.remove_existing!(step.table, :tables, state)
-  end
-
-  @impl Step
   def diff(old, new) do
     Enum.map(old.tables, fn {_, table} ->
-      if !State.table?(new, table.name) do
+      if !State.has?(new, :tables, table.name) do
         new(table)
       else
         nil

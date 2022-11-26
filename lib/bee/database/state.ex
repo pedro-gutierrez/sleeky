@@ -1,32 +1,16 @@
-defmodule Bee.Migrations.State do
+defmodule Bee.Database.State do
   @moduledoc false
-  alias Bee.Migrations.Migration
-  alias Bee.Migrations.Table
 
   @type t :: %__MODULE__{}
 
-  defstruct tables: %{}
+  defstruct tables: %{}, foreign_keys: %{}
 
-  def table?(state, name) do
-    Map.has_key?(state.tables, name)
-  end
+  def new, do: %__MODULE__{}
 
-  def from_migrations(migrations) do
-    migrations
-    |> Enum.reject(& &1.skip)
-    |> Enum.reduce(%__MODULE__{}, &Migration.aggregate/2)
-  end
-
-  def from_schema(schema) do
-    schema.entities
-    |> Enum.reject(& &1.virtual?)
-    |> Enum.reduce(%__MODULE__{}, &with_entity/2)
-  end
-
-  defp with_entity(entity, state) do
-    entity
-    |> Table.from_entity()
-    |> add_new!(:tables, state)
+  def has?(state, key, name) do
+    state
+    |> Map.fetch!(key)
+    |> Map.has_key?(name)
   end
 
   def add_new!(item, key, state) do

@@ -1,7 +1,9 @@
 defmodule Bee.Migrations do
   @moduledoc false
   alias Bee.Migrations.Migration
-  alias Bee.Migrations.State
+  alias Bee.Database.ForeignKey
+  alias Bee.Database.State
+  alias Bee.Database.Table
 
   def existing(dir) do
     Path.join([dir, "*_bee_*.exs"])
@@ -14,11 +16,36 @@ defmodule Bee.Migrations do
   end
 
   def missing(migrations, schema) do
-    new = State.from_schema(schema)
-    existing = State.from_migrations(migrations)
+    new_state = state_from_schema(schema)
+    old_state = state_from_migrations(migrations)
     next_version = next_version(migrations)
 
-    Migration.diff(existing, new, version: next_version)
+    IO.inspect(old_state: old_state, new_state: new_state)
+
+    Migration.diff(old_state, new_state, version: next_version)
+  end
+
+  defp state_from_migrations(migrations) do
+    migrations
+    |> Enum.reject(& &1.skip)
+    |> Enum.reduce(State.new(), &Migration.aggregate/2)
+  end
+
+  defp state_from_schema(schema) do
+    schema.entities
+    |> Enum.reject(& &1.virtual?)
+    |> Enum.reduce(State.new(), &state_from_entity/2)
+  end
+
+  defp state_from_entity(entity, state) do
+    state =
+      entity
+      |> Table.from_entity()
+      |> State.add_new!(:tables, state)
+
+    entity
+    |> ForeignKey.from_entity()
+    |> Enum.reduce(state, &State.add_new!(&1, :foreign_keys, &2))
   end
 
   defp next_version([]), do: 1

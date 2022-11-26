@@ -33,6 +33,13 @@ defmodule Bee.Inspector do
   def as_list(items) when is_list(items), do: items
   def as_list(single), do: [single]
 
+  def join(items) do
+    items
+    |> strings()
+    |> Enum.join("_")
+    |> String.to_atom()
+  end
+
   def name(entity) do
     entity
     |> Module.split()

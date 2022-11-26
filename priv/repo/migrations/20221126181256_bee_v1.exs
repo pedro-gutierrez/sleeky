@@ -38,6 +38,30 @@ defmodule(Bee.Migration.V1) do
       add(:user_id, :uuid, null: false)
       timestamps()
     end
+
+    alter(table(:comments)) do
+      modify(:post_id, references(:posts, type: :uuid, null: false, on_delete: :nothing))
+    end
+
+    alter(table(:comments)) do
+      modify(:user_id, references(:users, type: :uuid, null: false, on_delete: :nothing))
+    end
+
+    alter(table(:posts)) do
+      modify(:user_id, references(:users, type: :uuid, null: false, on_delete: :nothing))
+    end
+
+    alter(table(:tags)) do
+      modify(:post_id, references(:posts, type: :uuid, null: false, on_delete: :nothing))
+    end
+
+    alter(table(:votes)) do
+      modify(:comment_id, references(:comments, type: :uuid, null: false, on_delete: :nothing))
+    end
+
+    alter(table(:votes)) do
+      modify(:user_id, references(:users, type: :uuid, null: false, on_delete: :nothing))
+    end
   end
 
   def(down) do

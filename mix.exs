@@ -25,6 +25,7 @@ defmodule Bee.MixProject do
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:inflex, "~> 2.0.0"},
+      {:postgrex, ">= 0.0.0"},
       {:slugify, "~> 1.3"}
     ]
   end
