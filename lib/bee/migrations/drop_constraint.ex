@@ -1,6 +1,10 @@
 defmodule Bee.Migrations.DropConstraint do
   @moduledoc false
-  use Bee.Migrations.Step
+  @behaviour Bee.Migrations.Step
+
+  alias Bee.Database.Constraint
+  alias Bee.Database.State
+  alias Bee.Migrations.Step
 
   defstruct [:constraint]
 
@@ -21,6 +25,11 @@ defmodule Bee.Migrations.DropConstraint do
   def encode(step) do
     {:drop_if_exists, [line: 1],
      [{:constraint, [line: 1], [step.constraint.table, step.constraint.name]}]}
+  end
+
+  @impl Step
+  def aggregate(step, state) do
+    State.remove!(step.constraint, :constraints, state)
   end
 
   @impl Step

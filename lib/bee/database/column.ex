@@ -1,6 +1,6 @@
 defmodule Bee.Database.Column do
   @moduledoc false
-
+  alias Bee.Database.ColumnOpts
   alias Bee.Entity.Attribute
   alias Bee.Entity.Relation
 
@@ -20,6 +20,14 @@ defmodule Bee.Database.Column do
     |> with_references(opts)
     |> with_null(opts)
     |> with_default(opts)
+  end
+
+  def new(name) when is_atom(name) do
+    new(name, nil, [])
+  end
+
+  def new([name, kind, opts]) do
+    new(name, kind, opts)
   end
 
   def new(%Attribute{} = attr) do
@@ -54,6 +62,25 @@ defmodule Bee.Database.Column do
       |> maybe_encode_primary_key(col)
 
     [col.name, col.kind, opts]
+  end
+
+  def apply_changes(%__MODULE__{} = col, %ColumnOpts{} = changes) do
+    Enum.reduce(changes.opts, col, fn {key, value}, c ->
+      Map.put(c, key, value)
+    end)
+  end
+
+  def diff(%__MODULE__{} = old, %__MODULE__{} = new) do
+    changes = ColumnOpts.new(new.name, [])
+
+    Enum.reduce([:kind, :default, :primary_key, :references, :null], changes, fn key, changes ->
+      if Map.get(old, key) != Map.get(new, key) do
+        opts = Keyword.put(changes.opts, key, Map.get(new, key))
+        %{changes | opts: opts}
+      else
+        changes
+      end
+    end)
   end
 
   defp with_null(col, opts) do

@@ -39,11 +39,11 @@ defmodule Bee.Migrations do
     state =
       entity
       |> Table.from_entity()
-      |> State.add_new!(:tables, state)
+      |> State.add!(:tables, state)
 
     entity
     |> Constraint.from_entity()
-    |> Enum.reduce(state, &State.add_new!(&1, :constraints, &2))
+    |> Enum.reduce(state, &State.add!(&1, :constraints, &2))
   end
 
   defp next_version([]), do: 1

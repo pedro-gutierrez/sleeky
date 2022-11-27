@@ -1,6 +1,10 @@
 defmodule Bee.Migrations.DropTable do
   @moduledoc false
-  use Bee.Migrations.Step
+  @behaviour Bee.Migrations.Step
+
+  alias Bee.Database.State
+  alias Bee.Database.Table
+  alias Bee.Migrations.Step
 
   defstruct [:table]
 
@@ -23,6 +27,11 @@ defmodule Bee.Migrations.DropTable do
      [
        {:table, [line: 1], [step.table.name]}
      ]}
+  end
+
+  @impl Step
+  def aggregate(step, state) do
+    State.remove!(step.table, :tables, state)
   end
 
   @impl Step

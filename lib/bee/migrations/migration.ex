@@ -5,6 +5,7 @@ defmodule Bee.Migrations.Migration do
 
   @mutations [
     Bee.Migrations.CreateTable,
+    Bee.Migrations.AlterTable,
     Bee.Migrations.CreateConstraint,
     Bee.Migrations.DropConstraint,
     Bee.Migrations.DropTable

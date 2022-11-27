@@ -13,7 +13,13 @@ defmodule Bee.Database.State do
     |> Map.has_key?(name)
   end
 
-  def add_new!(item, key, state) do
+  def find!(name, key, state) do
+    state
+    |> Map.fetch!(key)
+    |> Map.fetch!(name)
+  end
+
+  def add!(item, key, state) do
     items = Map.fetch!(state, key)
 
     if Map.has_key?(items, item.name) do
@@ -26,7 +32,7 @@ defmodule Bee.Database.State do
     Map.put(state, key, items)
   end
 
-  def remove_existing!(item, key, state) do
+  def remove!(item, key, state) do
     items = Map.fetch!(state, key)
 
     if !Map.has_key?(items, item.name) do
@@ -36,6 +42,15 @@ defmodule Bee.Database.State do
     end
 
     items = Map.drop(items, [item.name])
+    Map.put(state, key, items)
+  end
+
+  def replace!(item, key, state) do
+    items =
+      state
+      |> Map.fetch!(key)
+      |> Map.put(item.name, item)
+
     Map.put(state, key, items)
   end
 end

@@ -1,6 +1,10 @@
 defmodule Bee.Migrations.CreateConstraint do
   @moduledoc false
-  use Bee.Migrations.Step
+  @behaviour Bee.Migrations.Step
+
+  alias Bee.Migrations.Step
+  alias Bee.Database.Constraint
+  alias Bee.Database.State
 
   defstruct [:constraint]
 
@@ -43,6 +47,11 @@ defmodule Bee.Migrations.CreateConstraint do
             ]}
        ]
      ]}
+  end
+
+  @impl Step
+  def aggregate(step, state) do
+    State.add!(step.constraint, :constraints, state)
   end
 
   @impl Step

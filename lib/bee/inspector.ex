@@ -70,4 +70,11 @@ defmodule Bee.Inspector do
   def columns(items) do
     Enum.map(items, & &1.column)
   end
+
+  def indexed(items, key \\ :name) do
+    Enum.reduce(items, %{}, fn item, index ->
+      index_key = Map.get(item, key)
+      Map.put(index, index_key, item)
+    end)
+  end
 end
