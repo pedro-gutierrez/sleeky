@@ -8,7 +8,8 @@ defmodule Bee.Migrations.Migration do
     Bee.Migrations.AlterTable,
     Bee.Migrations.CreateConstraint,
     Bee.Migrations.DropConstraint,
-    Bee.Migrations.DropTable
+    Bee.Migrations.DropTable,
+    Bee.Migrations.CreateIndex
   ]
 
   defstruct [
