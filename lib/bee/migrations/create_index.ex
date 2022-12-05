@@ -2,10 +2,9 @@ defmodule Bee.Migrations.CreateIndex do
   @moduledoc false
   @behaviour Bee.Migrations.Step
 
+  alias Bee.Database.Index
   alias Bee.Database.State
   alias Bee.Migrations.Step
-
-  import Bee.Inspector
 
   defstruct [:index]
 
@@ -15,43 +14,37 @@ defmodule Bee.Migrations.CreateIndex do
 
   @impl Step
   def decode({:create, _, [{:unique_index, _, [table, columns, [name: name]]}]}) do
-    Index.new(table, columns: columns, name: name, unique: true)
+    Index.new(table: table, columns: columns, name: name, unique: true)
     |> new()
   end
 
   def decode({:create, _, [{:index, _, [table, columns, [name: name]]}]}) do
-    Index.new(table, columns: columns, name: name, unique: false)
+    Index.new(table: table, columns: columns, name: name, unique: false)
     |> new()
   end
 
   def decode(_), do: nil
 
   @impl Step
-  def encode(%__MODULE__{} = step) do
-    columns =
-      step.table.columns
-      |> Map.values()
-      |> Enum.map(&{:add, [line: 1], Column.encode(&1)})
+  def encode(%__MODULE__{index: index}) do
+    kind = if index.unique, do: :unique_index, else: :index
 
     {:create, [line: 1],
      [
-       {:table, [line: 1], [step.table.name, [primary_key: false]]},
-       [
-         do: {:__block__, [], columns ++ [{:timestamps, [line: 1], []}]}
-       ]
+       {kind, [line: 1], [index.table, index.columns, [name: index.name]]}
      ]}
   end
 
   @impl Step
-  def aggregate(step, state) do
-    State.add!(step.table, :tables, state)
+  def aggregate(%__MODULE__{} = step, state) do
+    State.add!(step.index, :indices, state)
   end
 
   @impl Step
   def diff(old, new) do
-    new.tables
+    new.indices
     |> Map.values()
-    |> Enum.reject(&State.has?(old, :tables, &1.name))
+    |> Enum.reject(&State.has?(old, :indices, &1.name))
     |> Enum.map(&new/1)
   end
 end

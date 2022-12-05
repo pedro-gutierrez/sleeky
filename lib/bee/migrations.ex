@@ -2,6 +2,7 @@ defmodule Bee.Migrations do
   @moduledoc false
   alias Bee.Migrations.Migration
   alias Bee.Database.Constraint
+  alias Bee.Database.Index
   alias Bee.Database.State
   alias Bee.Database.Table
 
@@ -41,9 +42,14 @@ defmodule Bee.Migrations do
       |> Table.from_entity()
       |> State.add!(:tables, state)
 
+    state =
+      entity
+      |> Constraint.all_from_entity()
+      |> Enum.reduce(state, &State.add!(&1, :constraints, &2))
+
     entity
-    |> Constraint.from_entity()
-    |> Enum.reduce(state, &State.add!(&1, :constraints, &2))
+    |> Index.all_from_entity()
+    |> Enum.reduce(state, &State.add!(&1, :indices, &2))
   end
 
   defp next_version([]), do: 1

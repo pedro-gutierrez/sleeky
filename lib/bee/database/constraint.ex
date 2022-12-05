@@ -29,7 +29,7 @@ defmodule Bee.Database.Constraint do
     end
   end
 
-  def from_entity(entity) do
+  def all_from_entity(entity) do
     Enum.map(entity.parents, &new/1)
   end
 end

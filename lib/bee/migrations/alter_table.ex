@@ -37,7 +37,7 @@ defmodule Bee.Migrations.AlterTable do
 
   def decode({:add, _, col}), do: {:add, Column.new(col)}
   def decode({:modify, _, col}), do: {:modify, ColumnOpts.decode(col)}
-  def decode({:remove, _, name}), do: {:remove, Column.new(name)}
+  def decode({:remove, _, [name]}), do: {:remove, Column.new(name)}
 
   def decode(_), do: nil
 

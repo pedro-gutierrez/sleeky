@@ -4,8 +4,11 @@ defmodule Blog.User do
   attribute :email, :string do
   end
 
+  attribute(:app, :string)
+
   has_many(:posts)
   has_many(:comments)
 
   unique(:email)
+  # unique([:email, :app])
 end

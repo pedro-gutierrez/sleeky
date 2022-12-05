@@ -3,7 +3,7 @@ defmodule Bee.Database.State do
 
   @type t :: %__MODULE__{}
 
-  defstruct tables: %{}, constraints: %{}
+  defstruct tables: %{}, constraints: %{}, indices: %{}
 
   def new, do: %__MODULE__{}
 
@@ -25,7 +25,11 @@ defmodule Bee.Database.State do
     if Map.has_key?(items, item.name) do
       keys = Map.keys(items)
 
-      raise "Cannot add into #{inspect(key)}. Item #{inspect(item.name)} already exists in state: #{inspect(keys)}"
+      raise """
+      Cannot add into #{inspect(key)}.
+
+      Item #{inspect(item.name)} already exists in state: #{inspect(keys)}
+      """
     end
 
     items = Map.put(items, item.name, item)
@@ -38,7 +42,11 @@ defmodule Bee.Database.State do
     if !Map.has_key?(items, item.name) do
       keys = Map.keys(items)
 
-      raise "Cannot remove from #{inspect(key)}. Item #{inspect(item.name)} does not exist in state: #{inspect(keys)}"
+      raise """
+      Cannot remove from #{inspect(key)}.
+
+      Item #{inspect(item.name)} does not exist in state: #{inspect(keys)}
+      """
     end
 
     items = Map.drop(items, [item.name])

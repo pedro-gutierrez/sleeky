@@ -14,6 +14,7 @@ defmodule Bee.Entity.Ecto do
     attributes = entity.attributes
     parents = entity.parents
     children = entity.children
+    keys = entity.keys
 
     quote do
       use Ecto.Schema
@@ -28,6 +29,7 @@ defmodule Bee.Entity.Ecto do
       def attributes, do: unquote(Macro.escape(attributes))
       def parents, do: unquote(Macro.escape(parents))
       def children, do: unquote(Macro.escape(children))
+      def keys, do: unquote(Macro.escape(keys))
 
       unquote_splicing(
         @generators
