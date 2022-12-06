@@ -1,9 +1,11 @@
 defmodule Blog.Schema do
   use Bee.Schema
 
-  add(Blog.User)
-  add(Blog.Post)
-  add(Blog.Comment)
-  add(Blog.Tag)
-  add(Blog.Vote)
+  enum(Blog.Sentiment)
+
+  entity(Blog.User)
+  entity(Blog.Post)
+  entity(Blog.Comment)
+  entity(Blog.Tag)
+  entity(Blog.Vote)
 end

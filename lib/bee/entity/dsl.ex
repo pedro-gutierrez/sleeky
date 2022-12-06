@@ -15,6 +15,8 @@ defmodule Bee.Entity.Dsl do
       [name: name, kind: kind, entity: entity]
       |> Attribute.new()
       |> with_opts(opts)
+      |> Attribute.maybe_immutable(opts)
+      |> Attribute.maybe_enum(opts)
       |> add_to(:attributes, entity)
 
     Module.put_attribute(module, :entity, entity)

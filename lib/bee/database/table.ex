@@ -1,7 +1,7 @@
 defmodule Bee.Database.Table do
   @moduledoc false
   alias Bee.Database.Column
-  alias Bee.Database.ColumnOpts
+  alias Bee.Database.ColumnChanges
   import Bee.Inspector
 
   defstruct [
@@ -36,7 +36,7 @@ defmodule Bee.Database.Table do
     end
   end
 
-  def modify_column(%Column{} = column, %ColumnOpts{} = changes, %__MODULE__{} = table) do
+  def modify_column(%Column{} = column, %ColumnChanges{} = changes, %__MODULE__{} = table) do
     column = Column.apply_changes(column, changes)
     columns = Map.put(table.columns, column.name, column)
 

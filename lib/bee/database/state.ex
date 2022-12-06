@@ -3,7 +3,7 @@ defmodule Bee.Database.State do
 
   @type t :: %__MODULE__{}
 
-  defstruct tables: %{}, constraints: %{}, indices: %{}
+  defstruct tables: %{}, constraints: %{}, indices: %{}, enums: %{}
 
   def new, do: %__MODULE__{}
 

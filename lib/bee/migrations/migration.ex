@@ -4,13 +4,15 @@ defmodule Bee.Migrations.Migration do
   import Bee.Migrations.Ecto
 
   @mutations [
+    Bee.Migrations.CreateEnum,
     Bee.Migrations.CreateTable,
     Bee.Migrations.AlterTable,
     Bee.Migrations.CreateConstraint,
     Bee.Migrations.CreateIndex,
     Bee.Migrations.DropConstraint,
     Bee.Migrations.DropIndex,
-    Bee.Migrations.DropTable
+    Bee.Migrations.DropTable,
+    Bee.Migrations.DropEnum
   ]
 
   defstruct [

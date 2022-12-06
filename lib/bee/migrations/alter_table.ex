@@ -4,7 +4,7 @@ defmodule Bee.Migrations.AlterTable do
 
   alias Bee.Database.Table
   alias Bee.Database.Column
-  alias Bee.Database.ColumnOpts
+  alias Bee.Database.ColumnChanges
   alias Bee.Database.State
   alias Bee.Migrations.Step
 
@@ -36,13 +36,14 @@ defmodule Bee.Migrations.AlterTable do
   end
 
   def decode({:add, _, col}), do: {:add, Column.new(col)}
-  def decode({:modify, _, col}), do: {:modify, ColumnOpts.decode(col)}
+  def decode({:modify, _, col}), do: {:modify, ColumnChanges.decode(col)}
   def decode({:remove, _, [name]}), do: {:remove, Column.new(name)}
 
   def decode(_), do: nil
 
   @impl Step
   def encode(step) do
+    IO.inspect(step)
     add = step.add |> Map.values() |> Enum.map(&{:add, [line: 1], Column.encode(&1)})
     remove = step.remove |> Map.values() |> Enum.map(&{:remove, [line: 1], [&1.name]})
     modify = step.modify |> Map.values() |> Enum.map(&{:modify, [line: 1], Column.encode(&1)})
@@ -139,7 +140,7 @@ defmodule Bee.Migrations.AlterTable do
       new_column = Map.fetch!(new_table.columns, name)
       Column.diff(old_column, new_column)
     end)
-    |> Enum.reject(&ColumnOpts.empty?/1)
+    |> Enum.reject(&ColumnChanges.empty?/1)
     |> indexed()
   end
 end

@@ -2,7 +2,8 @@ defmodule(Bee.Migration.V15) do
   use(Ecto.Migration)
 
   def(up) do
-    create(unique_index(:users, [:email, :app], name: :users_email_app_idx))
+    drop_if_exists(index(:users, [], name: :email))
+    drop_if_exists(index(:posts, [], name: :slug))
   end
 
   def(down) do

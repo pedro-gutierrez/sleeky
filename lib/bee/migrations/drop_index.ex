@@ -13,7 +13,9 @@ defmodule Bee.Migrations.DropIndex do
   end
 
   @impl Step
-  def decode({:drop_if_exists, _, [{:index, _, [table, name]}]}) do
+  def decode({:drop_if_exists, _, [{:index, _, [table, _, opts]}]}) do
+    name = Keyword.fetch!(opts, :name)
+
     [name: name, table: table]
     |> Index.new()
     |> new()
@@ -23,12 +25,12 @@ defmodule Bee.Migrations.DropIndex do
 
   @impl Step
   def encode(%__MODULE__{index: index}) do
-    {:drop_if_exists, [line: 1], [{:index, [line: 1], [index.table, index.name]}]}
+    {:drop_if_exists, [line: 1], [{:index, [line: 1], [index.table, [], [name: index.name]]}]}
   end
 
   @impl Step
-  def aggregate(%__MODULE{index: index}, state) do
-    State.remove!(index, :indices, state)
+  def aggregate(%__MODULE__{} = step, state) do
+    State.remove!(step.index, :indices, state)
   end
 
   @impl Step

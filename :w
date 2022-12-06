@@ -4,9 +4,7 @@ defmodule Blog.Comment do
   attribute :text, :text do
   end
 
-  attribute :sentiment, :enum do
-    one_of(:sentiment)
-  end
+  attribute(:sentiment, one_of: :sentiment)
 
   belongs_to(:post)
   belongs_to(:user)

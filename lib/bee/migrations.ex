@@ -31,12 +31,15 @@ defmodule Bee.Migrations do
   end
 
   defp state_from_schema(schema) do
-    schema.entities
-    |> Enum.reject(& &1.virtual?)
-    |> Enum.reduce(State.new(), &state_from_entity/2)
+    state =
+      schema.entities
+      |> Enum.reject(& &1.virtual?)
+      |> Enum.reduce(State.new(), &state_with_entity/2)
+
+    Enum.reduce(schema.enums, state, &state_with_enum/2)
   end
 
-  defp state_from_entity(entity, state) do
+  defp state_with_entity(entity, state) do
     state =
       entity
       |> Table.from_entity()
@@ -50,6 +53,10 @@ defmodule Bee.Migrations do
     entity
     |> Index.all_from_entity()
     |> Enum.reduce(state, &State.add!(&1, :indices, &2))
+  end
+
+  defp state_with_enum(enum, state) do
+    State.add!(enum, :enums, state)
   end
 
   defp next_version([]), do: 1

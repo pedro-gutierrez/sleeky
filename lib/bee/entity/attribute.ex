@@ -10,6 +10,7 @@ defmodule Bee.Entity.Attribute do
     :default,
     :storage,
     :plugin,
+    enum: nil,
     aliases: [],
     implied: false,
     column: nil,
@@ -55,6 +56,9 @@ defmodule Bee.Entity.Attribute do
       :datetime ->
         %{attr | storage: :utc_datetime}
 
+      :enum ->
+        %{attr | storage: :string}
+
       kind ->
         %{attr | storage: kind}
     end
@@ -75,4 +79,16 @@ defmodule Bee.Entity.Attribute do
 
     %{attr | timestamp: timestamp}
   end
+
+  def maybe_immutable(attr, do: {:immutable, _, _}) do
+    %{attr | immutable: true}
+  end
+
+  def maybe_immutable(attr, _), do: attr
+
+  def maybe_enum(attr, do: {:one_of, _, [enum]}) do
+    %{attr | enum: enum}
+  end
+
+  def maybe_enum(attr, _), do: attr
 end
