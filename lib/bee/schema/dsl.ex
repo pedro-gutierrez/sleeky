@@ -1,13 +1,7 @@
 defmodule Bee.Schema.Dsl do
-  defmacro entity({:__aliases__, _, mod}) do
+  defmacro context({:__aliases__, _, mod}) do
     schema = __CALLER__.module
-    entity = Module.concat(mod)
-    Module.put_attribute(schema, :entities, entity)
-  end
-
-  defmacro enum({:__aliases__, _, mod}) do
-    schema = __CALLER__.module
-    enum = Module.concat(mod)
-    Module.put_attribute(schema, :enums, enum)
+    context = Module.concat(mod)
+    Module.put_attribute(schema, :contexts, context)
   end
 end
