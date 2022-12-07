@@ -10,6 +10,10 @@ defmodule Bee.Inspector do
     ast
   end
 
+  def module({:__aliases__, _, mod}) do
+    Module.concat(mod)
+  end
+
   def flatten(items) do
     items
     |> List.flatten()

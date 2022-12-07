@@ -1,8 +1,20 @@
 defmodule Bee.Context do
-  defmacro __using__(_) do
+  @moduledoc false
+
+  import Bee.Inspector
+
+  @generators [
+    Bee.Context.Info,
+    Bee.Context.ListActions
+  ]
+
+  defmacro __using__(opts) do
     context = __CALLER__.module
-    Module.register_attribute(context, :entities, persist: true, accumulate: true)
-    Module.register_attribute(context, :enums, persist: true, accumulate: true)
+    Module.register_attribute(context, :entities, persist: false, accumulate: true)
+    Module.register_attribute(context, :enums, persist: false, accumulate: true)
+
+    repo = opts |> Keyword.fetch!(:repo) |> module()
+    Module.put_attribute(context, :repo, repo)
 
     quote do
       import Bee.Context.Dsl, only: :macros
@@ -12,14 +24,11 @@ defmodule Bee.Context do
 
   defmacro __before_compile__(_env) do
     context = __CALLER__.module
+    repo = Module.get_attribute(context, :repo)
     entities = Module.get_attribute(context, :entities)
-    Module.delete_attribute(context, :entities)
     enums = Module.get_attribute(context, :enums)
-    Module.delete_attribute(context, :enums)
+    opts = [repo: repo, context: context]
 
-    quote do
-      def entities, do: unquote(entities)
-      def enums, do: unquote(enums)
-    end
+    Enum.flat_map(@generators, & &1.ast(entities, enums, opts))
   end
 end
