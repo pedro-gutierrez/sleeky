@@ -1,18 +1,13 @@
 defmodule Bee.Entity.Ecto.FieldSpecs do
   @moduledoc false
-  import Bee.Inspector
 
   def ast(entity) do
-    quote do
-      (unquote_splicing(
-         flatten([
-           attributes(entity),
-           parents(entity),
-           children(entity),
-           default()
-         ])
-       ))
-    end
+    [
+      attributes(entity),
+      parents(entity),
+      children(entity),
+      default()
+    ]
   end
 
   defp attributes(entity) do

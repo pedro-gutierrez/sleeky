@@ -1,5 +1,5 @@
 defmodule Blog.Content do
-  use Bee.Context, repo: Blog.Repo
+  use Bee.Context, repo: Blog.Repo, auth: Blog.Auth
 
   enum(Blog.Sentiment)
 

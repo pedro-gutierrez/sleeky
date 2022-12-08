@@ -9,4 +9,7 @@ defmodule Blog.Post do
   belongs_to(:user)
   has_many(:comments)
   has_many(:tags)
+
+  action(:list)
+  key([:user, :subject])
 end

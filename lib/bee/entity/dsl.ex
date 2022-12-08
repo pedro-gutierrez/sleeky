@@ -3,9 +3,22 @@ defmodule Bee.Entity.Dsl do
   alias Bee.Entity.Attribute
   alias Bee.Entity.Key
   alias Bee.Entity.Relation
+  alias Bee.Entity.Action
   import Bee.Entity
   import Bee.Inspector
   import Bee.Opts
+
+  defmacro action(name) do
+    module = __CALLER__.module
+    entity = Entity.entity(module)
+
+    entity =
+      [name: name, entity: entity]
+      |> Action.new()
+      |> add_to(:actions, entity)
+
+    Module.put_attribute(module, :entity, entity)
+  end
 
   defmacro attribute(name, kind, opts \\ nil) do
     module = __CALLER__.module
@@ -48,8 +61,19 @@ defmodule Bee.Entity.Dsl do
     Module.put_attribute(module, :entity, entity)
   end
 
-  defmacro unique(fields, opts \\ nil) do
+  defmacro unique(fields, opts \\ []) do
     module = __CALLER__.module
+    opts = Keyword.put(opts, :unique, true)
+    key(module, fields, opts)
+  end
+
+  defmacro key(fields, opts \\ []) do
+    module = __CALLER__.module
+    opts = Keyword.put(opts, :unique, false)
+    key(module, fields, opts)
+  end
+
+  defp key(module, fields, opts) do
     entity = Entity.entity(module)
 
     fields =
@@ -89,7 +113,7 @@ defmodule Bee.Entity.Dsl do
     entity = add_to(attribute, :attributes, entity)
 
     entity =
-      [fields: [attribute], entity: entity]
+      [fields: [attribute], entity: entity, unique: true]
       |> Key.new()
       |> with_opts(opts)
       |> add_to(:keys, entity)

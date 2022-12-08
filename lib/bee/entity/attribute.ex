@@ -37,8 +37,8 @@ defmodule Bee.Entity.Attribute do
     attr.name == :id
   end
 
-  defp with_summary_entity(rel) do
-    %{rel | entity: Summary.new(rel.entity)}
+  defp with_summary_entity(attr) do
+    %{attr | entity: Summary.new(attr.entity)}
   end
 
   defp with_column(attr) do

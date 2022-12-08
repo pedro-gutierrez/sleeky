@@ -11,10 +11,12 @@ defmodule Bee.Entity do
     :plural,
     :table,
     :pk_constraint,
+    actions: [],
     attributes: [],
     parents: [],
     children: [],
     keys: [],
+    preloads: [],
     virtual?: false
   ]
 
@@ -44,6 +46,10 @@ defmodule Bee.Entity do
     Map.put(entity, key, values)
   end
 
+  def action(name, entity) do
+    Enum.find(entity.actions, &(&1.name == name))
+  end
+
   def fields!(names, entity) do
     Enum.map(names, &field!(&1, entity))
   end
@@ -64,6 +70,18 @@ defmodule Bee.Entity do
 
   def entity(entity) do
     Module.get_attribute(entity, :entity)
+  end
+
+  def list_all_function(entity) do
+    join(["list", entity.plural()])
+  end
+
+  def list_by_function(entity, by) do
+    join(["list", entity.plural(), "by", by])
+  end
+
+  def query_function(entity) do
+    join(["query", entity.plural()])
   end
 
   defmacro __using__(_) do

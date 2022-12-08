@@ -11,4 +11,6 @@ defmodule Blog.User do
 
   unique(:email)
   # unique([:email, :app])
+
+  action(:list)
 end

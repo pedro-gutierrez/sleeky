@@ -7,6 +7,9 @@ defmodule Bee.Entity.Ecto do
     Bee.Entity.Ecto.Schema,
     Bee.Entity.Ecto.Changesets,
     Bee.Entity.Ecto.FieldSpecs,
+    Bee.Entity.Ecto.ColumnSpecs,
+    Bee.Entity.Ecto.Pagination,
+    Bee.Entity.Ecto.Preload,
     Bee.Entity.Ecto.Slug
   ]
 
@@ -15,6 +18,7 @@ defmodule Bee.Entity.Ecto do
     parents = entity.parents
     children = entity.children
     keys = entity.keys
+    actions = entity.actions
 
     quote do
       use Ecto.Schema
@@ -24,12 +28,15 @@ defmodule Bee.Entity.Ecto do
       @primary_key {:id, :binary_id, autogenerate: false}
       @timestamps_opts [type: :utc_datetime]
 
+      def name, do: unquote(entity.name)
+      def plural, do: unquote(entity.plural)
       def virtual?, do: false
       def table, do: unquote(entity.table)
       def attributes, do: unquote(Macro.escape(attributes))
       def parents, do: unquote(Macro.escape(parents))
       def children, do: unquote(Macro.escape(children))
       def keys, do: unquote(Macro.escape(keys))
+      def actions, do: unquote(Macro.escape(actions))
 
       unquote_splicing(
         @generators

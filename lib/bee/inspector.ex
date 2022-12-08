@@ -71,6 +71,11 @@ defmodule Bee.Inspector do
     Enum.map(items, & &1.name)
   end
 
+  def var(name) when is_atom(name), do: Macro.var(name, nil)
+  def var(other), do: other |> Keyword.fetch!(:name) |> var()
+
+  def vars(names), do: Enum.map(names, &var(&1))
+
   def columns(items) do
     Enum.map(items, & &1.column)
   end
