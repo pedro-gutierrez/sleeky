@@ -3,10 +3,15 @@ defmodule Bee.Context.Helpers do
 
   import Bee.Inspector
 
-  def ast(_entities, _enums, _opts) do
+  def ast(_entities, _enums, opts) do
+    repo = Keyword.fetch!(opts, :repo)
+    auth = Keyword.fetch!(opts, :auth)
+
     flatten([
       pagination_arguments_function(),
-      ids_function()
+      ids_function(),
+      list_function(repo, auth),
+      aggregate_function(repo, auth)
     ])
   end
 
@@ -32,5 +37,29 @@ defmodule Bee.Context.Helpers do
         defp ids(ids) when is_list(ids), do: ids
       end
     ]
+  end
+
+  defp list_function(repo, auth) do
+    quote do
+      defp list(query, entity, context) do
+        with query <- unquote(auth).scope_query(entity.name(), :list, query, context),
+             {:ok, sort_field, sort_direction, limit, offset} <- pagination_arguments(context),
+             {:ok, query} <-
+               entity.paginate_query(query, sort_field, sort_direction, limit, offset),
+             {:ok, query} <- entity.preload_query(query) do
+          {:ok, unquote(repo).all(query)}
+        end
+      end
+    end
+  end
+
+  defp aggregate_function(repo, auth) do
+    quote do
+      defp aggregate(query, entity, context) do
+        with query <- unquote(auth).scope_query(entity.name(), :list, query, context) do
+          {:ok, %{count: unquote(repo).aggregate(query, :count)}}
+        end
+      end
+    end
   end
 end

@@ -76,12 +76,24 @@ defmodule Bee.Entity do
     join(["list", entity.plural()])
   end
 
+  def aggregate_all_function(entity) do
+    join(["aggregate", entity.plural()])
+  end
+
   def list_by_function(entity, by) do
     join(["list", entity.plural(), "by", by])
   end
 
+  def aggregate_by_function(entity, by) do
+    join(["aggregate", entity.plural(), "by", by])
+  end
+
   def query_function(entity) do
     join(["query", entity.plural()])
+  end
+
+  def aggregate_function(entity) do
+    join(["aggregate", entity.plural()])
   end
 
   defmacro __using__(_) do

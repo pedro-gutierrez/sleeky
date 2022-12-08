@@ -10,6 +10,7 @@ defmodule Bee.Entity.Key do
     :index,
     :entity,
     list_function_name: nil,
+    aggregate_function_name: nil,
     unique: false
   ]
 
@@ -18,7 +19,7 @@ defmodule Bee.Entity.Key do
     |> struct(fields)
     |> with_summary_entity()
     |> with_name_and_index()
-    |> with_list_function_name()
+    |> with_function_names()
   end
 
   defp with_summary_entity(key) do
@@ -33,13 +34,17 @@ defmodule Bee.Entity.Key do
     %{key | name: name, index: index}
   end
 
-  defp with_list_function_name(key) do
-    if key.unique do
+  defp with_function_names(%{unique: true} = key), do: key
+
+  defp with_function_names(%{unique: false} = key) do
+    fields = names(key.fields)
+    list_function_name = join([:list, key.entity.plural(), :by] ++ fields)
+    aggregate_function_name = join([:aggregate, key.entity.plural(), :by] ++ fields)
+
+    %{
       key
-    else
-      fields = names(key.fields)
-      function_name = join([:list, key.entity.plural(), :by] ++ fields)
-      %{key | list_function_name: function_name}
-    end
+      | list_function_name: list_function_name,
+        aggregate_function_name: aggregate_function_name
+    }
   end
 end
