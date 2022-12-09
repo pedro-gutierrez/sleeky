@@ -1,8 +1,8 @@
 defmodule Bee.Entity.ForeignKey do
   @moduledoc false
-  
+
   import Bee.Inspector
-  
+
   defstruct [:name, :field]
 
   def new(rel) do

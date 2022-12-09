@@ -6,7 +6,8 @@ defmodule Bee.Context do
   @generators [
     Bee.Context.Preamble,
     Bee.Context.Helpers,
-    Bee.Context.List
+    Bee.Context.List,
+    Bee.Context.Read
   ]
 
   defmacro __using__(opts) do

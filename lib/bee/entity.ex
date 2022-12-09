@@ -72,6 +72,10 @@ defmodule Bee.Entity do
     Module.get_attribute(entity, :entity)
   end
 
+  def aggregate_by_function(entity, by) do
+    join(["aggregate", entity.plural(), "by", by])
+  end
+
   def list_all_function(entity) do
     join(["list", entity.plural()])
   end
@@ -84,16 +88,12 @@ defmodule Bee.Entity do
     join(["list", entity.plural(), "by", by])
   end
 
-  def aggregate_by_function(entity, by) do
-    join(["aggregate", entity.plural(), "by", by])
+  def read_function(entity) do
+    join(["read", entity.name()])
   end
 
-  def query_function(entity) do
-    join(["query", entity.plural()])
-  end
-
-  def aggregate_function(entity) do
-    join(["aggregate", entity.plural()])
+  def read_by_function(entity, by) do
+    join(["read", entity.name(), "by", by])
   end
 
   defmacro __using__(_) do
