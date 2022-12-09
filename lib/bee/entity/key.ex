@@ -11,6 +11,7 @@ defmodule Bee.Entity.Key do
     :entity,
     list_function_name: nil,
     aggregate_function_name: nil,
+    read_function_name: nil,
     unique: false
   ]
 
@@ -34,12 +35,17 @@ defmodule Bee.Entity.Key do
     %{key | name: name, index: index}
   end
 
-  defp with_function_names(%{unique: true} = key), do: key
+  defp with_function_names(%{unique: true} = key) do
+    fields = key.fields |> names() |> strings() |> Enum.join("_and_") |> atoms()
+    read_function_name = join([:read, key.entity.name(), :by, fields])
+
+    %{key | read_function_name: read_function_name}
+  end
 
   defp with_function_names(%{unique: false} = key) do
-    fields = names(key.fields)
-    list_function_name = join([:list, key.entity.plural(), :by] ++ fields)
-    aggregate_function_name = join([:aggregate, key.entity.plural(), :by] ++ fields)
+    fields = key.fields |> names() |> strings() |> Enum.join("_and_") |> atoms()
+    list_function_name = join([:list, key.entity.plural(), :by, fields])
+    aggregate_function_name = join([:aggregate, key.entity.plural(), :by, fields])
 
     %{
       key

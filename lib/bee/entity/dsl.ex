@@ -63,17 +63,15 @@ defmodule Bee.Entity.Dsl do
 
   defmacro unique(fields, opts \\ []) do
     module = __CALLER__.module
-    opts = Keyword.put(opts, :unique, true)
-    key(module, fields, opts)
+    key(module, fields, true, opts)
   end
 
   defmacro key(fields, opts \\ []) do
     module = __CALLER__.module
-    opts = Keyword.put(opts, :unique, false)
-    key(module, fields, opts)
+    key(module, fields, false, opts)
   end
 
-  defp key(module, fields, opts) do
+  defp key(module, fields, unique, opts) do
     entity = Entity.entity(module)
 
     fields =
@@ -82,7 +80,7 @@ defmodule Bee.Entity.Dsl do
       |> fields!(entity)
 
     entity =
-      [fields: fields, entity: entity]
+      [fields: fields, entity: entity, unique: unique]
       |> Key.new()
       |> with_opts(opts)
       |> add_to(:keys, entity)

@@ -11,7 +11,8 @@ defmodule Bee.Context.Helpers do
       pagination_arguments_function(),
       ids_function(),
       list_function(repo, auth),
-      aggregate_function(repo, auth)
+      aggregate_function(repo, auth),
+      check_allowed_functions(auth)
     ])
   end
 
@@ -61,5 +62,23 @@ defmodule Bee.Context.Helpers do
         end
       end
     end
+  end
+
+  defp check_allowed_functions(auth) do
+    [
+      quote do
+        defp check_allowed(nil, _, _, _), do: {:error, :not_found}
+      end,
+      quote do
+        defp check_allowed(item, entity, action, context) do
+          context = Map.put(context, entity.name(), item)
+
+          case unquote(auth).allowed?(entity.name(), action, context) do
+            false -> {:error, :unauthorized}
+            true -> {:ok, item}
+          end
+        end
+      end
+    ]
   end
 end
