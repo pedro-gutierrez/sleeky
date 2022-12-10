@@ -193,7 +193,7 @@ defmodule Bee.Context.Helpers do
     context = var(:context)
 
     quote do
-      :ok <- unquote(auth).allowed?(unquote(entity.name()), unquote(action), unquote(context))
+      :ok <- unquote(auth).allow_action(unquote(entity.name()), unquote(action), unquote(context))
     end
   end
 
