@@ -4,24 +4,20 @@ defmodule Bee.Context.Read do
   alias Bee.Entity
   import Bee.Inspector
 
-  def ast(entities, _enums, opts) do
-    repo = Keyword.fetch!(opts, :repo)
-
-    entities
-    |> Enum.reject(& &1.virtual?)
-    |> Enum.filter(&Entity.action(:read, &1))
-    |> Enum.map(fn entity ->
+  def ast(entity, repo, _auth) do
+    if Entity.action(:read, entity) do
       [
         read_by_id_function(entity, repo),
         read_by_id_bang_function(entity),
         read_by_unique_key_functions(entity, repo)
       ]
-    end)
-    |> flatten()
+    else
+      []
+    end
   end
 
   defp read_by_id_function(entity, repo) do
-    function_name = Entity.read_function(entity)
+    function_name = Entity.single_function_name(:read, entity)
 
     quote do
       def unquote(function_name)(id, context \\ %{}) do
@@ -36,7 +32,7 @@ defmodule Bee.Context.Read do
   end
 
   defp read_by_id_bang_function(entity) do
-    function_name = Entity.read_function(entity)
+    function_name = Entity.single_function_name(:read, entity)
     bang_function_name = String.to_atom("#{function_name}!")
 
     quote do

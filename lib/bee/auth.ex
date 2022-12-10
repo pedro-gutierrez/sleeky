@@ -17,7 +17,7 @@ defmodule Bee.Auth do
 
     quote do
       def scope_query(_, _, query, _), do: query
-      def allowed?(_, _, context), do: true
+      def allowed?(_, _, context), do: :ok
     end
   end
 end

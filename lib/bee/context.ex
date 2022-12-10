@@ -3,13 +3,6 @@ defmodule Bee.Context do
 
   import Bee.Inspector
 
-  @generators [
-    Bee.Context.Preamble,
-    Bee.Context.Helpers,
-    Bee.Context.List,
-    Bee.Context.Read
-  ]
-
   defmacro __using__(opts) do
     context = __CALLER__.module
     Module.register_attribute(context, :entities, persist: false, accumulate: true)
@@ -33,9 +26,12 @@ defmodule Bee.Context do
     auth = Module.get_attribute(context, :auth)
     entities = Module.get_attribute(context, :entities)
     enums = Module.get_attribute(context, :enums)
-    opts = [repo: repo, auth: auth, context: context]
 
-    Enum.flat_map(@generators, & &1.ast(entities, enums, opts))
-    |> print()
+    [
+      Bee.Context.Preamble.ast(entities, enums),
+      Bee.Context.Helpers.ast(repo, auth),
+      Bee.Context.Entities.ast(entities, repo, auth)
+    ]
+    |> flatten()
   end
 end

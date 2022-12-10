@@ -4,11 +4,8 @@ defmodule Bee.Context.List do
   alias Bee.Entity
   import Bee.Inspector
 
-  def ast(entities, _enums, _opts) do
-    entities
-    |> Enum.reject(& &1.virtual?)
-    |> Enum.filter(&Entity.action(:list, &1))
-    |> Enum.map(fn entity ->
+  def ast(entity, _repo, _auth) do
+    if Entity.action(:list, entity) do
       [
         list_all_function(entity),
         aggregate_all_function(entity),
@@ -18,12 +15,13 @@ defmodule Bee.Context.List do
         list_by_non_unique_keys_functions(entity),
         aggregate_by_non_unique_keys_functions(entity)
       ]
-    end)
-    |> flatten()
+    else
+      []
+    end
   end
 
   defp list_all_function(entity) do
-    function_name = Entity.list_all_function(entity)
+    function_name = Entity.multiple_function_name(:list, entity)
     entity_name = entity.name()
 
     quote do
@@ -35,7 +33,7 @@ defmodule Bee.Context.List do
   end
 
   defp aggregate_all_function(entity) do
-    function_name = Entity.aggregate_all_function(entity)
+    function_name = Entity.multiple_function_name(:aggregate, entity)
     entity_name = entity.name()
 
     quote do
@@ -47,7 +45,7 @@ defmodule Bee.Context.List do
   end
 
   defp list_by_ids_function(entity) do
-    function_name = Entity.list_by_function(entity, :ids)
+    function_name = Entity.multiple_function_name(:list, entity, :ids)
     entity_name = entity.name()
 
     quote do
@@ -65,7 +63,7 @@ defmodule Bee.Context.List do
     entity_name = entity.name()
 
     for rel <- entity.parents() do
-      function_name = Entity.list_by_function(entity, rel.name)
+      function_name = Entity.multiple_function_name(:list, entity, rel.name)
 
       quote do
         def unquote(function_name)(ids, context \\ %{}) do
@@ -83,7 +81,7 @@ defmodule Bee.Context.List do
     entity_name = entity.name()
 
     for rel <- entity.parents() do
-      function_name = Entity.aggregate_by_function(entity, rel.name)
+      function_name = Entity.multiple_function_name(:aggregate, entity, rel.name)
 
       quote do
         def unquote(function_name)(ids, context \\ %{}) do

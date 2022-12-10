@@ -31,7 +31,7 @@ defmodule Bee.Entity.Key do
     table = key.entity.table
     columns = key.fields |> Enum.map_join("_", &to_string(&1.column)) |> String.to_atom()
     name = columns
-    index = "#{table}_#{columns}_key"
+    index = "#{table}_#{columns}_idx"
     %{key | name: name, index: index}
   end
 

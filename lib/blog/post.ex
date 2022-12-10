@@ -10,6 +10,8 @@ defmodule Blog.Post do
   has_many(:comments)
   has_many(:tags)
 
-  action(:list)
   key([:user, :subject])
+
+  action(:list)
+  action(:create)
 end
