@@ -16,4 +16,5 @@ defmodule Blog.User do
   action(:read)
   action(:create)
   action(:update)
+  action(:delete)
 end

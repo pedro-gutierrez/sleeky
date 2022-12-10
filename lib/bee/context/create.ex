@@ -29,6 +29,7 @@ defmodule Bee.Context.Create do
 
   defp create_function(entity, auth) do
     function_name = Entity.single_function_name(:create, entity)
+    do_function_name = Entity.single_function_name(:do_create, entity)
     attrs = var(:attrs)
     context = var(:context)
 
@@ -48,10 +49,9 @@ defmodule Bee.Context.Create do
                  allowed?(entity, :create, auth)
                ])
              ),
-             do: unquote(do_create(entity))
+             do: unquote(do_function_name)(unquote(attrs), unquote(context))
       end
     end
-    |> print()
   end
 
   defp do_create_function(entity, action, repo) do
@@ -67,27 +67,16 @@ defmodule Bee.Context.Create do
           (unquote_splicing(
              flatten([
                before_action(entity, action),
-               insert(entity, repo),
+               repo_insert(entity, repo),
                after_action(entity, action)
              ])
            ))
         end)
       end
     end
-    |> print()
   end
 
-  defp do_create(entity) do
-    function_name = Entity.single_function_name(:do_create, entity)
-    attrs = var(:attrs)
-    context = var(:context)
-
-    quote do
-      unquote(function_name)(unquote(attrs), unquote(context))
-    end
-  end
-
-  defp insert(entity, repo) do
+  defp repo_insert(entity, repo) do
     attrs = var(:attrs)
 
     quote do

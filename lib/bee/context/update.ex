@@ -11,6 +11,7 @@ defmodule Bee.Context.Update do
       attrs_with_optional_parents: 1,
       attrs_with_required_parents: 1,
       context_with_args: 0,
+      context_with_item: 1,
       allowed?: 3
     ]
 
@@ -29,6 +30,7 @@ defmodule Bee.Context.Update do
 
   defp update_function(entity, auth) do
     function_name = Entity.single_function_name(:update, entity)
+    do_function_name = Entity.single_function_name(:do_update, entity)
     attrs = var(:attrs)
     context = var(:context)
     item = var(:item)
@@ -50,10 +52,9 @@ defmodule Bee.Context.Update do
                  allowed?(entity, :update, auth)
                ])
              ),
-             do: unquote(do_update(entity))
+             do: unquote(do_function_name)(unquote(item), unquote(attrs), unquote(context))
       end
     end
-    |> print()
   end
 
   defp do_update_function(entity, action, repo) do
@@ -70,28 +71,16 @@ defmodule Bee.Context.Update do
           (unquote_splicing(
              flatten([
                before_action(entity, action),
-               update(entity, repo),
+               repo_update(entity, repo),
                after_action(entity, action)
              ])
            ))
         end)
       end
     end
-    |> print()
   end
 
-  defp do_update(entity) do
-    function_name = Entity.single_function_name(:do_update, entity)
-    attrs = var(:attrs)
-    context = var(:context)
-    item = var(:item)
-
-    quote do
-      unquote(function_name)(unquote(item), unquote(attrs), unquote(context))
-    end
-  end
-
-  defp update(entity, repo) do
+  defp repo_update(entity, repo) do
     item = var(:item)
     attrs = var(:attrs)
 
@@ -105,15 +94,6 @@ defmodule Bee.Context.Update do
         {:error, reason} ->
           unquote(repo).rollback(reason)
       end
-    end
-  end
-
-  defp context_with_item(entity) do
-    context = var(:context)
-    item = var(:item)
-
-    quote do
-      unquote(context) <- Map.put(unquote(context), unquote(entity.name()), unquote(item))
     end
   end
 

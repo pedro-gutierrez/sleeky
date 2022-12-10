@@ -33,5 +33,6 @@ defmodule Bee.Context do
       Bee.Context.Entities.ast(entities, repo, auth)
     ]
     |> flatten()
+    |> print()
   end
 end

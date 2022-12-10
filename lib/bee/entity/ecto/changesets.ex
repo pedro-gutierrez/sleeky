@@ -78,7 +78,7 @@ defmodule Bee.Entity.Ecto.Changesets do
 
   defp delete_changeset(entity) do
     quote do
-      def delete_changeset(e, attrs) do
+      def delete_changeset(e) do
         changes = cast(e, %{}, [])
 
         unquote_splicing(

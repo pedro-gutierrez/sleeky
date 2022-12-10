@@ -10,9 +10,9 @@ defmodule Bee.Context.Helpers do
       attrs_with_id(),
       ids_function(),
       maybe_id_function(),
+      maybe_not_found(),
       list_function(repo, auth),
-      aggregate_function(repo, auth),
-      check_allowed_functions(auth)
+      aggregate_function(repo, auth)
     ])
   end
 
@@ -94,21 +94,43 @@ defmodule Bee.Context.Helpers do
     end
   end
 
-  defp check_allowed_functions(auth) do
+  def maybe_not_found do
+    item = var(:item)
+
     [
       quote do
-        defp check_allowed(nil, _, _, _), do: {:error, :not_found}
+        defp maybe_not_found(nil), do: {:error, :not_found}
       end,
       quote do
-        defp check_allowed(item, entity, action, context) do
-          context = Map.put(context, entity.name(), item)
-
-          with :ok <- unquote(auth).allowed?(entity.name(), action, context) do
-            {:ok, item}
-          end
-        end
+        defp maybe_not_found(unquote(item)), do: {:ok, unquote(item)}
       end
     ]
+  end
+
+  def maybe_not_found_call do
+    item = var(:item)
+
+    quote do
+      {:ok, unquote(item)} <- maybe_not_found(unquote(item))
+    end
+  end
+
+  def item_id do
+    item = var(:item)
+    id = var(:id)
+
+    quote do
+      unquote(id) <- unquote(item).id
+    end
+  end
+
+  def repo_read_by_id(entity, repo) do
+    item = var(:item)
+    id = var(:id)
+
+    quote do
+      unquote(item) <- unquote(repo).get(unquote(entity), unquote(id))
+    end
   end
 
   def context_with_parents(entity) do
@@ -155,6 +177,15 @@ defmodule Bee.Context.Helpers do
 
     quote do
       unquote(context) <- Map.put(unquote(context), :args, unquote(attrs))
+    end
+  end
+
+  def context_with_item(entity) do
+    context = var(:context)
+    item = var(:item)
+
+    quote do
+      unquote(context) <- Map.put(unquote(context), unquote(entity.name()), unquote(item))
     end
   end
 

@@ -5,7 +5,8 @@ defmodule Bee.Context.Entities do
     Bee.Context.List,
     Bee.Context.Read,
     Bee.Context.Create,
-    Bee.Context.Update
+    Bee.Context.Update,
+    Bee.Context.Delete
   ]
 
   @virtual_generators []
