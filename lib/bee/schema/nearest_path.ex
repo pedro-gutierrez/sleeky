@@ -52,7 +52,7 @@ defmodule Bee.Schema.NearestPath do
 
   defp default_nearest_path do
     quote do
-      def neareast_path(_, _), do: []
+      def nearest_path(_, _), do: []
     end
   end
 

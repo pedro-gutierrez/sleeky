@@ -55,6 +55,5 @@ defmodule Bee.Schema do
     @generators
     |> Enum.map(& &1.ast(schema))
     |> flatten()
-    |> print()
   end
 end

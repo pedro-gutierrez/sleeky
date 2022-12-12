@@ -9,7 +9,10 @@ defmodule Bee.Schema.Evaluate do
       literal(),
       trailing_wildcard(),
       trailing_field(),
-      nearest_path()
+      nearest_path(),
+      multiple_paths(),
+      entity_parent(),
+      map_parent()
     ]
   end
 
@@ -61,7 +64,7 @@ defmodule Bee.Schema.Evaluate do
 
           {:ok, :child, _, _} ->
             context
-            |> entity.relation(context, field)
+            |> entity.relation(field)
             |> Enum.reject(&is_nil/1)
 
           {:ok, :parent, _, _, _} ->
@@ -89,40 +92,52 @@ defmodule Bee.Schema.Evaluate do
     end
   end
 
-  #  def evaluate(context, [field | _] = paths) when is_map(context) and is_list(field) do
-  #    paths
-  #    |> Enum.map(&evaluate(context, &1))
-  #    |> List.flatten()
-  #    |> Enum.reject(&is_nil/1)
-  #    |> Enum.uniq()
-  #  end
+  defp multiple_paths do
+    quote do
+      def evaluate(context, [field | _] = paths) when is_map(context) and is_list(field) do
+        paths
+        |> Enum.map(&evaluate(context, &1))
+        |> List.flatten()
+        |> Enum.reject(&is_nil/1)
+        |> Enum.uniq()
+      end
+    end
+  end
 
-  #  def evaluate(%{__struct__: schema} = context, [field | rest]) do
-  #    case schema.field_spec(field) do
-  #      {:error, :unknown_field} ->
-  #        nil
+  defp entity_parent do
+    quote do
+      def evaluate(%{__struct__: entity} = context, [field | rest]) do
+        case entity.field_spec(field) do
+          {:error, :unknown_field} ->
+            nil
 
-  #      {:ok, _kind, _column} ->
-  #        nil
+          {:ok, _kind, _column} ->
+            nil
 
-  #      {:ok, :has_many, _, _next_schema} ->
-  #        context
-  #        |> relation(field)
-  #        |> Enum.map(&evaluate(&1, rest))
-  #        |> List.flatten()
-  #        |> Enum.reject(&is_nil/1)
-  #        |> Enum.uniq()
+          {:ok, :child, _, _} ->
+            context
+            |> entity.relation(field)
+            |> Enum.map(&evaluate(&1, rest))
+            |> List.flatten()
+            |> Enum.reject(&is_nil/1)
+            |> Enum.uniq()
 
-  #      {:ok, :belongs_to, _, _next_schema, _} ->
-  #        context
-  #        |> relation(field)
-  #        |> evaluate(rest)
-  #    end
-  #  end
+          {:ok, :parent, _, _, _} ->
+            context
+            |> entity.relation(field)
+            |> evaluate(rest)
+        end
+      end
+    end
+  end
 
-  #  def evaluate(context, [field | rest]) when is_map(context) and is_atom(field) do
-  #    context
-  #    |> Map.get(field)
-  #    |> evaluate(rest)
-  #  end
+  defp map_parent do
+    quote do
+      def evaluate(context, [field | rest]) when is_map(context) and is_atom(field) do
+        context
+        |> Map.get(field)
+        |> evaluate(rest)
+      end
+    end
+  end
 end
