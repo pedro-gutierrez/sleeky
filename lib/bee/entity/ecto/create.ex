@@ -1,35 +1,35 @@
-defmodule Bee.Context.Create do
+defmodule Bee.Entity.Ecto.Create do
   @moduledoc false
 
   alias Bee.Entity
   import Bee.Inspector
 
-  import Bee.Context.Helpers,
+  import Bee.Entity.Ecto.Helpers,
     only: [
       parent_function_args: 1,
       context_with_parents: 1,
       attrs_with_optional_parents: 1,
       attrs_with_required_parents: 1,
       context_with_args: 0,
-      allowed?: 3
+      allowed?: 2
     ]
 
-  def ast(entity, repo, auth) do
+  def ast(entity) do
     action = Entity.action(:create, entity)
 
     if action do
       [
-        create_function(entity, auth),
-        do_create_function(entity, action, repo)
+        create_function(entity),
+        do_create_function(entity, action)
       ]
     else
       []
     end
   end
 
-  defp create_function(entity, auth) do
-    function_name = Entity.single_function_name(:create, entity)
-    do_function_name = Entity.single_function_name(:do_create, entity)
+  defp create_function(entity) do
+    function_name = :create
+    do_function_name = :do_create
     attrs = var(:attrs)
     context = var(:context)
 
@@ -46,7 +46,7 @@ defmodule Bee.Context.Create do
                  attrs_with_required_parents(entity),
                  attrs_with_optional_parents(entity),
                  context_with_args(),
-                 allowed?(entity, :create, auth)
+                 allowed?(entity, :create)
                ])
              ),
              do: unquote(do_function_name)(unquote(attrs), unquote(context))
@@ -54,8 +54,8 @@ defmodule Bee.Context.Create do
     end
   end
 
-  defp do_create_function(entity, action, repo) do
-    function_name = Entity.single_function_name(:do_create, entity)
+  defp do_create_function(entity, action) do
+    function_name = :do_create
     attrs = var(:attrs)
     context = var(:context)
 
@@ -63,11 +63,11 @@ defmodule Bee.Context.Create do
       defp unquote(function_name)(unquote(attrs), unquote(context) \\ %{}) do
         opts = unquote(context)[:opts] || []
 
-        unquote(repo).transaction(fn ->
+        @repo.transaction(fn ->
           (unquote_splicing(
              flatten([
                before_action(entity, action),
-               repo_insert(entity, repo),
+               repo_insert(entity),
                after_action(entity, action)
              ])
            ))
@@ -76,18 +76,19 @@ defmodule Bee.Context.Create do
     end
   end
 
-  defp repo_insert(entity, repo) do
+  defp repo_insert(entity) do
     attrs = var(:attrs)
+    entity_module = entity.module
 
     quote do
-      case %unquote(entity){}
-           |> unquote(entity).insert_changeset(unquote(attrs))
-           |> unquote(repo).insert(opts) do
+      case %unquote(entity_module){}
+           |> unquote(entity_module).insert_changeset(unquote(attrs))
+           |> @repo.insert(opts) do
         {:ok, item} ->
           item
 
         {:error, reason} ->
-          unquote(repo).rollback(reason)
+          @repo.rollback(reason)
       end
     end
   end

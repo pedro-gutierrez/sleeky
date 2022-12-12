@@ -10,6 +10,9 @@ defmodule Bee.Entity do
     :module,
     :plural,
     :table,
+    :schema,
+    :repo,
+    :auth,
     :pk_constraint,
     actions: [],
     attributes: [],
@@ -27,6 +30,9 @@ defmodule Bee.Entity do
   ]
 
   def new(module) do
+    schema = module |> context() |> module(Schema)
+    repo = module |> context() |> module(Repo)
+    auth = module |> context() |> module(Auth)
     name = name(module)
     plural = plural(name)
     table = plural
@@ -35,6 +41,9 @@ defmodule Bee.Entity do
       context: context(module),
       module: module,
       name: name,
+      schema: schema,
+      repo: repo,
+      auth: auth,
       plural: plural,
       table: table,
       pk_constraint: "#{table}_pkey"
@@ -70,22 +79,6 @@ defmodule Bee.Entity do
 
   def entity(entity) do
     Module.get_attribute(entity, :entity)
-  end
-
-  def single_function_name(prefix, entity) do
-    join([prefix, entity.name()])
-  end
-
-  def single_function_name(prefix, entity, by) do
-    join([prefix, entity.name(), "by", by])
-  end
-
-  def multiple_function_name(prefix, entity) do
-    join([prefix, entity.plural()])
-  end
-
-  def multiple_function_name(prefix, entity, by) do
-    join([prefix, entity.plural(), "by", by])
   end
 
   defmacro __using__(_) do

@@ -8,9 +8,10 @@ defmodule Bee.Auth do
     Bee.Auth.Allow
   ]
 
-  defmacro __using__(opts) do
+  defmacro __using__(_opts) do
     auth = __CALLER__.module
-    schema = opts |> Keyword.fetch!(:schema) |> module()
+
+    schema = auth |> context() |> module(Schema)
     Module.put_attribute(auth, :schema, schema)
 
     quote do

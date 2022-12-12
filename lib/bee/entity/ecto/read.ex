@@ -1,30 +1,30 @@
-defmodule Bee.Context.Read do
+defmodule Bee.Entity.Ecto.Read do
   @moduledoc false
 
   alias Bee.Entity
   import Bee.Inspector
 
-  import Bee.Context.Helpers,
+  import Bee.Entity.Ecto.Helpers,
     only: [
-      allowed?: 3,
+      allowed?: 2,
       context_with_item: 1,
       maybe_not_found_call: 0,
-      repo_read_by_id: 2
+      repo_read_by_id: 1
     ]
 
-  def ast(entity, repo, auth) do
+  def ast(entity) do
     if Entity.action(:read, entity) do
       [
-        read_by_id_function(entity, repo, auth),
-        read_by_unique_key_functions(entity, repo, auth)
+        read_by_id_function(entity),
+        read_by_unique_key_functions(entity)
       ]
     else
       []
     end
   end
 
-  defp read_by_id_function(entity, repo, auth) do
-    function_name = Entity.single_function_name(:read, entity)
+  defp read_by_id_function(entity) do
+    function_name = :read
     context = var(:context)
     id = var(:id)
     item = var(:item)
@@ -35,11 +35,11 @@ defmodule Bee.Context.Read do
 
         with unquote_splicing(
                flatten([
-                 repo_read_by_id(entity, repo),
-                 preload_item(repo),
+                 repo_read_by_id(entity),
+                 preload_item(),
                  maybe_not_found_call(),
                  context_with_item(entity),
-                 allowed?(entity, :read, auth)
+                 allowed?(entity, :read)
                ])
              ),
              do: {:ok, unquote(item)}
@@ -47,12 +47,12 @@ defmodule Bee.Context.Read do
     end
   end
 
-  defp read_by_unique_key_functions(entity, repo, auth) do
+  defp read_by_unique_key_functions(entity) do
     context = var(:context)
     item = var(:item)
 
     for key <- entity.keys() |> Enum.filter(& &1.unique) do
-      function_name = key.read_function_name
+      function_name = function_name(:read_by, names(key.fields))
       args = key.fields |> names() |> vars()
 
       quote do
@@ -61,11 +61,11 @@ defmodule Bee.Context.Read do
 
           with unquote_splicing(
                  flatten([
-                   repo_read_by_key(entity, repo, key),
-                   preload_item(repo),
+                   repo_read_by_key(entity, key),
+                   preload_item(),
                    maybe_not_found_call(),
                    context_with_item(entity),
-                   allowed?(entity, :read, auth)
+                   allowed?(entity, :read)
                  ])
                ),
                do: {:ok, unquote(item)}
@@ -74,10 +74,12 @@ defmodule Bee.Context.Read do
     end
   end
 
-  defp repo_read_by_key(entity, repo, key) do
+  defp repo_read_by_key(entity, key) do
+    entity_module = entity.module
+
     filters =
       for field <- key.fields do
-        {:ok, column} = entity.column_for(field.name)
+        column = field.column
         var = var(field.name)
 
         quote do
@@ -88,15 +90,15 @@ defmodule Bee.Context.Read do
     item = var(:item)
 
     quote do
-      unquote(item) <- unquote(repo).get_by(unquote(entity), [unquote_splicing(filters)])
+      unquote(item) <- @repo.get_by(unquote(entity_module), [unquote_splicing(filters)])
     end
   end
 
-  defp preload_item(repo) do
+  defp preload_item do
     item = var(:item)
 
     quote do
-      unquote(item) <- unquote(repo).preload(unquote(item), preloads)
+      unquote(item) <- @repo.preload(unquote(item), preloads)
     end
   end
 end

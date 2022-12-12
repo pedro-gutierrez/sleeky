@@ -3,6 +3,7 @@ defmodule Bee.Entity.Ecto do
   import Bee.Inspector
 
   @generators [
+    Bee.Entity.Ecto.Helpers,
     Bee.Entity.Ecto.FieldAttributes,
     Bee.Entity.Ecto.Schema,
     Bee.Entity.Ecto.Changesets,
@@ -10,10 +11,18 @@ defmodule Bee.Entity.Ecto do
     Bee.Entity.Ecto.ColumnSpecs,
     Bee.Entity.Ecto.Pagination,
     Bee.Entity.Ecto.Preload,
-    Bee.Entity.Ecto.Slug
+    Bee.Entity.Ecto.Relation,
+    Bee.Entity.Ecto.Slug,
+    Bee.Entity.Ecto.List,
+    Bee.Entity.Ecto.Read,
+    Bee.Entity.Ecto.Create,
+    Bee.Entity.Ecto.Update,
+    Bee.Entity.Ecto.Delete
   ]
 
   def ast(entity) do
+    auth = entity.auth
+    repo = entity.repo
     attributes = entity.attributes
     parents = entity.parents
     children = entity.children
@@ -22,8 +31,9 @@ defmodule Bee.Entity.Ecto do
 
     quote do
       use Ecto.Schema
-      import Ecto.Changeset
-      import Ecto.Query
+
+      @auth unquote(auth)
+      @repo unquote(repo)
 
       @primary_key {:id, :binary_id, autogenerate: false}
       @timestamps_opts [type: :utc_datetime]

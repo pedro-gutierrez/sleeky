@@ -1,24 +1,25 @@
-defmodule Bee.Context.Helpers do
+defmodule Bee.Entity.Ecto.Helpers do
   @moduledoc false
 
   import Bee.Inspector
 
-  def ast(repo, auth) do
-    flatten([
+  def ast(_entity) do
+    [
       imports(),
       pagination_arguments_function(),
       attrs_with_id(),
       ids_function(),
       maybe_id_function(),
       maybe_not_found(),
-      list_function(repo, auth),
-      aggregate_function(repo, auth)
-    ])
+      list_function(),
+      aggregate_function()
+    ]
   end
 
   defp imports do
     quote do
       import Ecto.Query
+      import Ecto.Changeset
     end
   end
 
@@ -70,25 +71,25 @@ defmodule Bee.Context.Helpers do
     ]
   end
 
-  defp list_function(repo, auth) do
+  defp list_function do
     quote do
       defp list(query, entity, context) do
-        with query <- unquote(auth).scope_query(entity.name(), :list, query, context),
+        with query <- @auth.scope_query(entity.name(), :list, query, context),
              {:ok, sort_field, sort_direction, limit, offset} <- pagination_arguments(context),
              {:ok, query} <-
                entity.paginate_query(query, sort_field, sort_direction, limit, offset),
              {:ok, query} <- entity.preload_query(query) do
-          {:ok, unquote(repo).all(query)}
+          {:ok, @repo.all(query)}
         end
       end
     end
   end
 
-  defp aggregate_function(repo, auth) do
+  defp aggregate_function do
     quote do
       defp aggregate(query, entity, context) do
-        with query <- unquote(auth).scope_query(entity.name(), :list, query, context) do
-          {:ok, %{count: unquote(repo).aggregate(query, :count)}}
+        with query <- @auth.scope_query(entity.name(), :list, query, context) do
+          {:ok, %{count: @repo.aggregate(query, :count)}}
         end
       end
     end
@@ -124,19 +125,20 @@ defmodule Bee.Context.Helpers do
     end
   end
 
-  def repo_read_by_id(entity, repo) do
+  def repo_read_by_id(entity) do
+    entity_module = entity.module
     item = var(:item)
     id = var(:id)
 
     quote do
-      unquote(item) <- unquote(repo).get(unquote(entity), unquote(id))
+      unquote(item) <- @repo.get(unquote(entity_module), unquote(id))
     end
   end
 
   def context_with_parents(entity) do
     context = var(:context)
 
-    for rel <- entity.parents() do
+    for rel <- entity.parents do
       var = var(rel.name)
 
       quote do
@@ -148,7 +150,7 @@ defmodule Bee.Context.Helpers do
   def attrs_with_required_parents(entity) do
     attrs = var(:attrs)
 
-    for rel <- entity.parents() |> Enum.filter(& &1.required) do
+    for rel <- entity.parents |> Enum.filter(& &1.required) do
       column = rel.column
       var = var(rel.name)
 
@@ -161,7 +163,7 @@ defmodule Bee.Context.Helpers do
   def attrs_with_optional_parents(entity) do
     attrs = var(:attrs)
 
-    for rel <- entity.parents() |> Enum.reject(& &1.required) do
+    for rel <- entity.parents |> Enum.reject(& &1.required) do
       column = rel.column
       var = var(rel.name)
 
@@ -181,19 +183,21 @@ defmodule Bee.Context.Helpers do
   end
 
   def context_with_item(entity) do
+    entity_name = entity.name
     context = var(:context)
     item = var(:item)
 
     quote do
-      unquote(context) <- Map.put(unquote(context), unquote(entity.name()), unquote(item))
+      unquote(context) <- Map.put(unquote(context), unquote(entity_name), unquote(item))
     end
   end
 
-  def allowed?(entity, action, auth) do
+  def allowed?(entity, action) do
+    entity_name = entity.name
     context = var(:context)
 
     quote do
-      :ok <- unquote(auth).allow_action(unquote(entity.name()), unquote(action), unquote(context))
+      :ok <- @auth.allow_action(unquote(entity_name), unquote(action), unquote(context))
     end
   end
 

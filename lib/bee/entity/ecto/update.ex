@@ -1,10 +1,10 @@
-defmodule Bee.Context.Update do
+defmodule Bee.Entity.Ecto.Update do
   @moduledoc false
 
   alias Bee.Entity
   import Bee.Inspector
 
-  import Bee.Context.Helpers,
+  import Bee.Entity.Ecto.Helpers,
     only: [
       parent_function_args: 1,
       context_with_parents: 1,
@@ -12,25 +12,26 @@ defmodule Bee.Context.Update do
       attrs_with_required_parents: 1,
       context_with_args: 0,
       context_with_item: 1,
-      allowed?: 3
+      allowed?: 2
     ]
 
-  def ast(entity, repo, auth) do
+  def ast(entity) do
     action = Entity.action(:update, entity)
 
     if action do
       [
-        update_function(entity, auth),
-        do_update_function(entity, action, repo)
+        update_function(entity),
+        do_update_function(entity, action)
       ]
     else
       []
     end
   end
 
-  defp update_function(entity, auth) do
-    function_name = Entity.single_function_name(:update, entity)
-    do_function_name = Entity.single_function_name(:do_update, entity)
+  defp update_function(entity) do
+    function_name = :update
+    do_function_name = :do_update
+    entity_module = entity.module
     attrs = var(:attrs)
     context = var(:context)
     item = var(:item)
@@ -38,7 +39,7 @@ defmodule Bee.Context.Update do
     quote do
       def unquote(function_name)(
             unquote_splicing(parent_function_args(entity)),
-            %unquote(entity){} = unquote(item),
+            %unquote(entity_module){} = unquote(item),
             unquote(attrs),
             unquote(context) \\ %{}
           ) do
@@ -49,7 +50,7 @@ defmodule Bee.Context.Update do
                  attrs_with_required_parents(entity),
                  attrs_with_optional_parents(entity),
                  context_with_args(),
-                 allowed?(entity, :update, auth)
+                 allowed?(entity, :update)
                ])
              ),
              do: unquote(do_function_name)(unquote(item), unquote(attrs), unquote(context))
@@ -57,8 +58,8 @@ defmodule Bee.Context.Update do
     end
   end
 
-  defp do_update_function(entity, action, repo) do
-    function_name = Entity.single_function_name(:do_update, entity)
+  defp do_update_function(entity, action) do
+    function_name = :do_update
     attrs = var(:attrs)
     context = var(:context)
     item = var(:item)
@@ -67,11 +68,11 @@ defmodule Bee.Context.Update do
       defp unquote(function_name)(unquote(item), unquote(attrs), unquote(context) \\ %{}) do
         opts = unquote(context)[:opts] || []
 
-        unquote(repo).transaction(fn ->
+        @repo.transaction(fn ->
           (unquote_splicing(
              flatten([
                before_action(entity, action),
-               repo_update(entity, repo),
+               repo_update(entity),
                after_action(entity, action)
              ])
            ))
@@ -80,19 +81,20 @@ defmodule Bee.Context.Update do
     end
   end
 
-  defp repo_update(entity, repo) do
+  defp repo_update(entity) do
+    entity_module = entity.module
     item = var(:item)
     attrs = var(:attrs)
 
     quote do
       case unquote(item)
-           |> unquote(entity).update_changeset(unquote(attrs))
-           |> unquote(repo).update(opts) do
+           |> unquote(entity_module).update_changeset(unquote(attrs))
+           |> @repo.update(opts) do
         {:ok, item} ->
           item
 
         {:error, reason} ->
-          unquote(repo).rollback(reason)
+          @repo.rollback(reason)
       end
     end
   end

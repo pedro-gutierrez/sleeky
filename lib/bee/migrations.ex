@@ -32,14 +32,11 @@ defmodule Bee.Migrations do
 
   defp state_from_schema(schema) do
     state =
-      schema.contexts
-      |> Enum.flat_map(& &1.entities)
+      schema.entities
       |> Enum.reject(& &1.virtual?)
       |> Enum.reduce(State.new(), &state_with_entity/2)
 
-    schema.contexts
-    |> Enum.flat_map(& &1.enums)
-    |> Enum.reduce(state, &state_with_enum/2)
+    Enum.reduce(schema.enums, state, &state_with_enum/2)
   end
 
   defp state_with_entity(entity, state) do

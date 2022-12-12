@@ -17,6 +17,5 @@ defmodule Bee.Auth.Roles do
         unquote(schema).evaluate(unquote(context), unquote(roles_expr))
       end
     end
-    |> print()
   end
 end

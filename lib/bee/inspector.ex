@@ -14,10 +14,24 @@ defmodule Bee.Inspector do
     Module.concat(mod)
   end
 
+  def module(prefix, suffix) do
+    Module.concat(prefix, suffix)
+  end
+
   def flatten(items) do
     items
     |> List.flatten()
     |> Enum.reject(&is_nil/1)
+  end
+
+  def function_name(prefix, suffix) when is_list(suffix) do
+    suffix = suffix |> strings() |> Enum.join("_and_")
+
+    join(prefix, suffix)
+  end
+
+  def function_name(prefix, suffix) do
+    join(prefix, suffix)
   end
 
   def atoms(l) when is_list(l) do
@@ -42,6 +56,10 @@ defmodule Bee.Inspector do
     |> strings()
     |> Enum.join("_")
     |> String.to_atom()
+  end
+
+  def join(prefix, suffix) do
+    join([prefix, suffix])
   end
 
   def name(entity) do
