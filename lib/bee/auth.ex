@@ -3,10 +3,17 @@ defmodule Bee.Auth do
   import Bee.Inspector
 
   @generators [
-    Bee.Auth.Roles,
+    Bee.Auth.Role,
+    Bee.Auth.Policy,
     Bee.Auth.Scope,
     Bee.Auth.Allow
   ]
+
+  def schema!(auth) do
+    with nil <- Module.get_attribute(auth, :schema) do
+      raise "No schema defined in auth module #{inspect(auth)}"
+    end
+  end
 
   defmacro __using__(_opts) do
     auth = __CALLER__.module
@@ -16,16 +23,18 @@ defmodule Bee.Auth do
 
     quote do
       import Bee.Auth.Dsl, only: :macros
+      import Ecto.Query
+      @schema unquote(schema)
       @before_compile unquote(Bee.Auth)
     end
   end
 
   defmacro __before_compile__(_env) do
     auth = __CALLER__.module
-    schema = Module.get_attribute(auth, :schema)
 
     @generators
-    |> Enum.map(& &1.ast(auth, schema))
+    |> Enum.map(& &1.ast(auth))
     |> flatten()
+    |> print()
   end
 end

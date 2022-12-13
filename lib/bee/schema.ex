@@ -4,7 +4,8 @@ defmodule Bee.Schema do
   @generators [
     Bee.Schema.Preamble,
     Bee.Schema.NearestPath,
-    Bee.Schema.Evaluate
+    Bee.Schema.Evaluate,
+    Bee.Schema.Compare
   ]
 
   import Bee.Inspector

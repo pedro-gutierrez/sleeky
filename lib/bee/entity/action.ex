@@ -6,8 +6,6 @@ defmodule Bee.Entity.Action do
   defstruct [
     :name,
     :entity,
-    :context_function,
-    :aggregate_context_function,
     list?: false,
     custom?: false
   ]
@@ -20,7 +18,6 @@ defmodule Bee.Entity.Action do
     |> with_summary_entity()
     |> maybe_custom_action()
     |> maybe_list_action()
-    |> with_context_functions()
   end
 
   defp with_summary_entity(action) do
@@ -33,21 +30,5 @@ defmodule Bee.Entity.Action do
 
   defp maybe_list_action(action) do
     %{action | list?: action.name |> to_string() |> String.starts_with?("list")}
-  end
-
-  defp with_context_functions(action) do
-    if action.list? do
-      %{
-        action
-        | context_function: action_name(action.name, action.entity.plural),
-          aggregate_context_function: action_name(:aggregate, action.entity.plural)
-      }
-    else
-      %{action | context_function: action_name(action.name, action.entity.name)}
-    end
-  end
-
-  defp action_name(action, entity) do
-    String.to_atom("#{action}_#{entity}")
   end
 end

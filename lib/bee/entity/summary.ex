@@ -8,5 +8,6 @@ defmodule Bee.Entity.Summary do
     |> Map.put(:parents, [])
     |> Map.put(:children, [])
     |> Map.put(:keys, [])
+    |> Map.put(:actions, [])
   end
 end
