@@ -35,6 +35,5 @@ defmodule Bee.Auth do
     @generators
     |> Enum.map(& &1.ast(auth))
     |> flatten()
-    |> print()
   end
 end

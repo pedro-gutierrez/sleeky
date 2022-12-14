@@ -17,7 +17,10 @@ defmodule Bee.Entity.Ecto do
     Bee.Entity.Ecto.Read,
     Bee.Entity.Ecto.Create,
     Bee.Entity.Ecto.Update,
-    Bee.Entity.Ecto.Delete
+    Bee.Entity.Ecto.Delete,
+    Bee.Entity.Ecto.Query,
+    Bee.Entity.Ecto.Join,
+    Bee.Entity.Ecto.Where
   ]
 
   def ast(entity) do

@@ -5,6 +5,7 @@ defmodule Bee.Schema do
     Bee.Schema.Preamble,
     Bee.Schema.NearestPath,
     Bee.Schema.Evaluate,
+    Bee.Schema.Filter,
     Bee.Schema.Compare
   ]
 
