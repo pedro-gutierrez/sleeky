@@ -3,7 +3,7 @@ defmodule Bee.Auth.Role do
 
   import Bee.Inspector
 
-  def ast(auth) do
+  def ast(auth, _schema, _scopes, _default_policy) do
     [
       roles_from_context_function(auth),
       no_role_allow_function(),
@@ -40,7 +40,7 @@ defmodule Bee.Auth.Role do
     quote do
       defp role_allow?(roles, policies, _default_policy, _) do
         roles
-        |> Enum.map(&Keyword.get(policies, &1))
+        |> Enum.map(&Map.get(policies, &1))
         |> Enum.reject(&is_nil/1)
         |> case do
           [] ->

@@ -43,7 +43,6 @@ defmodule Bee.Migrations.AlterTable do
 
   @impl Step
   def encode(step) do
-    IO.inspect(step)
     add = step.add |> Map.values() |> Enum.map(&{:add, [line: 1], Column.encode(&1)})
     remove = step.remove |> Map.values() |> Enum.map(&{:remove, [line: 1], [&1.name]})
     modify = step.modify |> Map.values() |> Enum.map(&{:modify, [line: 1], Column.encode(&1)})

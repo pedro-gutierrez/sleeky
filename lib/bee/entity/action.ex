@@ -7,7 +7,8 @@ defmodule Bee.Entity.Action do
     :name,
     :entity,
     list?: false,
-    custom?: false
+    custom?: false,
+    policies: []
   ]
 
   @built_in [:create, :list, :read, :update, :delete]
@@ -30,5 +31,43 @@ defmodule Bee.Entity.Action do
 
   defp maybe_list_action(action) do
     %{action | list?: action.name |> to_string() |> String.starts_with?("list")}
+  end
+
+  def with_policies(action, nil), do: action
+
+  def with_policies(action, block) do
+    %{action | policies: policies_from(block)}
+  end
+
+  defp policies_from(do: item) do
+    policies_from(item)
+  end
+
+  defp policies_from({:__block__, _, items}) do
+    policies_from(items)
+  end
+
+  defp policies_from(items) when is_list(items) do
+    items
+    |> Enum.map(fn
+      {:allow, _, [role, [do: {:scope, _, [scope]}]]} -> {role, scope}
+      {:allow, _, [role, scope]} -> {role, scope}
+    end)
+    |> Enum.into(%{})
+  end
+
+  defp policies_from(item), do: policies_from([item])
+
+  def resolve_policies(%__MODULE__{} = action, scopes) do
+    for {role, scope} <- action.policies, into: %{} do
+      case Map.get(scopes, scope) do
+        nil ->
+          raise "unknown scope #{inspect(scope)} in action #{inspect(action.name)} of entity
+            #{inspect(action.entity.name)} for role #{inspect(role)}. Known scopes are: #{inspect(Map.keys(scopes))}"
+
+        scope ->
+          {role, scope}
+      end
+    end
   end
 end

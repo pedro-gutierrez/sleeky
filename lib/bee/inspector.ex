@@ -34,22 +34,22 @@ defmodule Bee.Inspector do
     join(prefix, suffix)
   end
 
-  def atoms(l) when is_list(l) do
-    Enum.map(l, &atoms/1)
-  end
-
+  def atoms(l) when is_list(l), do: Enum.map(l, &atoms/1)
   def atoms(a) when is_binary(a), do: String.to_atom(a)
   def atoms(a) when is_atom(a), do: a
 
-  def strings(l) when is_list(l) do
-    Enum.map(l, &strings/1)
-  end
-
+  def strings(l) when is_list(l), do: Enum.map(l, &strings/1)
   def strings(a) when is_binary(a), do: a
   def strings(a) when is_atom(a), do: to_string(a)
 
   def as_list(items) when is_list(items), do: items
   def as_list(single), do: [single]
+
+  def tokenize(str) when is_binary(str) do
+    str |> String.split(".") |> tokenize()
+  end
+
+  def tokenize(other), do: atoms(other)
 
   def join(items) do
     items

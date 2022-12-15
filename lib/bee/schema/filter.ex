@@ -35,20 +35,20 @@ defmodule Bee.Schema.Filter do
         case entity.field_spec(field) do
           {:error, :unknown_field} ->
             if entity.name() == field do
-              entity.filter(q, :id, op, value, on: last_binding)
+              entity.where(q, :id, op, value, on: last_binding)
             else
               nil
             end
 
           {:ok, _, _column} ->
-            entity.filter(q, field, op, value, on: last_binding)
+            entity.where(q, field, op, value, on: last_binding)
 
           {:ok, :child, _, _child_entity} ->
             {field, binding} = query_binding(field)
-            entity.filter(q, field, op, value, parent: last_binding, child: binding)
+            entity.where(q, field, op, value, parent: last_binding, child: binding)
 
           {:ok, :parent, _, _parent_entity, _} ->
-            entity.filter(q, field, op, value, parent: last_binding)
+            entity.where(q, field, op, value, parent: last_binding)
         end
       end
     end
@@ -66,7 +66,7 @@ defmodule Bee.Schema.Filter do
             end
 
           {:ok, _, _column} ->
-            entity.filter(q, field, op, value, on: last_binding)
+            entity.where(q, field, op, value, on: last_binding)
 
           {:ok, :child, _, next_entity} ->
             {field, binding} = query_binding(field)

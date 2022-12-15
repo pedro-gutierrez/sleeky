@@ -12,9 +12,16 @@ defmodule Blog.User do
   unique(:email)
   # unique([:email, :app])
 
-  action(:list)
+  action :list do
+    allow(:admin, :self)
+  end
+
   action(:read)
-  action(:create)
+
+  action :create do
+    allow(:admin, :any)
+  end
+
   action(:update)
   action(:delete)
 end

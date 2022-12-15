@@ -15,8 +15,14 @@ defmodule Bee.Auth do
     end
   end
 
+  def scopes!(auth) do
+    Module.get_attribute(auth, :scopes)
+  end
+
   defmacro __using__(_opts) do
     auth = __CALLER__.module
+
+    Module.register_attribute(auth, :scopes, persist: false, accumulate: true)
 
     schema = auth |> context() |> module(Schema)
     Module.put_attribute(auth, :schema, schema)
@@ -31,9 +37,12 @@ defmodule Bee.Auth do
 
   defmacro __before_compile__(_env) do
     auth = __CALLER__.module
+    scopes = Bee.Auth.Scope.Resolver.scopes(auth)
+    schema = Bee.Auth.schema!(auth)
+    default_policy = :deny
 
     @generators
-    |> Enum.map(& &1.ast(auth))
+    |> Enum.map(& &1.ast(auth, schema, scopes, default_policy))
     |> flatten()
   end
 end

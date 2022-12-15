@@ -1,33 +1,38 @@
 defmodule Bee.Auth.Scope do
   @moduledoc false
 
-  def ast(auth) do
-    default_policy = :deny
-    schema = Bee.Auth.schema!(auth)
+  alias Bee.Entity.Action
 
+  defstruct [:name, :expression]
+
+  def new(opts) do
+    struct(__MODULE__, opts)
+  end
+
+  def ast(_auth, schema, scopes, default_policy) do
     [
-      scope_query_functions(schema, default_policy),
+      scope_query_functions(schema, scopes, default_policy),
       do_scope_query_functions(),
       helper_functions()
     ]
     |> List.flatten()
   end
 
-  def scope_query_functions(schema, default_policy) do
+  def scope_query_functions(schema, scopes, default_policy) do
     (schema.entities()
      |> Enum.flat_map(& &1.actions())
      |> Enum.filter(& &1.list?)
-     |> Enum.map(&scope_query_function(&1, default_policy))) ++
+     |> Enum.map(&scope_query_function(&1, scopes, default_policy))) ++
       [
         default_scope_query_function()
       ]
   end
 
-  def scope_query_function(action, _default_policy) do
+  def scope_query_function(action, scopes, _default_policy) do
     action_name = action.name
     entity_name = action.entity.name
     entity_module = action.entity.module
-    policies = Macro.escape([])
+    policies = Action.resolve_policies(action, scopes) |> Macro.escape()
 
     quote do
       def scope_query(unquote(entity_name), unquote(action_name), query, context) do
@@ -63,6 +68,7 @@ defmodule Bee.Auth.Scope do
       do_scope_query_no_roles(),
       do_scope_query_roles(),
       do_scope_query_allow(),
+      do_scope_query_no_policy(),
       do_scope_query_deny(),
       do_scope_query_any_policy(),
       do_scope_query_all_policies(),
@@ -84,6 +90,14 @@ defmodule Bee.Auth.Scope do
         roles
         |> policy(policies)
         |> do_scope_query(q, entity_name, entity, context)
+      end
+    end
+  end
+
+  defp do_scope_query_no_policy do
+    quote do
+      defp do_scope_query(nil, q, _entity_name, _entity, _context) do
+        return_nothing(q)
       end
     end
   end
@@ -130,6 +144,17 @@ defmodule Bee.Auth.Scope do
              context
            ) do
         value = context |> @schema.evaluate(value_spec) |> maybe_ids()
+
+        IO.inspect(
+          prop: prop,
+          value_spec: value_spec,
+          op: op,
+          q: q,
+          entity_name: entity_name,
+          entity: entity,
+          context: context,
+          value: value
+        )
 
         @schema.filter(entity, prop, op, value, q, entity_name)
       end

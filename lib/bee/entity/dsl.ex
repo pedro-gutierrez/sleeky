@@ -8,13 +8,14 @@ defmodule Bee.Entity.Dsl do
   import Bee.Inspector
   import Bee.Opts
 
-  defmacro action(name) do
+  defmacro action(name, block \\ nil) do
     module = __CALLER__.module
     entity = Entity.entity(module)
 
     entity =
       [name: name, entity: entity]
       |> Action.new()
+      |> Action.with_policies(block)
       |> add_to(:actions, entity)
 
     Module.put_attribute(module, :entity, entity)

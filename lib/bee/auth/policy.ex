@@ -1,7 +1,7 @@
 defmodule Bee.Auth.Policy do
   @moduledoc false
 
-  def ast(_auth) do
+  def ast(_auth, _schema, _scopes, _default_policy) do
     [
       policy_function(),
       no_role_policy_allow_function(),
@@ -18,7 +18,7 @@ defmodule Bee.Auth.Policy do
     quote do
       defp policy(roles, policies) do
         roles
-        |> Enum.map(&Keyword.get(policies, &1))
+        |> Enum.map(&Map.get(policies, &1))
         |> Enum.reject(&is_nil/1)
         |> case do
           [] -> nil
