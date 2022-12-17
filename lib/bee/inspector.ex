@@ -14,7 +14,16 @@ defmodule Bee.Inspector do
     Module.concat(mod)
   end
 
+  def module_parts(mod) do
+    mod
+    |> Module.split()
+    |> Enum.map(&snake/1)
+  end
+
   def module(prefix, suffix) do
+    prefix = Inflex.camelize(prefix)
+    suffix = Inflex.camelize(suffix)
+
     Module.concat(prefix, suffix)
   end
 

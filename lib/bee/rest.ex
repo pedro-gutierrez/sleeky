@@ -22,6 +22,5 @@ defmodule Bee.Rest do
     @generators
     |> Enum.map(& &1.ast(rest, schema))
     |> flatten()
-    |> print()
   end
 end
