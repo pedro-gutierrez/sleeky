@@ -45,11 +45,13 @@ defmodule Bee.Inspector do
   def as_list(items) when is_list(items), do: items
   def as_list(single), do: [single]
 
-  def tokenize(str) when is_binary(str) do
-    str |> String.split(".") |> tokenize()
+  def tokenize(str, separator \\ ".")
+
+  def tokenize(str, separator) when is_binary(str) do
+    str |> String.split(separator) |> tokenize()
   end
 
-  def tokenize(other), do: atoms(other)
+  def tokenize(other, _separator), do: atoms(other)
 
   def join(items) do
     items
@@ -104,4 +106,6 @@ defmodule Bee.Inspector do
       Map.put(index, index_key, item)
     end)
   end
+
+  def snake(value), do: value |> Macro.underscore() |> String.to_atom()
 end

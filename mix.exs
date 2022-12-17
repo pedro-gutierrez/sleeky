@@ -21,11 +21,14 @@ defmodule Bee.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:bandit, ">= 0.6.3"},
       {:calendar, "~> 1.0.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:inflex, "~> 2.0.0"},
+      {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
+      {:plug, "~> 1.14"},
       {:slugify, "~> 1.3"}
     ]
   end

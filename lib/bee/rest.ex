@@ -1,31 +1,27 @@
 defmodule Bee.Rest do
-  defmacro __using__(_) do
-    Module.register_attribute(__CALLER__.module, :schema, persist: true, accumulate: false)
+  @generators [
+    Bee.Rest.OpenApi,
+    Bee.Rest.RouterHelper,
+    Bee.Rest.Router,
+    Bee.Rest.Redoc
+  ]
 
+  import Bee.Inspector
+
+  defmacro __using__(_) do
     quote do
-      import Bee.Rest, only: :macros
+      import Bee.Rest.Dsl, only: :macros
       @before_compile Bee.Rest
     end
   end
 
-  defmacro schema({:__aliases__, _, mod}) do
-    schema = Module.concat(mod)
-    Module.put_attribute(__CALLER__.module, :schema, schema)
-  end
-
   defmacro __before_compile__(_env) do
-    schema = Module.get_attribute(__CALLER__.module, :schema)
-    Code.ensure_compiled!(schema)
+    rest = __CALLER__.module
+    schema = Module.get_attribute(rest, :schema)
 
-    # for e <- Bee.Schema.entities(schema) do
-    #  IO.inspect(
-    #    entity: e,
-    #    attributes: Bee.Entity.attributes(e),
-    #    parents: Bee.Entity.parents(e),
-    #    children: Bee.Entity.children(e)
-    #  )
-    # end
-
-    :ok
+    @generators
+    |> Enum.map(& &1.ast(rest, schema))
+    |> flatten()
+    |> print()
   end
 end
