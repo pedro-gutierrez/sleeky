@@ -2,6 +2,7 @@ defmodule Bee.Rest do
   @generators [
     Bee.Rest.OpenApi,
     Bee.Rest.RouterHelper,
+    Bee.Rest.Handlers,
     Bee.Rest.Router,
     Bee.Rest.Redoc
   ]

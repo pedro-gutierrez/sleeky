@@ -4,6 +4,7 @@ defmodule Bee.Rest.Router do
   import Bee.Inspector
 
   alias Bee.Entity.Action
+  alias Bee.Rest.Handlers
 
   def ast(rest, schema) do
     router = module(rest, Router)
@@ -13,7 +14,7 @@ defmodule Bee.Rest.Router do
 
     routes =
       schema.entities()
-      |> Enum.map(&routes(&1, router))
+      |> Enum.map(&routes(&1, rest))
       |> flatten()
 
     conn = var(:conn)
@@ -44,19 +45,17 @@ defmodule Bee.Rest.Router do
         end
       end
     end
-    |> print()
   end
 
-  defp routes(entity, router) do
+  defp routes(entity, rest) do
     [
-      standard_routes(entity, router)
+      standard_routes(entity, rest)
     ]
   end
 
-  defp standard_routes(entity, router) do
-    handler = http_handler(entity, router)
-
+  defp standard_routes(entity, rest) do
     for action <- entity.actions do
+      handler = Handlers.module_name(rest, entity, action)
       method = http_method(action)
       path = http_path(action)
 
@@ -72,10 +71,6 @@ defmodule Bee.Rest.Router do
   def http_method(:update), do: :patch
   def http_method(:delete), do: :delete
   def http_method(%Action{} = action), do: http_method(action.name)
-
-  def http_handler(entity, router) do
-    module(router, "#{entity.name()}_handler")
-  end
 
   defp http_path(%Action{} = action) do
     case action.name do

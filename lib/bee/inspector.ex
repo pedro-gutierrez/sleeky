@@ -14,6 +14,12 @@ defmodule Bee.Inspector do
     Module.concat(mod)
   end
 
+  def module(parts) when is_list(parts) do
+    parts
+    |> Enum.map(&Inflex.camelize/1)
+    |> Module.concat()
+  end
+
   def module_parts(mod) do
     mod
     |> Module.split()
