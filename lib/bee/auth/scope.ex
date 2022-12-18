@@ -145,16 +145,16 @@ defmodule Bee.Auth.Scope do
            ) do
         value = context |> @schema.evaluate(value_spec) |> maybe_ids()
 
-        IO.inspect(
-          prop: prop,
-          value_spec: value_spec,
-          op: op,
-          q: q,
-          entity_name: entity_name,
-          entity: entity,
-          context: context,
-          value: value
-        )
+        # IO.inspect(
+        #  prop: prop,
+        #  value_spec: value_spec,
+        #  op: op,
+        #  q: q,
+        #  entity_name: entity_name,
+        #  entity: entity,
+        #  context: context,
+        #  value: value
+        # )
 
         @schema.filter(entity, prop, op, value, q, entity_name)
       end

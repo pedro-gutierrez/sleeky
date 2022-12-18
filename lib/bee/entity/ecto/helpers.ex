@@ -26,10 +26,10 @@ defmodule Bee.Entity.Ecto.Helpers do
   defp pagination_arguments_function do
     quote do
       defp pagination_arguments(context) do
-        sort_field = Map.get(context, :sort_by, :inserted_at)
-        sort_direction = Map.get(context, :sort_direction, :asc)
-        limit = Map.get(context, :limit, 20)
-        offset = Map.get(context, :offset, 0)
+        sort_field = Map.get(context, :sort_by) || :inserted_at
+        sort_direction = Map.get(context, :sort_direction) || :asc
+        limit = Map.get(context, :limit) || 20
+        offset = Map.get(context, :offset) || 0
 
         {:ok, sort_field, sort_direction, limit, offset}
       end

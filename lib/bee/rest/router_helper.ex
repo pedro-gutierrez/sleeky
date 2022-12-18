@@ -84,7 +84,7 @@ defmodule Bee.Rest.RouterHelper do
           with {:ok, offset} <- cast_param(conn, "offset", :integer, 0),
                {:ok, limit} <- cast_param(conn, "limit", :integer, 20),
                {:ok, sort_by} <- cast_param(conn, "sort_by", :string, nil),
-               {:ok, sort_direction} <- cast_param(conn, "sort_direction", :string, "asc") do
+               {:ok, sort_direction} <- cast_param(conn, "sort_direction", :atom, :asc) do
             {:ok,
              conn
              |> assign(:offset, offset)
@@ -113,6 +113,7 @@ defmodule Bee.Rest.RouterHelper do
         end
 
         defp cast(v, :string) when is_binary(v), do: {:ok, v}
+        defp cast(v, :atom) when is_binary(v), do: {:ok, String.to_existing_atom(v)}
         defp cast(json, :json) when is_map(json), do: {:ok, json}
 
         defp cast(v, :datetime) do

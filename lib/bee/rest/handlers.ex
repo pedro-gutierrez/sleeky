@@ -53,10 +53,19 @@ defmodule Bee.Rest.Handlers do
   end
 
   defp action_handler(rest, entity, %Action{name: :list} = action) do
+    preconditions = [
+      pagination_args(),
+      api_call(entity, action)
+    ]
+
     body = [
       quote do
         def handle(conn, _opts) do
-          send_json(conn, %{}, 200)
+          with unquote_splicing(flatten(preconditions)) do
+            send_json(conn, items)
+          else
+            {:error, reason} -> send_error(conn, reason)
+          end
         end
       end
     ]
@@ -120,6 +129,12 @@ defmodule Bee.Rest.Handlers do
     handler(rest, entity, action, [body])
   end
 
+  defp pagination_args do
+    quote do
+      {:ok, conn} <- with_pagination(conn)
+    end
+  end
+
   defp attribute_args(entity) do
     [
       required_attribute_args(entity)
@@ -176,12 +191,18 @@ defmodule Bee.Rest.Handlers do
     end
   end
 
-  defp api_call(entity, _action) do
+  defp api_call(entity, %Action{name: :create}) do
     parent_var_names = entity.parents() |> names() |> vars()
 
     quote do
       {:ok, item} <-
         unquote(entity).create(unquote_splicing(parent_var_names), args, conn.assigns)
+    end
+  end
+
+  defp api_call(entity, %Action{name: :list}) do
+    quote do
+      {:ok, items} <- unquote(entity).list(conn.assigns)
     end
   end
 end
