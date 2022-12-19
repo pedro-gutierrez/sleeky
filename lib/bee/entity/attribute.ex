@@ -10,6 +10,7 @@ defmodule Bee.Entity.Attribute do
     :default,
     :storage,
     :plugin,
+    :using,
     enum: nil,
     aliases: [],
     implied: false,

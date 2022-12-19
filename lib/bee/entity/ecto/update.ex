@@ -10,6 +10,7 @@ defmodule Bee.Entity.Ecto.Update do
       context_with_parents: 1,
       attrs_with_optional_parents: 1,
       attrs_with_required_parents: 1,
+      attrs_with_computed_attributes: 1,
       context_with_args: 0,
       context_with_item: 1,
       allowed?: 2
@@ -49,6 +50,7 @@ defmodule Bee.Entity.Ecto.Update do
                  context_with_item(entity),
                  attrs_with_required_parents(entity),
                  attrs_with_optional_parents(entity),
+                 attrs_with_computed_attributes(entity),
                  context_with_args(),
                  allowed?(entity, :update)
                ])

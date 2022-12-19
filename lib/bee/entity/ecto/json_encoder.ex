@@ -6,13 +6,17 @@ defmodule Bee.Entity.Ecto.JsonEncoder do
     module_name = module(entity.module, JsonEncoder)
 
     attributes = names(entity.attributes)
-    relations = columns(entity.parents)
+
+    relations =
+      for rel <- entity.parents, into: %{} do
+        {rel.name, rel.column}
+      end
 
     quote do
       defmodule unquote(module_name) do
         defimpl Jason.Encoder, for: unquote(entity.module) do
           @attributes unquote(attributes)
-          @relations unquote(relations)
+          @relations unquote(Macro.escape(relations))
 
           def encode(item, opts) do
             item

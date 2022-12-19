@@ -36,7 +36,7 @@ defmodule Bee.Rest.RouterHelper do
 
         def lookup(conn, param, api, :required) do
           with {:ok, id} <- cast_param(conn, param, :id) do
-            api.get_by_id(id)
+            api.get(id)
           end
         end
 
@@ -60,7 +60,7 @@ defmodule Bee.Rest.RouterHelper do
 
             value ->
               with {:ok, id} <- cast(value, :id) do
-                api.get_by_id(id)
+                api.get(id)
               end
           end
         end

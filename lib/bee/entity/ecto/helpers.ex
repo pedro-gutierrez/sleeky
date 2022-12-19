@@ -3,6 +3,8 @@ defmodule Bee.Entity.Ecto.Helpers do
 
   import Bee.Inspector
 
+  alias Bee.Entity.Attribute
+
   def ast(_entity) do
     [
       imports(),
@@ -11,6 +13,7 @@ defmodule Bee.Entity.Ecto.Helpers do
       ids_function(),
       maybe_id_function(),
       maybe_not_found(),
+      get_function(),
       list_function(),
       aggregate_function()
     ]
@@ -135,6 +138,17 @@ defmodule Bee.Entity.Ecto.Helpers do
     end
   end
 
+  def get_function do
+    quote do
+      def get(id) do
+        case @repo.get(__MODULE__, id) do
+          nil -> {:error, :not_found}
+          item -> {:ok, item}
+        end
+      end
+    end
+  end
+
   def context_with_parents(entity) do
     context = var(:context)
 
@@ -170,6 +184,24 @@ defmodule Bee.Entity.Ecto.Helpers do
       quote do
         unquote(attrs) <- Map.put(unquote(attrs), unquote(column), maybe_id(unquote(var)))
       end
+    end
+  end
+
+  def attrs_with_computed_attributes(entity) do
+    attrs = var(:attrs)
+    context = var(:context)
+
+    for %Attribute{computed: true, using: mod} = attr <- entity.attributes do
+      var = var(attr.name)
+
+      [
+        quote do
+          {:ok, unquote(var)} <- unquote(mod).execute(unquote(attrs), unquote(context))
+        end,
+        quote do
+          unquote(attrs) <- Map.put(unquote(attrs), unquote(attr.name), unquote(var))
+        end
+      ]
     end
   end
 

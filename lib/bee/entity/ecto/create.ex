@@ -10,6 +10,7 @@ defmodule Bee.Entity.Ecto.Create do
       context_with_parents: 1,
       attrs_with_optional_parents: 1,
       attrs_with_required_parents: 1,
+      attrs_with_computed_attributes: 1,
       context_with_args: 0,
       allowed?: 2
     ]
@@ -45,6 +46,7 @@ defmodule Bee.Entity.Ecto.Create do
                  attrs_with_id(),
                  attrs_with_required_parents(entity),
                  attrs_with_optional_parents(entity),
+                 attrs_with_computed_attributes(entity),
                  context_with_args(),
                  allowed?(entity, :create)
                ])
