@@ -5,7 +5,6 @@ defmodule Bee.UI.View.Render do
 
   def ast(view) do
     flatten([
-      named_view_function(view),
       content_function(view),
       render_function(),
       resolve_function(),
@@ -19,20 +18,11 @@ defmodule Bee.UI.View.Render do
       resolve_empty_content_function(),
       resolve_literal_function(),
       resolve_node_with_single_child(),
+      resolve_void_node(),
       resolve_catch_all_function(),
-      resolve_arg_function(),
-      resolve_args_function()
+      resolve_args_function(),
+      resolve_arg_function()
     ])
-  end
-
-  defp named_view_function(view) do
-    context = context(view)
-
-    quote do
-      defp named_view(name) do
-        Module.concat([unquote(context), name |> to_string() |> Macro.camelize()])
-      end
-    end
   end
 
   defp render_function do
@@ -84,8 +74,8 @@ defmodule Bee.UI.View.Render do
 
   defp resolve_view_with_arguments_function do
     quote do
-      def resolve({:view, _, [view, [do: args]]}, _args) do
-        view = named_view(view)
+      def resolve({:view, _, [{:__aliases__, _, view}, [do: args]]}, _args) do
+        view = Module.concat(view)
         args = resolve_args(args)
         view.resolve(args)
       end
@@ -94,8 +84,8 @@ defmodule Bee.UI.View.Render do
 
   defp resolve_view_without_arguments_function do
     quote do
-      def resolve({:view, _, [view]}, _args) do
-        view = named_view(view)
+      def resolve({:view, _, [{:__aliases__, _, view}]}, _args) do
+        view = Module.concat(view)
         view.resolve(%{})
       end
     end
@@ -131,7 +121,7 @@ defmodule Bee.UI.View.Render do
         end
       end,
       quote do
-        def resolve({node, _, children} = block, args) when is_list(children) do
+        def resolve({node, [line: _], children} = block, args) when is_list(children) do
           {node, [], resolve(children, args)}
         end
       end
@@ -168,6 +158,14 @@ defmodule Bee.UI.View.Render do
     end
   end
 
+  def resolve_void_node() do
+    quote do
+      def resolve({_, _} = other, _args) do
+        other
+      end
+    end
+  end
+
   defp resolve_empty_content_function do
     quote do
       def resolve({:__block__, _, _}, _args) do
@@ -178,7 +176,7 @@ defmodule Bee.UI.View.Render do
 
   defp resolve_literal_function do
     quote do
-      def resolve(other, _args) when is_binary(other) do
+      def resolve(other, _args) when is_binary(other) or is_number(other) do
         other
       end
     end
@@ -200,15 +198,25 @@ defmodule Bee.UI.View.Render do
 
   defp resolve_arg_function do
     quote do
-      defp resolve_args({name, _, content}), do: %{name => resolve(content, %{})}
+      defp resolve_arg({name, _, content}), do: {name, resolve(content, %{})}
     end
   end
 
   defp resolve_args_function do
-    quote do
-      defp resolve_args(args) when is_list(args) do
-        for arg <- args, into: %{}, do: resolve_args(arg)
+    [
+      quote do
+        defp resolve_args({:__block__, _, args}) when is_list(args) do
+          for arg <- args, into: %{}, do: resolve_arg(arg)
+        end
+      end,
+      quote do
+        defp resolve_args(args) when is_list(args) do
+          for arg <- args, into: %{}, do: resolve_arg(arg)
+        end
+      end,
+      quote do
+        defp resolve_args({name, _, content} = arg), do: resolve_args([arg])
       end
-    end
+    ]
   end
 end
