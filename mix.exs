@@ -25,6 +25,7 @@ defmodule Bee.MixProject do
       {:calendar, "~> 1.0.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
+      {:html_builder, "~> 0.1"},
       {:inflex, "~> 2.0.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},

@@ -24,3 +24,6 @@ bee-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# MacOS Finder
+/.DS_Store/
