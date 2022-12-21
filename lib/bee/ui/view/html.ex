@@ -9,6 +9,7 @@ defmodule Bee.UI.View.Render do
       render_function(),
       resolve_function(),
       resolve_slot_function(),
+      resolve_repeat_function(),
       resolve_view_with_arguments_function(),
       resolve_view_without_arguments_function(),
       resolve_children_function(),
@@ -17,6 +18,7 @@ defmodule Bee.UI.View.Render do
       resolve_nodes_function(),
       resolve_empty_content_function(),
       resolve_literal_function(),
+      resolve_field_function(),
       resolve_node_with_single_child(),
       resolve_void_node(),
       resolve_catch_all_function(),
@@ -68,6 +70,37 @@ defmodule Bee.UI.View.Render do
           value ->
             resolve(value, %{})
         end
+      end
+    end
+  end
+
+  defp resolve_repeat_function do
+    quote do
+      def resolve(
+            {:repeat, _,
+             [{:__aliases__, _, view}, [for: {:__aliases__, _, entity}], [do: slots]]},
+            args
+          ) do
+        view = Module.concat(view)
+        entity = Module.concat(entity)
+
+        slots =
+          slots
+          |> resolve_args()
+          |> Enum.map(fn {name, path} ->
+            path = Enum.map_join(path, ".", &to_string/1)
+            {name, {:span, ["x-text": "#{entity.name()}.#{path}"]}}
+          end)
+          |> Enum.into(%{})
+
+        {:template,
+         [
+           "x-for": "#{entity.name()} in #{entity.plural()}",
+           ":key": "#{entity.name()}.id"
+         ],
+         [
+           view.resolve(slots)
+         ]}
       end
     end
   end
@@ -178,6 +211,14 @@ defmodule Bee.UI.View.Render do
     quote do
       def resolve(other, _args) when is_binary(other) or is_number(other) do
         other
+      end
+    end
+  end
+
+  defp resolve_field_function do
+    quote do
+      def resolve(field, _args) when is_atom(field) do
+        field
       end
     end
   end
