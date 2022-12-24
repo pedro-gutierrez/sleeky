@@ -95,8 +95,11 @@ defmodule Bee.Rest.RouterHelper do
         end
 
         defp cast(nil, _, :invalid), do: {:error, :invalid}
+        defp cast("", _, :invalid), do: {:error, :invalid}
         defp cast(nil, _, :continue), do: {:error, :continue}
+        defp cast("", _, :continue), do: {:error, :continue}
         defp cast(nil, _, default), do: {:ok, default}
+        defp cast("", _, default), do: {:ok, default}
         defp cast(v, kind, _), do: cast(v, kind)
 
         defp cast(v, :id) do

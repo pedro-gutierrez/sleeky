@@ -7,9 +7,11 @@ defmodule Bee.UI.View.Render do
     flatten([
       content_function(view),
       render_function(),
+      resolve_slots_helpers(),
       resolve_function(),
       resolve_slot_function(),
       resolve_repeat_function(),
+      resolve_entity_function(),
       resolve_view_with_arguments_function(),
       resolve_view_without_arguments_function(),
       resolve_children_function(),
@@ -21,9 +23,7 @@ defmodule Bee.UI.View.Render do
       resolve_field_function(),
       resolve_node_with_single_child(),
       resolve_void_node(),
-      resolve_catch_all_function(),
-      resolve_args_function(),
-      resolve_arg_function()
+      resolve_catch_all_function()
     ])
   end
 
@@ -53,22 +53,38 @@ defmodule Bee.UI.View.Render do
     end
   end
 
+  defp resolve_slots_helpers do
+    [
+      quote do
+        defp resolve_slots(slots, args) do
+          resolve_slots(slots, args, fn {name, _, value} -> {name, value} end)
+        end
+      end,
+      quote do
+        defp resolve_slots(slots, args, fun) do
+          slots
+          |> resolve(args)
+          |> case do
+            args when is_list(args) -> args
+            arg -> [arg]
+          end
+          |> Enum.map(fun)
+          |> Enum.into(%{})
+        end
+      end
+    ]
+  end
+
   defp resolve_slot_function do
     quote do
       def resolve({:slot, _, [name]}, args) do
         case Map.get(args, name) do
           nil ->
-            raise """
-            View
-                #{inspect(__MODULE__)}
-            is trying to render slot
-                #{inspect(name)}
-            but no value was provided in:
-                #{inspect(args)}
-            """
+            raise "View #{inspect(__MODULE__)} is trying to render slot #{inspect(name)} but no value was provided in:
+              #{inspect(args)}"
 
           value ->
-            resolve(value, %{})
+            resolve(value, args)
         end
       end
     end
@@ -76,26 +92,23 @@ defmodule Bee.UI.View.Render do
 
   defp resolve_repeat_function do
     quote do
-      def resolve(
-            {:repeat, _,
-             [{:__aliases__, _, view}, [for: {:__aliases__, _, entity}], [do: slots]]},
-            args
-          ) do
+      def resolve({:repeat, _, [{:__aliases__, _, view}, [do: slots]]} = directive, args) do
         view = Module.concat(view)
-        entity = Module.concat(entity)
+        entity = Map.get(args, :__entity__)
+
+        unless entity do
+          raise "View #{inspect(__MODULE__)} is trying to resolve directive\n#{inspect(directive, pretty: true)}\nbut not entity vas provided in: #{inspect(args)}"
+        end
 
         slots =
-          slots
-          |> resolve_args()
-          |> Enum.map(fn {name, path} ->
+          resolve_slots(slots, args, fn {name, _, path} ->
             path = Enum.map_join(path, ".", &to_string/1)
             {name, {:span, ["x-text": "#{entity.name()}.#{path}"]}}
           end)
-          |> Enum.into(%{})
 
         {:template,
          [
-           "x-for": "#{entity.name()} in #{entity.plural()}",
+           "x-for": "#{entity.name()} in $store.#{entity.plural()}.all",
            ":key": "#{entity.name()}.id"
          ],
          [
@@ -105,11 +118,24 @@ defmodule Bee.UI.View.Render do
     end
   end
 
+  defp resolve_entity_function do
+    quote do
+      def resolve({:entity, _, [{:__aliases__, _, entity}, children]}, args) do
+        entity = Module.concat(entity)
+        args = Map.put(args, :__entity__, entity)
+
+        {:div, ["x-data": true, "x-init": "$store.#{entity.plural()}.list()"],
+         resolve(children, args)}
+      end
+    end
+  end
+
   defp resolve_view_with_arguments_function do
     quote do
-      def resolve({:view, _, [{:__aliases__, _, view}, [do: args]]}, _args) do
+      def resolve({:view, _, [{:__aliases__, _, view}, [do: slots]]}, args) do
         view = Module.concat(view)
-        args = resolve_args(args)
+        slots = resolve_slots(slots, args)
+        args = Map.merge(args, slots)
         view.resolve(args)
       end
     end
@@ -117,9 +143,9 @@ defmodule Bee.UI.View.Render do
 
   defp resolve_view_without_arguments_function do
     quote do
-      def resolve({:view, _, [{:__aliases__, _, view}]}, _args) do
+      def resolve({:view, _, [{:__aliases__, _, view}]}, args) do
         view = Module.concat(view)
-        view.resolve(%{})
+        view.resolve(args)
       end
     end
   end
@@ -235,29 +261,5 @@ defmodule Bee.UI.View.Render do
         """
       end
     end
-  end
-
-  defp resolve_arg_function do
-    quote do
-      defp resolve_arg({name, _, content}), do: {name, resolve(content, %{})}
-    end
-  end
-
-  defp resolve_args_function do
-    [
-      quote do
-        defp resolve_args({:__block__, _, args}) when is_list(args) do
-          for arg <- args, into: %{}, do: resolve_arg(arg)
-        end
-      end,
-      quote do
-        defp resolve_args(args) when is_list(args) do
-          for arg <- args, into: %{}, do: resolve_arg(arg)
-        end
-      end,
-      quote do
-        defp resolve_args({name, _, content} = arg), do: resolve_args([arg])
-      end
-    ]
   end
 end

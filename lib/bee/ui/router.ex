@@ -4,9 +4,10 @@ defmodule Bee.UI.Router do
 
   alias Bee.UI.View
 
-  def ast(ui, views) do
+  def ast(ui, views, _schema) do
     router = module(ui, Router)
     routes = for view <- views, do: route(view)
+    client = module(ui, Client)
     conn = var(:conn)
 
     quote do
@@ -16,6 +17,7 @@ defmodule Bee.UI.Router do
         import Plug.Conn
 
         @html "text/html"
+        @javascript "text/javascript"
 
         plug(:match)
         plug(:dispatch)
@@ -27,6 +29,14 @@ defmodule Bee.UI.Router do
         end
 
         unquote_splicing(routes)
+
+        @client_app unquote(client).source()
+
+        get "/assets/app.js" do
+          unquote(conn)
+          |> put_resp_content_type(@javascript)
+          |> send_resp(200, @client_app)
+        end
 
         match _ do
           send_html(unquote(conn), "<h1>Not Found</h1>", 404)
@@ -61,12 +71,7 @@ defmodule Bee.UI.Router do
   rescue
     e ->
       IO.puts("""
-      Error rendering view #{inspect(view)} with content:
-
-      #{inspect(view.content())}
-
-      Reason:
-
+      Error rendering view #{inspect(view)}:
       #{Exception.format(:error, e, __STACKTRACE__)}"
       """)
   end

@@ -5,7 +5,7 @@ defmodule Bee.MixProject do
     [
       app: :bee,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -25,6 +25,7 @@ defmodule Bee.MixProject do
       {:calendar, "~> 1.0.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
+      {:estree, "~> 2.7.0"},
       {:html_builder, "~> 0.1"},
       {:inflex, "~> 2.0.0"},
       {:jason, "~> 1.2"},
