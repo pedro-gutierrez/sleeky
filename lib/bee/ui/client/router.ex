@@ -19,9 +19,14 @@ defmodule Bee.UI.Client.Router do
       JS.object_expression([
         items() |> JS.property(null()),
         id() |> JS.property(null()),
+        mode() |> JS.property(list_mode()),
         sync("show", [items(), id()], [
-          assign("items"),
-          assign("id")
+          assign(:items),
+          assign(:id),
+          JS.if_statement(id(), assign(:mode, "update"), assign(:mode, "list"))
+        ]),
+        sync("create", [], [
+          assign(:mode, "create")
         ])
       ])
 

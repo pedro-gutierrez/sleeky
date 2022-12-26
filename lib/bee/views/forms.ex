@@ -37,11 +37,15 @@ defmodule Bee.Views.Forms do
 
     action = action(entity, :create)
 
-    {:view, form_view,
+    {:div, ["x-show": "$store.router.mode == 'create' || $store.router.mode == 'update'"],
      [
-       {:title, [], "#{entity.label} form"},
-       {:fields, [], flatten(form_fields)},
-       {:submit, [], action}
+       {:view, form_view,
+        [
+          {:title, [], "#{entity.label}"},
+          {:subtitle, [], "Basic information"},
+          {:fields, [], flatten(form_fields)},
+          {:submit, [], action}
+        ]}
      ]}
   end
 
@@ -53,7 +57,7 @@ defmodule Bee.Views.Forms do
      [
        {:label, attr.label},
        {:name, attr.name},
-       {:kind, :text},
+       {:kind, "text"},
        {:model, model},
        {:placeholder, "Enter #{attr.name}"}
      ]}

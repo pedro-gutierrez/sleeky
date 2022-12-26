@@ -33,10 +33,14 @@ defmodule Bee.Views.Lists do
          [[{:field, attr.name}, {:binding, "#{entity.name}.#{attr.name}"}] | fields]}
       end)
 
-    {:view, list_view,
+    {:div, ["x-show": "$store.router.mode == 'list'"],
      [
-       {:headers, [], headers},
-       {:fields, [], bindings}
+       {:view, list_view,
+        [
+          {:headers, [], headers},
+          {:fields, [], bindings},
+          {:onclick, [], "$store.router.show('#{entity.plural}', #{entity.name}.id)"}
+        ]}
      ]}
   end
 end

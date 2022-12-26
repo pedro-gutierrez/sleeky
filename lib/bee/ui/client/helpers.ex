@@ -12,13 +12,29 @@ defmodule Bee.UI.Client.Helpers do
   def item, do: JS.identifier(:item)
   def id, do: JS.identifier(:id)
   def error, do: JS.identifier(:error)
+  def mode, do: JS.identifier(:mode)
+  def list_mode, do: JS.literal("list")
+  def create_mode, do: JS.literal("create")
+  def update_mode, do: JS.literal("update")
 
   def assign(var) do
+    assign(var, var)
+  end
+
+  def assign(var, value) do
     JS.assignment_expression(
       :=,
       JS.identifier("this.#{var}"),
-      JS.identifier(var)
+      value(value)
     )
+  end
+
+  defp value(v) when is_binary(v) do
+    JS.literal(v)
+  end
+
+  defp value(v) when is_atom(v) do
+    JS.identifier(v)
   end
 
   def log(something) do

@@ -146,6 +146,7 @@ defmodule Bee.UI.View.Resolve do
 
       defp sanitize_attr([value]), do: sanitize_attr(value)
       defp sanitize_attr(value) when is_binary(value) or is_boolean(value), do: value
+      defp sanitize_attr(value) when is_atom(value), do: to_string(value)
     end
   end
 end

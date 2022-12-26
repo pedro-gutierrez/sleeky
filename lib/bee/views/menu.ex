@@ -27,8 +27,9 @@ defmodule Bee.Views.Menu do
 
   defp nav_item(entity) do
     [
-      onclick: "$store.router.show(\"#{entity.plural}\")",
-      class: "$store.router.items == '#{entity.plural}' ? 'bg-indigo-600': 'bg-gray-300'",
+      onclick: "$store.router.show('#{entity.plural}')",
+      class:
+        "$store.router.items == '#{entity.plural}' ? 'text-white bg-gray-900': 'text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white'",
       label: Inflex.pluralize(entity.label)
     ]
   end
