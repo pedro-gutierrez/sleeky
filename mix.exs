@@ -26,7 +26,7 @@ defmodule Bee.MixProject do
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:estree, "~> 2.7.0"},
-      {:html_builder, "~> 0.1"},
+      {:html_builder, git: "https://github.com/pedro-gutierrez/html_builder"},
       {:inflex, "~> 2.0.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},

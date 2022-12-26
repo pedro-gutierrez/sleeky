@@ -5,6 +5,7 @@ defmodule Bee.UI.Client do
   import Bee.UI.Client.Helpers
 
   @generators [
+    Bee.UI.Client.Router,
     Bee.UI.Client.Store
   ]
 
@@ -15,7 +16,8 @@ defmodule Bee.UI.Client do
       @generators
       |> Enum.map(& &1.ast(schema))
       |> flatten()
-      |> Enum.map(&render/1)
+      |> event_listener("alpine:init")
+      |> render()
 
     quote do
       defmodule unquote(client) do

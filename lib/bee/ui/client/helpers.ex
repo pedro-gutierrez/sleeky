@@ -13,6 +13,14 @@ defmodule Bee.UI.Client.Helpers do
   def id, do: JS.identifier(:id)
   def error, do: JS.identifier(:error)
 
+  def assign(var) do
+    JS.assignment_expression(
+      :=,
+      JS.identifier("this.#{var}"),
+      JS.identifier(var)
+    )
+  end
+
   def log(something) do
     call("console.log", [something])
   end
@@ -94,6 +102,18 @@ defmodule Bee.UI.Client.Helpers do
       false,
       false,
       true
+    )
+  end
+
+  def sync(name, params, statements) do
+    JS.function_declaration(
+      JS.identifier(name),
+      params,
+      [],
+      JS.block_statement(statements),
+      false,
+      false,
+      false
     )
   end
 

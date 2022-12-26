@@ -7,6 +7,7 @@ defmodule Bee.Entity do
   defstruct [
     :context,
     :name,
+    :label,
     :module,
     :plural,
     :table,
@@ -41,6 +42,7 @@ defmodule Bee.Entity do
       context: context(module),
       module: module,
       name: name,
+      label: Inflex.camelize(name),
       schema: schema,
       repo: repo,
       auth: auth,

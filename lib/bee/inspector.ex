@@ -98,6 +98,10 @@ defmodule Bee.Inspector do
     |> String.to_atom()
   end
 
+  def label(name) do
+    name |> to_string() |> String.replace("_", " ") |> String.capitalize()
+  end
+
   def context(module) do
     module |> Module.split() |> Enum.drop(-1) |> Module.concat()
   end

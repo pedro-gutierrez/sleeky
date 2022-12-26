@@ -44,6 +44,7 @@ defmodule Bee.Entity.Ecto do
 
       def name, do: unquote(entity.name)
       def plural, do: unquote(entity.plural)
+      def label, do: unquote(entity.label)
       def virtual?, do: false
       def table, do: unquote(entity.table)
       def attributes, do: unquote(Macro.escape(attributes))

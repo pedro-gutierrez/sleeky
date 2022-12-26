@@ -13,9 +13,7 @@ defmodule Bee.UI.Client.Store do
   import Bee.UI.Client.Helpers
 
   def ast(schema) do
-    schema.entities
-    |> Enum.map(&store/1)
-    |> event_listener("alpine:init")
+    Enum.map(schema.entities, &store/1)
   end
 
   defp store(entity) do

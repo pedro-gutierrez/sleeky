@@ -3,10 +3,6 @@ defmodule Bee.UI.View do
 
   import Bee.Inspector
 
-  @generators [
-    Bee.UI.View.Render
-  ]
-
   defstruct [:route, :module, :render]
 
   def new(opts) do
@@ -17,6 +13,13 @@ defmodule Bee.UI.View do
     parent |> context() |> module(name)
   end
 
+  def ast(definition) do
+    quote do
+      @definition unquote(Macro.escape(definition))
+      use Bee.UI.View.Resolve
+    end
+  end
+
   defmacro __using__(_opts) do
     quote do
       import Bee.UI.View.Dsl, only: :macros
@@ -25,10 +28,8 @@ defmodule Bee.UI.View do
   end
 
   defmacro __before_compile__(_env) do
-    page = __CALLER__.module
-
-    @generators
-    |> Enum.map(& &1.ast(page))
-    |> flatten()
+    __CALLER__.module
+    |> Module.get_attribute(:definition)
+    |> ast()
   end
 end

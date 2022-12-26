@@ -2,9 +2,11 @@ defmodule Bee.Entity.Attribute do
   @moduledoc false
   alias Bee.Entity.Aliases
   alias Bee.Entity.Summary
+  import Bee.Inspector
 
   defstruct [
     :name,
+    :label,
     :kind,
     :entity,
     :default,
@@ -26,6 +28,7 @@ defmodule Bee.Entity.Attribute do
   def new(fields) do
     __MODULE__
     |> struct(fields)
+    |> with_label()
     |> with_summary_entity()
     |> with_column()
     |> with_storage()
@@ -36,6 +39,10 @@ defmodule Bee.Entity.Attribute do
 
   def id?(attr) do
     attr.name == :id
+  end
+
+  def with_label(attr) do
+    %{attr | label: label(attr.name)}
   end
 
   defp with_summary_entity(attr) do
