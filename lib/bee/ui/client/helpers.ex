@@ -16,6 +16,7 @@ defmodule Bee.UI.Client.Helpers do
   def list_mode, do: JS.literal("list")
   def create_mode, do: JS.literal("create")
   def update_mode, do: JS.literal("update")
+  def path, do: JS.identifier(:path)
 
   def assign(var) do
     assign(var, var)
@@ -35,6 +36,10 @@ defmodule Bee.UI.Client.Helpers do
 
   defp value(v) when is_atom(v) do
     JS.identifier(v)
+  end
+
+  defp value(v) do
+    v
   end
 
   def log(something) do

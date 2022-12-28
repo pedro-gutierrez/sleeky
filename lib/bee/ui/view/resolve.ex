@@ -54,14 +54,19 @@ defmodule Bee.UI.View.Resolve do
         |> resolve(args)
       end
 
-      def resolve({:repeat, [], [view]} = directive, args) do
+      def resolve({:loop, [], children} = directive, args) do
         entity = entity!(args)
+        resolve({:loop, [entity.plural(), :items], children}, args)
+      end
+
+      def resolve({:loop, path, children}, args) do
+        path = Enum.map_join(path, ".", &to_string/1)
 
         {:template,
          [
-           "x-for": "#{entity.name()} in $store.#{entity.plural()}.items",
-           ":key": "#{entity.name()}.id"
-         ], [view.resolve(args)]}
+           "x-for": "item in $store.#{path}",
+           ":key": "item.id"
+         ], resolve(children, args)}
       end
 
       def resolve({:entity, entity, children}, args) do

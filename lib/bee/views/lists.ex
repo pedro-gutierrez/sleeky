@@ -30,7 +30,7 @@ defmodule Bee.Views.Lists do
       |> Enum.reject(&(&1.name == :id))
       |> Enum.reduce({[], []}, fn attr, {labels, fields} ->
         {[[{:label, attr.label}] | labels],
-         [[{:field, attr.name}, {:binding, "#{entity.name}.#{attr.name}"}] | fields]}
+         [[{:field, attr.name}, {:binding, "item.#{attr.name}"}] | fields]}
       end)
 
     {:div, ["x-show": "$store.router.mode == 'list'"],
@@ -39,7 +39,7 @@ defmodule Bee.Views.Lists do
         [
           {:headers, [], headers},
           {:fields, [], bindings},
-          {:onclick, [], "$store.router.show('#{entity.plural}', #{entity.name}.id)"}
+          {:onclick, [], "$store.router.show('#{entity.plural}', item.id)"}
         ]}
      ]}
   end

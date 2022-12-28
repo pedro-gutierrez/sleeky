@@ -9,41 +9,52 @@ defmodule Bee.Views.Forms do
     form_view = module(ui, Form)
 
     for entity <- schema.entities() do
-      module_name = module_name(views, entity)
-      definition = definition(ui, entity, form_view)
+      [
+        form(entity, :create, ui, views, form_view),
+        form(entity, :update, ui, views, form_view)
+      ]
+    end
+  end
 
-      quote do
-        defmodule unquote(module_name) do
-          unquote(View.ast(definition))
-        end
+  defp form(entity, intent, ui, views, form_view) do
+    module_name = module_name(views, entity, intent)
+    fields = form_fields(entity, intent, ui)
+    title = title(entity, intent)
+    subtitle = subtitle(entity, intent)
+    action = action(entity, intent)
+    definition = definition(form_view, title, subtitle, fields, action, intent)
+
+    quote do
+      defmodule unquote(module_name) do
+        unquote(View.ast(definition))
       end
     end
   end
 
-  defp module_name(views, entity) do
-    form = entity.label() |> module(Form)
+  defp module_name(views, entity, intent) do
+    intent = Inflex.camelize(intent)
+    form = entity.label() |> module("#{intent}Form")
     module(views, form)
   end
 
-  defp definition(ui, entity, form_view) do
-    form_fields =
-      entity.attributes
-      |> Enum.reject(& &1.immutable)
-      |> Enum.reject(& &1.virtual)
-      |> Enum.reject(& &1.computed)
-      |> Enum.reject(& &1.timestamp)
-      |> Enum.reject(& &1.implied)
-      |> Enum.map(&form_field(ui, &1))
+  defp form_fields(entity, _, ui) do
+    entity.attributes
+    |> Enum.reject(& &1.immutable)
+    |> Enum.reject(& &1.virtual)
+    |> Enum.reject(& &1.computed)
+    |> Enum.reject(& &1.timestamp)
+    |> Enum.reject(& &1.implied)
+    |> Enum.map(&form_field(ui, &1))
+  end
 
-    action = action(entity, :create)
-
-    {:div, ["x-show": "$store.router.mode == 'create' || $store.router.mode == 'update'"],
+  def definition(name, title, subtitle, fields, action, intent) do
+    {:div, ["x-show": "$store.router.mode == '#{intent}'"],
      [
-       {:view, form_view,
+       {:view, name,
         [
-          {:title, [], "#{entity.label}"},
-          {:subtitle, [], "Basic information"},
-          {:fields, [], flatten(form_fields)},
+          {:title, [], title},
+          {:subtitle, [], subtitle},
+          {:fields, [], flatten(fields)},
           {:submit, [], action}
         ]}
      ]}
@@ -96,8 +107,16 @@ defmodule Bee.Views.Forms do
     "$store.#{store}.item.#{name}"
   end
 
-  defp action(entity, name) do
+  defp title(entity, intent) do
+    "#{Inflex.camelize(intent)} #{entity.name()}"
+  end
+
+  defp subtitle(_, _) do
+    ""
+  end
+
+  defp action(entity, intent) do
     store = entity.plural
-    "$store.#{store}.#{name}()"
+    "$store.#{store}.#{intent}()"
   end
 end

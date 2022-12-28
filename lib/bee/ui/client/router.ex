@@ -17,17 +17,43 @@ defmodule Bee.UI.Client.Router do
 
     store =
       JS.object_expression([
+        path() |> JS.property(JS.array_expression([])),
         items() |> JS.property(null()),
         id() |> JS.property(null()),
         mode() |> JS.property(list_mode()),
         sync("show", [items(), id()], [
           assign(:items),
           assign(:id),
-          JS.if_statement(id(), assign(:mode, "update"), assign(:mode, "list"))
+          JS.if_statement(
+            id(),
+            JS.block_statement([
+              assign(:mode, "update"),
+              call("this.reset", []),
+              call("this.push", [JS.identifier(:items)]),
+              call("this.push", [JS.identifier(:id)])
+            ]),
+            JS.block_statement([
+              assign(:mode, "list"),
+              call("this.reset", []),
+              call("this.push", [JS.identifier(:items)])
+            ])
+          )
         ]),
         sync("create", [], [
           assign(:mode, "create")
-        ])
+        ]),
+        sync("reset", [], [
+          assign(:path, JS.array_expression([]))
+        ]),
+        sync("push", [JS.identifier(:label)], [
+          call("this.path.push", [
+            JS.object_expression([
+              JS.identifier(:label) |> JS.property(JS.identifier(:label)),
+              JS.identifier(:id) |> JS.property(JS.identifier(:label))
+            ])
+          ])
+        ]),
+        sync("is_last", [JS.identifier(:label)], [])
       ])
 
     call("Alpine.store", [name, store])
