@@ -5,7 +5,7 @@ defmodule Bee.Views.Lists do
   alias Bee.UI.View
 
   def ast(ui, views, schema) do
-    list_view = module(ui, List)
+    list_view = list_view(ui, views)
 
     for entity <- schema.entities() do
       module_name = module_name(views, entity)
@@ -19,13 +19,17 @@ defmodule Bee.Views.Lists do
     end
   end
 
-  defp module_name(views, entity) do
+  def list_view(_ui, views) do
+    module(views, Table)
+  end
+
+  def module_name(views, entity) do
     form = entity.label() |> module(List)
     module(views, form)
   end
 
   defp definition(_ui, entity, list_view) do
-    {headers, bindings} =
+    {headers, fields} =
       entity.attributes
       |> Enum.reject(&(&1.name == :id))
       |> Enum.reduce({[], []}, fn attr, {labels, fields} ->
@@ -33,13 +37,17 @@ defmodule Bee.Views.Lists do
          [[{:field, attr.name}, {:binding, "item.#{attr.name}"}] | fields]}
       end)
 
-    {:div, ["x-show": "$store.router.mode == 'list'"],
+    {:div, ["x-show": "$store.router.should_display('#{entity.plural}', 'list')"],
      [
        {:view, list_view,
         [
           {:headers, [], headers},
-          {:fields, [], bindings},
-          {:onclick, [], "$store.router.show('#{entity.plural}', item.id)"}
+          {:fields, [], fields},
+          {:next_page, [], "$store.#{entity.plural}.next_page()"},
+          {:previous_page, [], "$store.#{entity.plural}.previous_page()"},
+          {:search, [], "$store.#{entity.plural}.search"},
+          {:update, [], "$store.#{entity.plural}.list()"},
+          {:select, [], "`#/#{entity.plural}/${item.id}`"}
         ]}
      ]}
   end

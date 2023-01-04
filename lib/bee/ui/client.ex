@@ -15,9 +15,9 @@ defmodule Bee.UI.Client do
     source =
       @generators
       |> Enum.map(& &1.ast(schema))
-      |> flatten()
-      |> event_listener("alpine:init")
-      |> render()
+      |> Enum.map(&(&1 |> flatten() |> event_listener("alpine:init")))
+      |> Enum.map(&render/1)
+      |> Enum.join("\n")
 
     quote do
       defmodule unquote(client) do

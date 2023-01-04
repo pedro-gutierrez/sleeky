@@ -2,9 +2,21 @@ defmodule Bee.Views do
   @moduledoc false
 
   @generators [
+    Bee.Views.Notifications,
+    Bee.Views.Input,
+    Bee.Views.Select,
+    Bee.Views.Textarea,
+    Bee.Views.Label,
+    Bee.Views.Detail,
+    Bee.Views.Table,
+    Bee.Views.Form,
     Bee.Views.Forms,
     Bee.Views.Lists,
-    Bee.Views.Menu
+    Bee.Views.EntityDetail,
+    Bee.Views.NavBar,
+    Bee.Views.Menu,
+    Bee.Views.Breadcrumbs,
+    Bee.Views.Entities
   ]
 
   import Bee.Inspector

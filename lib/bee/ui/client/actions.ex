@@ -59,7 +59,7 @@ defmodule Bee.UI.Client.Actions do
       url
       |> fetch(request)
       |> decode_response()
-      |> reload_store()
+      |> set_item()
       |> handle_errors()
 
     async(action.name, params, [body])
@@ -196,6 +196,16 @@ defmodule Bee.UI.Client.Actions do
       JS.assignment_expression(
         :=,
         JS.identifier("this.items"),
+        response()
+      )
+    ])
+  end
+
+  defp set_item(callee) do
+    promise_then(callee, [response()], [
+      JS.assignment_expression(
+        :=,
+        JS.identifier("this.item"),
         response()
       )
     ])

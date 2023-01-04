@@ -25,9 +25,17 @@ defmodule Bee.UI.Client.Helpers do
   def assign(var, value) do
     JS.assignment_expression(
       :=,
-      JS.identifier("this.#{var}"),
+      variable(var),
       value(value)
     )
+  end
+
+  defp variable(var) when is_atom(var) do
+    variable("this.#{var}")
+  end
+
+  defp variable(var) when is_binary(var) do
+    JS.identifier(var)
   end
 
   defp value(v) when is_binary(v) do
@@ -132,6 +140,17 @@ defmodule Bee.UI.Client.Helpers do
       params,
       [],
       JS.block_statement(statements),
+      false,
+      false,
+      false
+    )
+  end
+
+  def arrow_function(params, block) do
+    JS.arrow_function_expression(
+      params,
+      [],
+      JS.block_statement(block),
       false,
       false,
       false

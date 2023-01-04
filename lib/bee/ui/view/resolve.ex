@@ -72,12 +72,7 @@ defmodule Bee.UI.View.Resolve do
       def resolve({:entity, entity, children}, args) do
         items = entity.plural()
         args = Map.put(args, :__entity__, entity)
-
-        {:div,
-         [
-           "x-show": "$store.router.items == '#{items}'",
-           "x-init": "$store.#{items}.list()"
-         ], resolve(children, args)}
+        resolve(children, args)
       end
 
       def resolve({:view, view}, args) do

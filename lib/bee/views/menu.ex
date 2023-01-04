@@ -2,11 +2,12 @@ defmodule Bee.Views.Menu do
   @moduledoc false
 
   import Bee.Inspector
+  alias Bee.Entity
   alias Bee.UI.View
 
   def ast(ui, views, schema) do
     view = module(views, Menu)
-    definition = definition(ui, schema)
+    definition = definition(ui, views, schema)
 
     quote do
       defmodule unquote(view) do
@@ -15,21 +16,27 @@ defmodule Bee.Views.Menu do
     end
   end
 
-  defp definition(ui, schema) do
-    nav_view = module(ui, Nav)
-    items = Enum.map(schema.entities(), &nav_item/1)
+  defp definition(ui, views, schema) do
+    nav_bar_view = navbar_view(ui, views)
+    items = schema.entities() |> Enum.filter(&has_menu?/1) |> Enum.map(&nav_item/1)
 
-    {:view, nav_view,
+    {:view, nav_bar_view,
      [
        {:items, items}
      ]}
   end
 
+  defp navbar_view(_ui, views) do
+    module(views, NavBar)
+  end
+
+  defp has_menu?(entity) do
+    Enum.empty?(entity.parents) && Entity.action(:list, entity)
+  end
+
   defp nav_item(entity) do
     [
-      onclick: "$store.router.show('#{entity.plural}')",
-      class:
-        "$store.router.items == '#{entity.plural}' ? 'text-white bg-gray-900': 'text-gray-300 bg-gray-800 hover:bg-gray-700 hover:text-white'",
+      url: "#/#{entity.plural}",
       label: Inflex.pluralize(entity.label)
     ]
   end

@@ -5,10 +5,22 @@ defmodule Bee.UI.Dsl do
 
   import Bee.Inspector
 
-  defmacro view(route, mod, opts \\ []) do
+  defmacro view({:__aliases__, _, mod}, opts \\ []) do
     ui = __CALLER__.module
     render = opts[:render] || :compilation
-    view = View.new(module: module(mod), route: route, render: render)
+    view = module(mod)
+    route = opts[:at] || route(mod)
+    view = View.new(module: view, route: route, render: render)
     Module.put_attribute(ui, :views, view)
+  end
+
+  defp route(view) when is_list(view) do
+    case view
+         |> List.last()
+         |> Inflex.underscore()
+         |> to_string() do
+      "index" -> "/"
+      name -> "/#{name}"
+    end
   end
 end

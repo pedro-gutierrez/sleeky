@@ -32,11 +32,11 @@ defmodule Bee.UI.Router do
 
         @client_app unquote(client).source()
 
-        get "/assets/app.js" do
-          unquote(conn)
-          |> put_resp_content_type(@javascript)
-          |> send_resp(200, @client_app)
-        end
+        # get "/assets/app.js" do
+        #  unquote(conn)
+        #  |> put_resp_content_type(@javascript)
+        #  |> send_resp(200, @client_app)
+        # end
 
         match _ do
           send_html(unquote(conn), "<h1>Not Found</h1>", 404)
