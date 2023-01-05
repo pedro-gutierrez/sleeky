@@ -2,33 +2,58 @@ defmodule Bee.Views.Forms do
   @moduledoc false
 
   import Bee.Inspector
+  alias Bee.Entity.Action
   alias Bee.UI.View
   alias Bee.Entity.Attribute
 
   def ast(ui, views, schema) do
     form_view = form_view(ui, views)
 
-    for entity <- schema.entities() do
-      [
-        form(entity, :create, ui, views, form_view),
-        form(entity, :update, ui, views, form_view),
-        form(entity, :delete, ui, views, form_view)
-      ]
-    end
+    schema.entities()
+    |> Enum.flat_map(& &1.actions)
+    |> Enum.map(&form(ui, views, form_view, &1))
+    |> flatten()
   end
 
   defp form_view(_ui, views) do
     module(views, Form)
   end
 
-  defp form(entity, intent, ui, views, form_view) do
-    module_name = module_name(views, entity, intent)
-    fields = form_fields(entity, intent, ui, views)
-    title = title(entity, intent)
-    subtitle = subtitle(entity, intent)
-    action = action(entity, intent)
-    cancel = cancel(entity, intent)
-    definition = definition(entity, form_view, title, subtitle, fields, action, cancel, intent)
+  defp form(_ui, views, _form_view, %Action{name: name, entity: entity}) when name == :delete do
+    module_name = module_name(views, entity, name)
+    submit = action(entity, name)
+    cancel = cancel(entity, name)
+
+    definition =
+      {:div,
+       [
+         class: "box hero is-shadowless has-background-danger-light",
+         "x-show": "$store.router.should_display('#{entity.plural}', 'delete')"
+       ],
+       [
+         {:div, [class: "container"],
+          [
+            {:p, [class: "block has-text-danger"],
+             ["Are you sure you want to delete this item?"]},
+            {:div, [class: "field is-grouped is-grouped-centered"],
+             [
+               {:div, [class: "control"],
+                [
+                  {:a, [href: "#", class: "button is-danger", "x-on:click": submit],
+                   [
+                     "Delete"
+                   ]}
+                ]},
+               {:div, [class: "control"],
+                [
+                  {:a, [class: "button is-light", "x-bind:href": cancel],
+                   [
+                     "Cancel"
+                   ]}
+                ]}
+             ]}
+          ]}
+       ]}
 
     quote do
       defmodule unquote(module_name) do
@@ -36,6 +61,25 @@ defmodule Bee.Views.Forms do
       end
     end
   end
+
+  defp form(ui, views, form_view, %Action{name: name, entity: entity})
+       when name in [:create, :update] do
+    module_name = module_name(views, entity, name)
+    fields = form_fields(entity, name, ui, views)
+    title = title(entity, name)
+    subtitle = subtitle(entity, name)
+    action = action(entity, name)
+    cancel = cancel(entity, name)
+    definition = definition(entity, form_view, title, subtitle, fields, action, cancel, name)
+
+    quote do
+      defmodule unquote(module_name) do
+        unquote(View.ast(definition))
+      end
+    end
+  end
+
+  defp form(_ui, _views, _form_view, _action), do: nil
 
   def module_name(views, entity, intent) do
     intent = Inflex.camelize(intent)
