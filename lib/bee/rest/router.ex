@@ -2,8 +2,6 @@ defmodule Bee.Rest.Router do
   @moduledoc false
 
   import Bee.Inspector
-
-  alias Bee.Entity.Action
   alias Bee.Rest.Handlers
 
   def ast(rest, schema) do
@@ -48,40 +46,8 @@ defmodule Bee.Rest.Router do
   end
 
   defp routes(entity, rest) do
-    [
-      standard_routes(entity, rest)
-    ]
-  end
-
-  defp standard_routes(entity, rest) do
-    for action <- entity.actions do
-      handler = Handlers.module_name(rest, entity, action)
-      method = http_method(action)
-      path = http_path(action)
-
-      quote do
-        unquote(method)(unquote(path), to: unquote(handler))
-      end
+    for generator <- Handlers.generators() do
+      generator.routes(entity, rest)
     end
   end
-
-  def http_method(:read), do: :get
-  def http_method(:list), do: :get
-  def http_method(:create), do: :post
-  def http_method(:update), do: :patch
-  def http_method(:delete), do: :delete
-  def http_method(%Action{} = action), do: http_method(action.name)
-
-  defp http_path(%Action{} = action) do
-    case action.name do
-      :read -> resource_http_path(action.entity)
-      :list -> collection_http_path(action.entity)
-      :create -> collection_http_path(action.entity)
-      :update -> resource_http_path(action.entity)
-      :delete -> resource_http_path(action.entity)
-    end
-  end
-
-  defp resource_http_path(entity), do: "/#{entity.plural}/:id"
-  defp collection_http_path(entity), do: "/#{entity.plural}"
 end

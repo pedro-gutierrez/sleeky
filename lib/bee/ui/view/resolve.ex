@@ -56,7 +56,7 @@ defmodule Bee.UI.View.Resolve do
 
       def resolve({:loop, [], children} = directive, args) do
         entity = entity!(args)
-        resolve({:loop, [entity.plural(), :items], children}, args)
+        resolve({:loop, [:items], children}, args)
       end
 
       def resolve({:loop, path, children}, args) do
@@ -64,7 +64,7 @@ defmodule Bee.UI.View.Resolve do
 
         {:template,
          [
-           "x-for": "item in $store.#{path}",
+           "x-for": "item in $store.default.#{path}",
            ":key": "item.id"
          ], resolve(children, args)}
       end

@@ -1,7 +1,6 @@
 defmodule Bee.Entity.Ecto.Schema do
   @moduledoc false
   import Bee.Inspector
-  alias Bee.Entity.Relation
 
   def ast(entity) do
     source = to_string(entity.plural)
@@ -62,7 +61,7 @@ defmodule Bee.Entity.Ecto.Schema do
 
   defp ecto_schema_children(entity) do
     for rel <- entity.children do
-      inverse = Relation.inverse(rel)
+      inverse = rel.inverse
 
       quote do
         has_many(

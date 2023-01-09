@@ -11,6 +11,7 @@ defmodule Bee.Entity.Relation do
     :target,
     :column,
     :foreign_key,
+    :inverse,
     aliases: [],
     required: true,
     immutable: false,
@@ -24,12 +25,31 @@ defmodule Bee.Entity.Relation do
     |> with_summary_entity()
     |> with_summary_target()
     |> with_column()
-    |> with_foreign_key()
     |> with_aliases()
   end
 
-  def inverse(%{kind: :child} = rel) do
-    new(name: rel.entity.name, kind: :parent, target: rel.entity, entity: rel.target)
+  def with_inverse(%{kind: :child} = rel) do
+    inverse = new(name: rel.entity.name, kind: :parent, target: rel.entity, entity: rel.target)
+
+    %{rel | inverse: inverse}
+  end
+
+  def with_inverse(%{kind: :parent} = rel) do
+    inverse = new(name: rel.entity.plural, kind: :child, target: rel.entity, entity: rel.target)
+
+    %{rel | inverse: inverse}
+  end
+
+  def with_foreign_key(%{kind: :parent} = rel) do
+    fk = ForeignKey.new(rel)
+
+    %{rel | foreign_key: fk}
+  end
+
+  def with_foreign_key(%{kind: :child} = rel) do
+    fk = ForeignKey.new(rel.inverse)
+
+    %{rel | foreign_key: fk}
   end
 
   defp with_summary_entity(rel) do
@@ -62,21 +82,6 @@ defmodule Bee.Entity.Relation do
   end
 
   defp with_column(rel), do: rel
-
-  defp with_foreign_key(%{kind: :parent} = rel) do
-    fk = ForeignKey.new(rel)
-
-    %{rel | foreign_key: fk}
-  end
-
-  defp with_foreign_key(%{kind: :child} = rel) do
-    fk =
-      rel
-      |> inverse()
-      |> ForeignKey.new()
-
-    %{rel | foreign_key: fk}
-  end
 
   defp with_aliases(rel) do
     Aliases.new(rel)

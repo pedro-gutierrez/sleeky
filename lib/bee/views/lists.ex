@@ -37,16 +37,16 @@ defmodule Bee.Views.Lists do
          [[{:field, attr.name}, {:binding, "item.#{attr.name}"}] | fields]}
       end)
 
-    {:div, ["x-show": "$store.router.should_display('#{entity.plural}', 'list')"],
+    {:div, ["x-show": "$store.default.should_display('#{entity.plural}', 'list')"],
      [
        {:view, list_view,
         [
           {:headers, [], headers},
           {:fields, [], fields},
-          {:next_page, [], "$store.#{entity.plural}.next_page()"},
-          {:previous_page, [], "$store.#{entity.plural}.previous_page()"},
-          {:search, [], "$store.#{entity.plural}.search"},
-          {:update, [], "$store.#{entity.plural}.list()"},
+          {:next_page, [], "$store.default.next_page()"},
+          {:previous_page, [], "$store.default.previous_page()"},
+          {:search, [], "$store.default.search"},
+          {:update, [], "$store.default.list()"},
           {:select, [], "`#/#{entity.plural}/${item.id}`"}
         ]}
      ]}

@@ -30,7 +30,7 @@ defmodule Bee.Views.Breadcrumbs do
                  ]}
               ]}
            ]},
-          {:loop, [:router, :path],
+          {:loop, [:path],
            [
              {:li, [],
               [

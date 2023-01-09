@@ -56,7 +56,7 @@ defmodule Bee.Views.Table do
             {:a,
              [
                class: "button mx-1 is-primary is-pulled-right",
-               "x-bind:href": "`#/${$store.router.entity}/new`"
+               "x-bind:href": "`#/${$store.default.entity}/new`"
              ],
              [
                {:span, [class: "icon"],

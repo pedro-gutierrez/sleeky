@@ -1,8 +1,6 @@
 defmodule Bee.Entity.Ecto.Join do
   @moduledoc false
 
-  alias Bee.Entity.Relation
-
   def ast(entity) do
     [
       header_join_function(),
@@ -54,7 +52,7 @@ defmodule Bee.Entity.Ecto.Join do
   def join_children_functions(entity) do
     for rel <- entity.children do
       target_entity = rel.target.module
-      inverse = Relation.inverse(rel)
+      inverse = rel.inverse
       column_name = inverse.column
 
       quote do

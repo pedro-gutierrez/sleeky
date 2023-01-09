@@ -10,7 +10,9 @@ defmodule Bee.Views.Forms do
     form_view = form_view(ui, views)
 
     schema.entities()
-    |> Enum.flat_map(& &1.actions)
+    |> Enum.flat_map(fn e ->
+      for action <- e.actions, do: Map.put(action, :entity, e)
+    end)
     |> Enum.map(&form(ui, views, form_view, &1))
     |> flatten()
   end
@@ -28,7 +30,7 @@ defmodule Bee.Views.Forms do
       {:div,
        [
          class: "box hero is-shadowless has-background-danger-light",
-         "x-show": "$store.router.should_display('#{entity.plural}', 'delete')"
+         "x-show": "$store.default.should_display('#{entity.plural}', 'delete')"
        ],
        [
          {:div, [class: "container"],
@@ -102,7 +104,7 @@ defmodule Bee.Views.Forms do
   end
 
   def definition(entity, name, title, subtitle, fields, submit, cancel, intent) do
-    {:div, ["x-show": "$store.router.should_display('#{entity.plural}', '#{intent}')"],
+    {:div, ["x-show": "$store.default.should_display('#{entity.plural}', '#{intent}')"],
      [
        {:view, name,
         [
@@ -129,49 +131,39 @@ defmodule Bee.Views.Forms do
 
   defp form_field(ui, views, %Attribute{kind: :string} = attr) do
     field_view = input_view(ui, views)
-    model = model(attr)
 
     {:view, field_view,
      [
        {:label, attr.label},
        {:name, attr.name},
        {:kind, "text"},
-       {:model, model},
+       {:model, "$store.default.item.#{attr.name}"},
        {:placeholder, "Enter #{attr.name}"}
      ]}
   end
 
   defp form_field(ui, views, %Attribute{kind: :text} = attr) do
     field_view = textarea_view(ui, views)
-    model = model(attr)
 
     {:view, field_view,
      [
        {:label, attr.label},
        {:name, attr.name},
-       {:model, model},
+       {:model, "$store.default.item.#{attr.name}"},
        {:placeholder, "Enter #{attr.name}"}
      ]}
   end
 
   defp form_field(ui, views, %Attribute{kind: :enum} = attr) do
     field_view = select_view(ui, views)
-    model = model(attr)
 
     {:view, field_view,
      [
        {:label, attr.label},
        {:name, attr.name},
-       {:model, model},
+       {:model, "$store.default.item.#{attr.name}"},
        {:placeholder, "Enter #{attr.name}"}
      ]}
-  end
-
-  defp model(attr) do
-    store = attr.entity.plural
-    name = attr.name
-
-    "$store.#{store}.item.#{name}"
   end
 
   defp title(entity, intent) do
@@ -182,9 +174,8 @@ defmodule Bee.Views.Forms do
     ""
   end
 
-  defp action(entity, intent) do
-    store = entity.plural
-    "$store.#{store}.#{intent}()"
+  defp action(_entity, intent) do
+    "$store.default.#{intent}()"
   end
 
   defp cancel(entity, :create) do
@@ -192,6 +183,6 @@ defmodule Bee.Views.Forms do
   end
 
   defp cancel(entity, _) do
-    "`/#/#{entity.plural}/${$store.#{entity.plural}.item.id}`"
+    "`/#/#{entity.plural}/${$store.default.item.id}`"
   end
 end

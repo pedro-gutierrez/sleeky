@@ -43,6 +43,8 @@ defmodule Bee.Entity.Dsl do
     entity =
       [name: name, kind: :parent, entity: entity]
       |> Relation.new()
+      |> Relation.with_inverse()
+      |> Relation.with_foreign_key()
       |> with_opts(opts)
       |> add_to(:parents, entity)
 
@@ -56,6 +58,8 @@ defmodule Bee.Entity.Dsl do
     entity =
       [name: name, kind: :child, entity: entity]
       |> Relation.new()
+      |> Relation.with_inverse()
+      |> Relation.with_foreign_key()
       |> with_opts(opts)
       |> add_to(:children, entity)
 

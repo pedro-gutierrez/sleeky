@@ -21,7 +21,7 @@ defmodule Bee.Views.Notifications do
 
   defp definition(_ui, _schema) do
     {:div, [class: "block notifications"],
-     {:loop, [:router, :messages],
+     {:loop, [:messages],
       {:div,
        [
          "x-bind:class": "`is-${item.severity}`",
