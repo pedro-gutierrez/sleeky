@@ -41,4 +41,12 @@ defmodule Bee.Rest.Handlers.Helpers do
         unquote(conn) |> cast_param("id", :id, :required) |> as(:id, unquote(args))
     end
   end
+
+  def pagination_args do
+    conn = var(:conn)
+
+    quote do
+      {:ok, unquote(conn)} <- with_pagination(unquote(conn))
+    end
+  end
 end

@@ -6,7 +6,8 @@ defmodule Bee.Rest.Handlers do
   def generators do
     [
       Bee.Rest.Handlers.Default,
-      Bee.Rest.Handlers.Aggregates
+      Bee.Rest.Handlers.Aggregates,
+      Bee.Rest.Handlers.Children
     ]
   end
 

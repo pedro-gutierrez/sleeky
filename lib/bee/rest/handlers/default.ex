@@ -46,6 +46,8 @@ defmodule Bee.Rest.Handlers.Default do
   defp collection_http_path(entity), do: "/#{entity.plural}"
 
   defp action_handler(rest, entity, %Action{name: :list} = action) do
+    conn = var(:conn)
+
     preconditions = [
       pagination_args(),
       api_call(entity, action)
@@ -53,11 +55,11 @@ defmodule Bee.Rest.Handlers.Default do
 
     body = [
       quote do
-        def handle(conn, _opts) do
+        def handle(unquote(conn), _opts) do
           with unquote_splicing(flatten(preconditions)) do
-            send_json(conn, items)
+            send_json(unquote(conn), items)
           else
-            {:error, reason} -> send_error(conn, reason)
+            {:error, reason} -> send_error(unquote(conn), reason)
           end
         end
       end
@@ -173,12 +175,6 @@ defmodule Bee.Rest.Handlers.Default do
     ]
 
     handler(rest, entity, action, body)
-  end
-
-  defp pagination_args do
-    quote do
-      {:ok, conn} <- with_pagination(conn)
-    end
   end
 
   defp attribute_args(entity, action) do
@@ -328,8 +324,10 @@ defmodule Bee.Rest.Handlers.Default do
   end
 
   defp api_call(entity, %Action{name: :list}) do
+    conn = var(:conn)
+
     quote do
-      {:ok, items} <- unquote(entity).list(conn.assigns)
+      {:ok, items} <- unquote(entity).list(unquote(conn).assigns)
     end
   end
 

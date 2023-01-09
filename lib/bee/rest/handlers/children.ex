@@ -1,4 +1,4 @@
-defmodule Bee.Rest.Handlers.Aggregates do
+defmodule Bee.Rest.Handlers.Children do
   @moduledoc false
 
   alias Bee.Entity.Relation
@@ -27,7 +27,7 @@ defmodule Bee.Rest.Handlers.Aggregates do
 
   defp route(%Relation{} = rel, rest) do
     method = :get
-    path = "/#{rel.entity.plural}/:id/#{rel.name}/aggregate"
+    path = "/#{rel.entity.plural}/:id/#{rel.name}"
     action = action(rel)
     handler = module_name(rest, rel.entity, action)
 
@@ -37,7 +37,7 @@ defmodule Bee.Rest.Handlers.Aggregates do
   end
 
   defp action(rel) do
-    module(Aggregate, Inflex.camelize(rel.name))
+    module(List, Inflex.camelize(rel.name))
   end
 
   defp handler(%Relation{} = rel, rest) do
@@ -48,6 +48,7 @@ defmodule Bee.Rest.Handlers.Aggregates do
 
     preconditions = [
       required_id_arg(),
+      pagination_args(),
       api_call(rel)
     ]
 
@@ -57,7 +58,7 @@ defmodule Bee.Rest.Handlers.Aggregates do
           unquote(args) = %{}
 
           with unquote_splicing(flatten(preconditions)) do
-            send_json(unquote(conn), data, 200)
+            send_json(unquote(conn), items, 200)
           else
             {:error, reason} -> send_error(unquote(conn), reason)
           end
@@ -71,10 +72,10 @@ defmodule Bee.Rest.Handlers.Aggregates do
     conn = var(:conn)
     args = var(:args)
     entity = rel.target.module
-    fun_name = function_name(:aggregate_by, rel.inverse.name)
+    fun_name = function_name(:list_by, rel.inverse.name)
 
     quote do
-      {:ok, data} <-
+      {:ok, items} <-
         unquote(entity).unquote(fun_name)(
           unquote(args).id,
           unquote(conn).assigns
