@@ -145,8 +145,19 @@ defmodule Bee.UI.View.Resolve do
       end
 
       defp sanitize_attr([value]), do: sanitize_attr(value)
-      defp sanitize_attr(value) when is_binary(value) or is_boolean(value), do: value
+
+      defp sanitize_attr(value) when is_binary(value) or is_boolean(value) or is_number(value),
+        do: value
+
       defp sanitize_attr(value) when is_atom(value), do: to_string(value)
+
+      defp sanitize_attr({expr, [], args}) when is_atom(expr) and is_list(args) do
+        {expr, [], Enum.map(args, &sanitize_attr/1)}
+      end
+
+      defp sanitize_attr({expr, arg}) when is_atom(expr) do
+        {expr, sanitize_attr(arg)}
+      end
     end
   end
 end

@@ -31,7 +31,7 @@ defmodule Bee.Rest.RouterHelper do
         def cast_param(conn, name, kind, default \\ :invalid) do
           value = conn.params[name]
 
-          cast(value, kind, default)
+          cast(value, kind, default, name)
         end
 
         def lookup(conn, param, api, :required) do
@@ -59,7 +59,7 @@ defmodule Bee.Rest.RouterHelper do
               {:ok, default_fn.()}
 
             value ->
-              with {:ok, id} <- cast(value, :id) do
+              with {:ok, id} <- cast(value, :id, param) do
                 api.get(id)
               end
           end
@@ -94,36 +94,44 @@ defmodule Bee.Rest.RouterHelper do
           end
         end
 
-        defp cast(nil, _, :invalid), do: {:error, :invalid}
-        defp cast("", _, :invalid), do: {:error, :invalid}
-        defp cast(nil, _, :continue), do: {:error, :continue}
-        defp cast("", _, :continue), do: {:error, :continue}
-        defp cast(nil, _, default), do: {:ok, default}
-        defp cast("", _, default), do: {:ok, default}
-        defp cast(v, kind, _), do: cast(v, kind)
+        defp cast(nil, _, :invalid, field), do: invalid(field)
+        defp cast("", _, :invalid, field), do: invalid(field)
+        defp cast(nil, _, :continue, _), do: {:error, :continue}
+        defp cast("", _, :continue, _), do: {:error, :continue}
+        defp cast(nil, _, default, _), do: {:ok, default}
+        defp cast("", _, default, _), do: {:ok, default}
+        defp cast(v, kind, _, field), do: cast(v, kind, field)
 
-        defp cast(v, :id) do
+        defp cast(v, :id, field) do
           with :error <- Ecto.UUID.cast(v) do
-            {:error, :invalid}
+            invalid(field)
           end
         end
 
-        defp cast(v, :integer) do
+        defp cast(v, :integer, field) do
           case Integer.parse(v) do
             {v, ""} -> {:ok, v}
-            :error -> {:error, :invalid}
+            :error -> invalid(field)
           end
         end
 
-        defp cast(v, :string) when is_binary(v), do: {:ok, v}
-        defp cast(v, :atom) when is_binary(v), do: {:ok, String.to_existing_atom(v)}
-        defp cast(json, :json) when is_map(json), do: {:ok, json}
+        defp cast(v, :string, _field) when is_binary(v), do: {:ok, v}
+        defp cast(v, :atom, _field) when is_binary(v), do: {:ok, String.to_existing_atom(v)}
+        defp cast(json, :json, _field) when is_map(json), do: {:ok, json}
 
-        defp cast(v, :datetime) do
+        defp cast(v, :datetime, field) do
           case DateTime.from_iso8601(v) do
             {:ok, dt, _} -> {:ok, dt}
-            {:error, _} -> {:error, :invalid}
+            {:error, _} -> invalid(field)
           end
+        end
+
+        defp invalid(field) do
+          error(field, :invalid)
+        end
+
+        defp error(field, reason) do
+          {:error, %{reason: reason, field: field}}
         end
 
         def as(result, arg, args \\ %{})
@@ -134,12 +142,14 @@ defmodule Bee.Rest.RouterHelper do
         defp reason(r) when is_atom(r), do: r |> to_string() |> reason()
         defp reason(r) when is_binary(r), do: [%{detail: r}]
         defp reason(r) when is_list(r), do: r
+        defp reason(r) when is_map(r), do: r
 
         defp status(:not_found), do: 404
         defp status(:invalid), do: 400
         defp status(:unauthorized), do: 401
         defp status(:conflict), do: 409
         defp status([%{detail: "has already been taken"}]), do: 409
+        defp status(%{reason: reason}), do: status(reason)
         defp status(_), do: 500
       end
     end
