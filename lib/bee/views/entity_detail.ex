@@ -14,6 +14,7 @@ defmodule Bee.Views.EntityDetail do
     module_name = module_name(views, entity)
     detail_view = detail_view(ui, views)
     children_view = children_view(ui, views)
+    parents_view = parents_view(ui, views)
     fields = fields(entity, ui, views)
 
     show = ["x-show": "$store.default.should_display('#{entity.plural()}', 'show')"]
@@ -25,7 +26,7 @@ defmodule Bee.Views.EntityDetail do
            {:div, [class: "column"], entity_detail(entity, detail_view, fields)},
            {:div, [class: "column"],
             flatten([
-              entity_parents(entity),
+              entity_parents(entity, parents_view),
               entity_children(entity, children_view)
             ])}
          ]}
@@ -58,6 +59,10 @@ defmodule Bee.Views.EntityDetail do
     module(views, Children)
   end
 
+  defp parents_view(_ui, views) do
+    module(views, Parents)
+  end
+
   defp label_view(_ui, views) do
     module(views, Label)
   end
@@ -81,10 +86,16 @@ defmodule Bee.Views.EntityDetail do
      ]}
   end
 
-  defp entity_parents(entity) do
+  defp entity_parents(entity, parents_view) do
     if Enum.empty?(entity.parents) do
       nil
     else
+      parents = Enum.map(entity.parents, &parent_link/1)
+
+      {:view, parents_view,
+       [
+         {:items, [], parents}
+       ]}
     end
   end
 
@@ -108,12 +119,26 @@ defmodule Bee.Views.EntityDetail do
     [
       {:label, name},
       {:url, select},
-      {:count, count}
+      {:count, count},
+      {:class, "#{count} > 0 ? 'is-primary' : ''"}
+    ]
+  end
+
+  defp parent_link(%Relation{} = rel) do
+    [
+      {:label, rel.name},
+      {:url, parent_url(rel)}
     ]
   end
 
   defp item_url(entity, name) do
     "`/#/#{entity.plural()}/${$store.default.item.id}/#{name}`"
+  end
+
+  defp parent_url(rel) do
+    target = rel.target.module
+
+    "`/#/#{target.plural()}/${$store.default.item.#{rel.name}?.id}`"
   end
 
   defp label(ui, views, %Attribute{} = attr) do

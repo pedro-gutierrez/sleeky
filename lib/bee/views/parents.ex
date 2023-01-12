@@ -1,11 +1,11 @@
-defmodule Bee.Views.Children do
+defmodule Bee.Views.Parents do
   @moduledoc false
 
   import Bee.Inspector
   alias Bee.UI.View
 
   def ast(_ui, views, _schema) do
-    view = module(views, Children)
+    view = module(views, Parents)
 
     definition =
       {:aside, [class: "menu box is-shadowless"],
@@ -18,12 +18,8 @@ defmodule Bee.Views.Children do
                 {:a, [class: "", "x-bind:href": {:slot, :url}],
                  [
                    {:span, [], [{:slot, :label}]},
-                   {:span,
-                    [
-                      "x-bind:class": {:slot, :class},
-                      class: "is-pulled-right tag is-rounded",
-                      "x-text": {:slot, :count}
-                    ], []}
+                   {:i, [class: "is-pulled-right fa-solid fa-arrow-right has-text-primary mr-1"],
+                    []}
                  ]}
               ]}
            ]}}
