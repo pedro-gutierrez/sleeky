@@ -3,9 +3,11 @@ defmodule Bee.Entity.Relation do
   alias Bee.Entity.Aliases
   alias Bee.Entity.ForeignKey
   alias Bee.Entity.Summary
+  import Bee.Inspector
 
   defstruct [
     :name,
+    :label,
     :kind,
     :entity,
     :target,
@@ -21,11 +23,16 @@ defmodule Bee.Entity.Relation do
   def new(fields) do
     __MODULE__
     |> struct(fields)
+    |> with_label()
     |> with_target()
     |> with_summary_entity()
     |> with_summary_target()
     |> with_column()
     |> with_aliases()
+  end
+
+  def with_label(rel) do
+    %{rel | label: label(rel.name)}
   end
 
   def with_inverse(%{kind: :child} = rel) do

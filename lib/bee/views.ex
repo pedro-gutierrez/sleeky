@@ -4,6 +4,7 @@ defmodule Bee.Views do
   @generators [
     Bee.Views.Notifications,
     Bee.Views.Input,
+    Bee.Views.EntitySelect,
     Bee.Views.Select,
     Bee.Views.Textarea,
     Bee.Views.Label,

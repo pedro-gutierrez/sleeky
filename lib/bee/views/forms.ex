@@ -5,6 +5,7 @@ defmodule Bee.Views.Forms do
   alias Bee.Entity.Action
   alias Bee.UI.View
   alias Bee.Entity.Attribute
+  alias Bee.Entity.Relation
 
   def ast(ui, views, schema) do
     form_view = form_view(ui, views)
@@ -94,12 +95,24 @@ defmodule Bee.Views.Forms do
   end
 
   defp form_fields(entity, _, ui, views) do
+    parent_fields(entity, ui, views) ++
+      attribute_fields(entity, ui, views)
+  end
+
+  defp attribute_fields(entity, ui, views) do
     entity.attributes
     |> Enum.reject(& &1.immutable)
     |> Enum.reject(& &1.virtual)
     |> Enum.reject(& &1.computed)
     |> Enum.reject(& &1.timestamp)
     |> Enum.reject(& &1.implied)
+    |> Enum.map(&form_field(ui, views, &1))
+  end
+
+  defp parent_fields(entity, ui, views) do
+    entity.parents
+    |> Enum.reject(& &1.computed)
+    |> Enum.reject(& &1.computed)
     |> Enum.map(&form_field(ui, views, &1))
   end
 
@@ -127,6 +140,10 @@ defmodule Bee.Views.Forms do
 
   defp select_view(_ui, views) do
     module(views, Select)
+  end
+
+  defp entity_select_view(_ui, views) do
+    module(views, EntitySelect)
   end
 
   defp form_field(ui, views, %Attribute{kind: :string} = attr) do
@@ -163,6 +180,21 @@ defmodule Bee.Views.Forms do
        {:name, attr.name},
        {:model, "$store.default.item.#{attr.name}"},
        {:placeholder, "Enter #{attr.name}"}
+     ]}
+  end
+
+  defp form_field(ui, views, %Relation{} = rel) do
+    field_view = entity_select_view(ui, views)
+    value = "$store.default.item.#{rel.name}"
+    filter = "$store.default.filter.#{rel.name}"
+
+    {:view, field_view,
+     [
+       {:label, rel.label},
+       {:name, rel.name},
+       {:value, value},
+       {:filter, filter},
+       {:placeholder, "Search #{rel.target.plural}"}
      ]}
   end
 

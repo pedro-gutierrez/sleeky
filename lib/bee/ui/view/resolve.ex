@@ -93,7 +93,7 @@ defmodule Bee.UI.View.Resolve do
       end
 
       def resolve({node, attrs, children}, args) do
-        {node, attrs |> resolve(args) |> sanitize_attrs(), resolve(children, args)}
+        {node, attrs |> resolve(args) |> sanitize_attrs(args), resolve(children, args)}
       end
 
       def resolve({node, children}, args) when is_list(children) do
@@ -140,23 +140,42 @@ defmodule Bee.UI.View.Resolve do
         end
       end
 
-      defp sanitize_attrs(attrs) do
-        for {name, value} <- attrs, do: {name, sanitize_attr(value)}
+      defp sanitize_attrs(attrs, args) do
+        for {name, value} <- attrs, do: {name, sanitize_attr(value, args)}
       end
 
-      defp sanitize_attr([value]), do: sanitize_attr(value)
+      defp sanitize_attr([value], args), do: sanitize_attr(value, args)
 
-      defp sanitize_attr(value) when is_binary(value) or is_boolean(value) or is_number(value),
-        do: value
-
-      defp sanitize_attr(value) when is_atom(value), do: to_string(value)
-
-      defp sanitize_attr({expr, [], args}) when is_atom(expr) and is_list(args) do
-        {expr, [], Enum.map(args, &sanitize_attr/1)}
+      defp sanitize_attr(value, args) when is_binary(value) do
+        replace_slots(value, args)
       end
 
-      defp sanitize_attr({expr, arg}) when is_atom(expr) do
-        {expr, sanitize_attr(arg)}
+      defp sanitize_attr(value, _args)
+           when is_boolean(value) or is_number(value),
+           do: value
+
+      defp sanitize_attr(value, _args) when is_atom(value), do: to_string(value)
+
+      defp replace_slots(str, args) do
+        str
+        |> String.split(" ")
+        |> Enum.map(&replace_slot(&1, args))
+        |> Enum.join(" ")
+      end
+
+      defp replace_slot("slot:" <> slot, args) do
+        slot = String.to_existing_atom(slot)
+        value = Map.get(args, slot)
+
+        unless value do
+          raise "No value provided for slot #{inspect(slot)} in #{inspect(Map.keys(args))}"
+        end
+
+        value
+      end
+
+      defp replace_slot(token, _args) do
+        token
       end
     end
   end
