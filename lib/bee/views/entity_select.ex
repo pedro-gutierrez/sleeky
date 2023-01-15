@@ -16,11 +16,21 @@ defmodule Bee.Views.EntitySelect do
   end
 
   defp definition(_ui, _schema) do
-    {:div, [class: "field"],
+    {:div, [class: "field", "x-data": "{ 'modifying': false }"],
      [
        {:label, [class: "label"], [{:slot, :label}]},
-       {:span, ["x-text": {:slot, :value}], []},
-       {:div, [class: "mt-3 control has-icons-left has-icons-right is-clearfix"],
+       {:div, ["x-show": "!modifying"],
+        [
+          {:span, ["x-text": {:slot, :value}], []},
+          {:button,
+           [
+             class: "button is-rounded is-light is-small ml-2",
+             "x-show": "!modifying",
+             "x-on:click": "modifying = !modifying"
+           ], ["Change"]}
+        ]},
+       {:div,
+        ["x-show": "modifying", class: "mt-3 control has-icons-left has-icons-right is-clearfix"],
         [
           {:input,
            [
@@ -36,33 +46,34 @@ defmodule Bee.Views.EntitySelect do
            [
              {:i, [class: "fa-solid fa-magnifying-glass"], []}
            ]},
-          {:span, ["x-on:click": "slot:keywords = null", class: "icon is-right is-clickable"],
+          {:span,
+           [
+             "x-on:click": "slot:keywords = null; modifying = false",
+             class: "icon is-right is-clickable"
+           ],
            [
              {:i, [class: "fa-solid fa-circle-xmark"], []}
            ]}
         ]},
-       {:div, [class: "control"],
+       {:div,
         [
-          {:div,
+          "x-bind:class": "slot:keywords ? 'is-active' : ''",
+          class: "dropdown is-block"
+        ],
+        [
+          {:div, [class: "dropdown-menu", role: "menu"],
            [
-             "x-bind:class": "slot:keywords ? 'is-active' : ''",
-             class: "dropdown is-block"
-           ],
-           [
-             {:div, [class: "dropdown-menu", role: "menu"],
+             {:div, [class: "dropdown-content"],
               [
-                {:div, [class: "dropdown-content"],
-                 [
-                   {:loop, {:slot, :results},
-                    {:a,
-                     [
-                       href: "#",
-                       tabindex: 0,
-                       "x-on:click": {:slot, :select},
-                       class: "dropdown-item",
-                       "x-text": "item.display"
-                     ], []}}
-                 ]}
+                {:loop, {:slot, :results},
+                 {:a,
+                  [
+                    href: "#",
+                    tabindex: 0,
+                    "x-on:click": "slot:select ; modifying = false",
+                    class: "dropdown-item",
+                    "x-text": "item.display"
+                  ], []}}
               ]}
            ]}
         ]}
