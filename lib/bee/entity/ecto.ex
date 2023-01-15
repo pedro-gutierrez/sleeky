@@ -13,6 +13,7 @@ defmodule Bee.Entity.Ecto do
     Bee.Entity.Ecto.Preload,
     Bee.Entity.Ecto.Relation,
     Bee.Entity.Ecto.Slug,
+    Bee.Entity.Ecto.Display,
     Bee.Entity.Ecto.JsonEncoder,
     Bee.Entity.Ecto.List,
     Bee.Entity.Ecto.Read,

@@ -108,6 +108,28 @@ defmodule Bee.Entity do
   defmacro __before_compile__(_env) do
     entity = entity(__CALLER__.module)
     generator = if entity.virtual?, do: Virtual, else: Ecto
-    generator.ast(entity)
+
+    entity
+    |> with_display()
+    |> generator.ast()
+  end
+
+  defp with_display(entity) do
+    if !field(:display, entity) do
+      [first | _] = Enum.reject(entity.attributes, & &1.implied)
+
+      [
+        name: :display,
+        kind: :string,
+        entity: entity,
+        computed: true,
+        using: Bee.Entity.Ecto.Display.module(entity),
+        plugin: {Bee.Entity.Ecto.Display, [first.name]}
+      ]
+      |> Attribute.new()
+      |> add_to(:attributes, entity)
+    else
+      entity
+    end
   end
 end

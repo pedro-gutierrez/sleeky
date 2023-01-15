@@ -59,7 +59,7 @@ defmodule Bee.UI.View.Resolve do
         resolve({:loop, [:items], children}, args)
       end
 
-      def resolve({:loop, path, children}, args) do
+      def resolve({:loop, path, children}, args) when is_list(path) do
         path = Enum.map_join(path, ".", &to_string/1)
 
         {:template,
@@ -67,6 +67,11 @@ defmodule Bee.UI.View.Resolve do
            "x-for": "item in $store.default.#{path}",
            ":key": "item.id"
          ], resolve(children, args)}
+      end
+
+      def resolve({:loop, {:slot, _} = path, children}, args) do
+        path = resolve(path, args)
+        resolve({:loop, path, children}, args)
       end
 
       def resolve({:entity, entity, children}, args) do

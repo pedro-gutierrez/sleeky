@@ -185,15 +185,16 @@ defmodule Bee.Views.Forms do
 
   defp form_field(ui, views, %Relation{} = rel) do
     field_view = entity_select_view(ui, views)
-    value = "$store.default.item.#{rel.name}"
-    filter = "$store.default.filter.#{rel.name}"
 
     {:view, field_view,
      [
        {:label, rel.label},
        {:name, rel.name},
-       {:value, value},
-       {:filter, filter},
+       {:value, "$store.default.item.#{rel.name}?.display"},
+       {:search, "$store.default.search('#{rel.target.plural}', '#{rel.name}')"},
+       {:keywords, "$store.default.keywords.#{rel.name}"},
+       {:results, [:results, rel.name]},
+       {:select, "$store.default.select('#{rel.name}', item)"},
        {:placeholder, "Search #{rel.target.plural}"}
      ]}
   end

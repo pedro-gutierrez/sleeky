@@ -12,6 +12,8 @@ defmodule Mix.Tasks.Bee.Migrations do
   A Mix task that generates all Ecto migrations for your schema
   """
 
+  @requirements ["compile"]
+
   @impl true
   def run([schema]) do
     schema = schema |> String.split(".") |> Module.concat()
@@ -34,5 +36,17 @@ defmodule Mix.Tasks.Bee.Migrations do
 
         Mix.shell().info("Written #{path}")
     end
+  end
+
+  def run(_) do
+    schema =
+      Mix.Project.config()
+      |> Keyword.fetch!(:app)
+      |> to_string()
+      |> Macro.camelize()
+      |> Module.concat("Schema")
+      |> to_string()
+
+    run([schema])
   end
 end

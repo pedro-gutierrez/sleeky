@@ -20,16 +20,23 @@ defmodule Bee.Views.EntitySelect do
      [
        {:label, [class: "label"], [{:slot, :label}]},
        {:span, ["x-text": {:slot, :value}], []},
-       {:div, [class: "mt-3 control has-icons-right"],
+       {:div, [class: "mt-3 control has-icons-left has-icons-right is-clearfix"],
         [
           {:input,
            [
              type: "text",
-             class: "input is-light",
-             "x-model": {:slot, :filter},
-             placeholder: {:slot, :placeholder}
+             class: "input is-light is-rounded",
+             "x-on:input.debounce": {:slot, :search},
+             "x-model": {:slot, :keywords},
+             placeholder: {:slot, :placeholder},
+             autocomplete: "off",
+             "aria-autocomplete": "list"
            ], []},
-          {:span, ["x-on:click": "slot:filter = null", class: "icon is-right is-clickable"],
+          {:span, [class: "icon is-left"],
+           [
+             {:i, [class: "fa-solid fa-magnifying-glass"], []}
+           ]},
+          {:span, ["x-on:click": "slot:keywords = null", class: "icon is-right is-clickable"],
            [
              {:i, [class: "fa-solid fa-circle-xmark"], []}
            ]}
@@ -38,7 +45,7 @@ defmodule Bee.Views.EntitySelect do
         [
           {:div,
            [
-             "x-bind:class": "slot:filter ? 'is-active' : ''",
+             "x-bind:class": "slot:keywords ? 'is-active' : ''",
              class: "dropdown is-block"
            ],
            [
@@ -46,18 +53,15 @@ defmodule Bee.Views.EntitySelect do
               [
                 {:div, [class: "dropdown-content"],
                  [
-                   {:a, [href: "#", class: "dropdown-item"],
-                    [
-                      "John Chrichton"
-                    ]},
-                   {:a, [href: "#", class: "dropdown-item"],
-                    [
-                      "Kar Dhargo"
-                    ]},
-                   {:a, [href: "#", class: "dropdown-item"],
-                    [
-                      "Aeryn Sun"
-                    ]}
+                   {:loop, {:slot, :results},
+                    {:a,
+                     [
+                       href: "#",
+                       tabindex: 0,
+                       "x-on:click": {:slot, :select},
+                       class: "dropdown-item",
+                       "x-text": "item.display"
+                     ], []}}
                  ]}
               ]}
            ]}
