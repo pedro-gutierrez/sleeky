@@ -74,6 +74,16 @@ defmodule Bee.UI.View.Resolve do
         resolve({:loop, path, children}, args)
       end
 
+      def resolve({:loop, path, children}, args) when is_binary(path) do
+        path =
+          path
+          |> sanitize_attr(args)
+          |> String.split(".")
+          |> Enum.map(&String.to_atom/1)
+
+        resolve({:loop, path, children}, args)
+      end
+
       def resolve({:entity, entity, children}, args) do
         items = entity.plural()
         args = Map.put(args, :__entity__, entity)
@@ -152,7 +162,15 @@ defmodule Bee.UI.View.Resolve do
       defp sanitize_attr([value], args), do: sanitize_attr(value, args)
 
       defp sanitize_attr(value, args) when is_binary(value) do
-        replace_slots(value, args)
+        args = string_keys(args)
+
+        value
+        |> Solid.parse!()
+        |> Solid.render!(args, strict_variables: true)
+        |> to_string
+      rescue
+        _ ->
+          raise "Error rendering attribute #{value} with args #{inspect(Map.keys(args))}"
       end
 
       defp sanitize_attr(value, _args)
@@ -161,26 +179,8 @@ defmodule Bee.UI.View.Resolve do
 
       defp sanitize_attr(value, _args) when is_atom(value), do: to_string(value)
 
-      defp replace_slots(str, args) do
-        str
-        |> String.split(" ")
-        |> Enum.map(&replace_slot(&1, args))
-        |> Enum.join(" ")
-      end
-
-      defp replace_slot("slot:" <> slot, args) do
-        slot = String.to_existing_atom(slot)
-        value = Map.get(args, slot)
-
-        unless value do
-          raise "No value provided for slot #{inspect(slot)} in #{inspect(Map.keys(args))}"
-        end
-
-        value
-      end
-
-      defp replace_slot(token, _args) do
-        token
+      defp string_keys(map) do
+        for {key, value} <- map, into: %{}, do: {to_string(key), value}
       end
     end
   end

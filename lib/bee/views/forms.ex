@@ -190,12 +190,9 @@ defmodule Bee.Views.Forms do
      [
        {:label, rel.label},
        {:name, rel.name},
-       {:value, "$store.default.item.#{rel.name}?.display || 'No selection'"},
-       {:search, "$store.default.search('#{rel.target.plural}', '#{rel.name}')"},
-       {:keywords, "$store.default.keywords.#{rel.name}"},
-       {:results, [:results, rel.name]},
-       {:select, "$store.default.select('#{rel.name}', item)"},
-       {:placeholder, "Search #{rel.target.plural}"}
+       {:store, "default"},
+       {:entity, rel.target.plural},
+       {:relation, rel.name}
      ]}
   end
 

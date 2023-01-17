@@ -16,12 +16,13 @@ defmodule Bee.Views.EntitySelect do
   end
 
   defp definition(_ui, _schema) do
-    {:div, [class: "field", "x-data": "{ 'modifying': false }"],
+    {:div, [class: "field", "x-data": "{ filter: null, modifying: false }"],
      [
        {:label, [class: "label"], [{:slot, :label}]},
        {:div, ["x-show": "!modifying"],
         [
-          {:span, ["x-text": {:slot, :value}], []},
+          {:span, ["x-text": "$store.{{ store }}.item.{{ relation }}?.display || 'No selection'"],
+           []},
           {:button,
            [
              class: "button is-rounded is-light is-small ml-2",
@@ -36,9 +37,10 @@ defmodule Bee.Views.EntitySelect do
            [
              type: "text",
              class: "input is-light is-rounded",
-             "x-on:input.debounce": {:slot, :search},
-             "x-model": {:slot, :keywords},
-             placeholder: {:slot, :placeholder},
+             "x-on:input.debounce":
+               "$store.{{ store }}.search('{{ entity }}', '{{ relation }}', filter)",
+             "x-model": "filter",
+             placeholder: "Search {{ entity }} ",
              autocomplete: "off",
              "aria-autocomplete": "list"
            ], []},
@@ -48,7 +50,7 @@ defmodule Bee.Views.EntitySelect do
            ]},
           {:span,
            [
-             "x-on:click": "slot:keywords = null; modifying = false",
+             "x-on:click": "filter = null; modifying = false",
              class: "icon is-right is-clickable"
            ],
            [
@@ -57,7 +59,7 @@ defmodule Bee.Views.EntitySelect do
         ]},
        {:div,
         [
-          "x-bind:class": "slot:keywords ? 'is-active' : ''",
+          "x-bind:class": "filter ? 'is-active' : ''",
           class: "dropdown is-block"
         ],
         [
@@ -65,13 +67,13 @@ defmodule Bee.Views.EntitySelect do
            [
              {:div, [class: "dropdown-content"],
               [
-                {:loop, {:slot, :results},
+                {:loop, "results.{{ relation }}",
                  {:a,
                   [
-                    href: "#",
                     tabindex: 0,
-                    "x-on:click": "slot:select ; modifying = false",
-                    class: "dropdown-item",
+                    "x-on:click":
+                      "$store.{{ store }}.select('{{ relation }}', item); filter = null; modifying = false",
+                    class: "is-clickable dropdown-item",
                     "x-text": "item.display"
                   ], []}}
               ]}

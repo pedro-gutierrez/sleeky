@@ -31,7 +31,8 @@ defmodule Bee.MixProject do
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
       {:plug, "~> 1.14"},
-      {:slugify, "~> 1.3"}
+      {:slugify, "~> 1.3"},
+      {:solid, "~> 0.14"}
     ]
   end
 end
