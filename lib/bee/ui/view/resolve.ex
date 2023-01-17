@@ -4,8 +4,10 @@ defmodule Bee.UI.View.Resolve do
   defmacro __using__(_opts) do
     quote do
       def render(args \\ %{}) do
-        resolved = resolve(args)
-        HTMLBuilder.encode!(resolved)
+        html =
+          args
+          |> resolve()
+          |> Bee.Html.render()
       end
 
       def definition, do: @definition
