@@ -16,13 +16,12 @@ defmodule Bee.Views.EntitySelect do
   end
 
   defp definition(_ui, _schema) do
-    {:div, [class: "field", "x-data": "{ filter: null, modifying: false }"],
+    {:div, [class: "field", "x-data": "{ filter: null, modifying: false, items: [] }"],
      [
        {:label, [class: "label"], [{:slot, :label}]},
        {:div, ["x-show": "!modifying"],
         [
-          {:span, ["x-text": "$store.{{ store }}.item.{{ relation }}?.display || 'No selection'"],
-           []},
+          {:span, ["x-text": "item.{{ name }}?.display || 'No selection'"], []},
           {:button,
            [
              class: "button is-rounded is-light is-small ml-2",
@@ -37,8 +36,7 @@ defmodule Bee.Views.EntitySelect do
            [
              type: "text",
              class: "input is-light is-rounded",
-             "x-on:input.debounce":
-               "$store.{{ store }}.search('{{ entity }}', '{{ relation }}', filter)",
+             "x-on:input.debounce": "({items, messages} = await search('{{ entity }}', filter))",
              "x-model": "filter",
              placeholder: "Search {{ entity }} ",
              autocomplete: "off",
@@ -67,14 +65,13 @@ defmodule Bee.Views.EntitySelect do
            [
              {:div, [class: "dropdown-content"],
               [
-                {:loop, "results.{{ relation }}",
+                {:each, "items",
                  {:a,
                   [
                     tabindex: 0,
-                    "x-on:click":
-                      "$store.{{ store }}.select('{{ relation }}', item); filter = null; modifying = false",
+                    "x-on:click": "item.{{ name }} = i; filter = null; modifying = false",
                     class: "is-clickable dropdown-item",
-                    "x-text": "item.display"
+                    "x-text": "i.display"
                   ], []}}
               ]}
            ]}

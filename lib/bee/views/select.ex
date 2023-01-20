@@ -24,8 +24,7 @@ defmodule Bee.Views.Select do
           {:select,
            [
              class: "select is-light",
-             "x-model": {:slot, :model},
-             placeholder: {:slot, :placeholder}
+             "x-model": "item.{{ name }}"
            ], []}
         ]}
      ]}

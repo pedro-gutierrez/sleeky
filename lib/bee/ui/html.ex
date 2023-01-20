@@ -1,4 +1,4 @@
-defmodule Bee.Html do
+defmodule Bee.UI.Html do
   @moduledoc false
 
   @self_closing_tags [

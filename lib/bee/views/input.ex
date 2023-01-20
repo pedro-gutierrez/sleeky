@@ -25,8 +25,8 @@ defmodule Bee.Views.Input do
            [
              type: {:slot, :kind},
              class: "input is-light",
-             "x-model": {:slot, :model},
-             placeholder: {:slot, :placeholder}
+             "x-model": "item.{{ name }}",
+             placeholder: "Enter {{ name }}"
            ], []}
         ]}
      ]}

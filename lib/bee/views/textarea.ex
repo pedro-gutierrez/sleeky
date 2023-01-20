@@ -24,8 +24,8 @@ defmodule Bee.Views.Textarea do
           {:textarea,
            [
              class: "textarea is-light",
-             "x-model": {:slot, :model},
-             placeholder: {:slot, :placeholder}
+             "x-model": "item.{{ name }}",
+             placeholder: "Enter {{ name }}"
            ], []}
         ]}
      ]}

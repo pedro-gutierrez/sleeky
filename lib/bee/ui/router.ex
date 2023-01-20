@@ -71,7 +71,7 @@ defmodule Bee.UI.Router do
   rescue
     e ->
       IO.puts("""
-      Error rendering view #{inspect(view)}:
+      Error rendering view #{inspect(view)}.
       #{Exception.format(:error, e, __STACKTRACE__)}"
       """)
   end
