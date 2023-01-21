@@ -18,7 +18,7 @@ defmodule Bee.Views.Forms.Create do
     buttons = buttons(entity, ui, views)
     messages = messages(ui, views)
 
-    definition = definition(show, data, messages, fields, buttons)
+    definition = definition(messages, fields, buttons, show: show, data: data)
 
     quote do
       defmodule unquote(module_name) do
@@ -39,7 +39,7 @@ defmodule Bee.Views.Forms.Create do
     [
       button(
         "Create #{entity.name()}",
-        "({item, messages} = await create('#{entity.plural()}', #{payload(entity)})); if (!messages.length) {
+        "({item, messages} = await create_item('#{entity.plural()}', #{payload(entity)})); if (!messages.length) {
         id = item.id; item = {}; visit(`/#/#{entity.plural()}/${id}`) }"
       )
     ]
@@ -85,6 +85,6 @@ defmodule Bee.Views.Forms.Create do
       |> parents()
       |> Enum.map_join(",", &"#{&1.name}: item.#{&1.name}?.id")
 
-    "{ #{attributes}, #{parents} }"
+    "{ #{[attributes, parents] |> flatten() |> Enum.join(",")} }"
   end
 end

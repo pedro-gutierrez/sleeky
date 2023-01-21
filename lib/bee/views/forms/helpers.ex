@@ -5,9 +5,23 @@ defmodule Bee.Views.Forms.Helpers do
   alias Bee.Entity.Relation
   import Bee.Inspector
 
-  def definition(show, data, messages, fields, buttons) do
+  def definition(messages, fields, buttons, opts) do
     contents = flatten([messages, fields, {:div, [class: "field is-grouped"], buttons}])
-    {:div, [class: "box is-shadowless", "x-data": data, "x-show": show], contents}
+
+    attrs =
+      [class: "box is-shadowless"]
+      |> with_x_attr(:data, opts)
+      |> with_x_attr(:init, opts)
+      |> with_x_attr(:show, opts)
+
+    {:div, attrs, contents}
+  end
+
+  defp with_x_attr(attrs, name, opts) do
+    case Keyword.get(opts, name) do
+      nil -> attrs
+      value -> Keyword.put(attrs, String.to_atom("x-#{name}"), value)
+    end
   end
 
   def messages(_ui, views) do
