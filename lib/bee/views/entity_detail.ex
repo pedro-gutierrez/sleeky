@@ -12,27 +12,31 @@ defmodule Bee.Views.EntityDetail do
 
   defp detail_view(entity, ui, views) do
     module_name = module_name(views, entity)
-    detail_view = detail_view(ui, views)
-    children_view = children_view(ui, views)
-    parents_view = parents_view(ui, views)
+    detail_view = module(views, Detail)
+    actions_view = module(views, Actions)
+    children_view = module(views, Children)
+    parents_view = module(views, Parents)
     fields = fields(entity, ui, views)
 
-    show = ["x-show": "$store.default.should_display('#{entity.plural()}', 'show')"]
+    show = show(entity)
+    data = data(entity)
+    init = init(entity)
+
+    main = entity_detail(entity, detail_view, fields)
+
+    side =
+      flatten([
+        entity_actions(entity, actions_view),
+        entity_parents(entity, parents_view),
+        entity_children(entity, children_view)
+      ])
 
     definition =
-      if has_related_entities?(entity) do
-        {:div, Keyword.merge(show, class: "columns"),
-         [
-           {:div, [class: "column"], entity_detail(entity, detail_view, fields)},
-           {:div, [class: "column"],
-            flatten([
-              entity_parents(entity, parents_view),
-              entity_children(entity, children_view)
-            ])}
-         ]}
-      else
-        entity_detail(entity, detail_view, fields, show)
-      end
+      {:div, [class: "columns", "x-data": data, "x-show": show, "x-init": init],
+       [
+         {:div, [class: "column"], main},
+         {:div, [class: "column"], side}
+       ]}
 
     quote do
       defmodule unquote(module_name) do
@@ -46,23 +50,6 @@ defmodule Bee.Views.EntityDetail do
     module(views, view)
   end
 
-  defp has_related_entities?(entity) do
-    Enum.count(entity.parents) +
-      Enum.count(entity.children) > 0
-  end
-
-  defp detail_view(_ui, views) do
-    module(views, Detail)
-  end
-
-  defp children_view(_ui, views) do
-    module(views, Children)
-  end
-
-  defp parents_view(_ui, views) do
-    module(views, Parents)
-  end
-
   defp label_view(_ui, views) do
     module(views, Label)
   end
@@ -73,15 +60,20 @@ defmodule Bee.Views.EntityDetail do
     |> Enum.map(&label(ui, views, &1))
   end
 
-  defp entity_detail(entity, detail_view, fields, attrs \\ []) do
-    {:div, attrs,
+  defp entity_detail(_entity, detail_view, fields) do
+    {:view, detail_view,
      [
-       {:view, detail_view,
+       {:fields, [], flatten(fields)}
+     ]}
+  end
+
+  defp entity_actions(entity, actions_view) do
+    {:view, actions_view,
+     [
+       {:items, [],
         [
-          {:fields, [], flatten(fields)},
-          {:edit, [], item_url(entity, "edit")},
-          {:delete, [], item_url(entity, "delete")},
-          {:cancel, [], "`/#/#{entity.plural()}`"}
+          [label: "Edit this #{entity.name()}", url: item_url(entity, "edit")],
+          [label: "Delete this #{entity.name()}", url: item_url(entity, "delete")]
         ]}
      ]}
   end
@@ -104,9 +96,15 @@ defmodule Bee.Views.EntityDetail do
       nil
     else
       children = Enum.map(entity.children, &child_link/1)
+      data = "{ messages: [], #{entity.children |> Enum.map(&child_data/1) |> Enum.join(", ")}}"
+
+      init =
+        "$watch('item', async (v) => { if (#{show(entity)}) { #{entity.children |> Enum.map(&child_count/1) |> Enum.join(" ")} }})"
 
       {:view, children_view,
        [
+         {:data, [], data},
+         {:init, [], init},
          {:items, [], children}
        ]}
     end
@@ -114,14 +112,21 @@ defmodule Bee.Views.EntityDetail do
 
   defp child_link(%Relation{name: name, entity: entity}) do
     select = item_url(entity, name)
-    count = "$store.default.children.#{name}"
+    label = "`${#{name}} #{name}`"
 
     [
-      {:label, name},
-      {:url, select},
-      {:count, count},
-      {:class, "#{count} > 0 ? 'is-primary' : ''"}
+      {:label, label},
+      {:url, select}
     ]
+  end
+
+  defp child_data(%Relation{name: name}) do
+    "#{name}: 0"
+  end
+
+  defp child_count(%Relation{name: name, entity: entity}) do
+    "let #{name}_aggregate = await aggregate_children('#{entity.plural()}', v, '#{name}'); #{name} =
+    #{name}_aggregate.count;"
   end
 
   defp parent_link(%Relation{} = rel) do
@@ -132,13 +137,13 @@ defmodule Bee.Views.EntityDetail do
   end
 
   defp item_url(entity, name) do
-    "`/#/#{entity.plural()}/${$store.default.item.id}/#{name}`"
+    "`/#/#{entity.plural()}/${item.id}/#{name}`"
   end
 
   defp parent_url(rel) do
     target = rel.target.module
 
-    "`/#/#{target.plural()}/${$store.default.item.#{rel.name}?.id}`"
+    "`/#/#{target.plural()}/${item.#{rel.name}?.id}`"
   end
 
   defp label(ui, views, %Attribute{} = attr) do
@@ -147,8 +152,20 @@ defmodule Bee.Views.EntityDetail do
     {:view, field_view,
      [
        {:label, attr.label},
-       {:model, "$store.default.item.#{attr.name}"},
+       {:model, "item.#{attr.name}"},
        {:name, attr.name}
      ]}
+  end
+
+  defp init(entity) do
+    "$watch('$store.default.item', (v) => { if (#{show(entity)}) item = v })"
+  end
+
+  defp show(entity) do
+    "$store.default.should_display('#{entity.plural()}', 'show')"
+  end
+
+  def data(_entity) do
+    "{ messages: [], item: {} }"
   end
 end

@@ -8,7 +8,7 @@ defmodule Bee.Views.Parents do
     view = module(views, Parents)
 
     definition =
-      {:aside, [class: "menu box is-shadowless"],
+      {:aside, [class: "menu mt-4"],
        [
          {:ul, [class: "menu-list"],
           {:slot, :items,

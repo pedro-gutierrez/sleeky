@@ -18,31 +18,7 @@ defmodule Bee.Views.Detail do
   defp definition(_ui, _schema) do
     {:div, [class: "box is-shadowless"],
      [
-       {:slot, :fields},
-       {:div, [class: "field is-grouped"],
-        [
-          {:p, [class: "control"],
-           [
-             {:a, ["x-bind:href": {:slot, :edit}, class: "button is-primary"],
-              [
-                "Edit"
-              ]}
-           ]},
-          {:p, [class: "control"],
-           [
-             {:a, ["x-bind:href": {:slot, :delete}, class: "button is-danger"],
-              [
-                "Delete"
-              ]}
-           ]},
-          {:p, [class: "control"],
-           [
-             {:a, ["x-bind:href": {:slot, :cancel}, class: "button is-light"],
-              [
-                "Cancel"
-              ]}
-           ]}
-        ]}
+       {:slot, :fields}
      ]}
   end
 end

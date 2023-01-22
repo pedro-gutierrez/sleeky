@@ -11,6 +11,7 @@ defmodule Bee.Views do
     Bee.Views.Detail,
     Bee.Views.Children,
     Bee.Views.Parents,
+    Bee.Views.Actions,
     Bee.Views.Table,
     Bee.Views.Form,
     Bee.Views.Forms,

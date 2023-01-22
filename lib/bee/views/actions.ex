@@ -1,14 +1,14 @@
-defmodule Bee.Views.Children do
+defmodule Bee.Views.Actions do
   @moduledoc false
 
   import Bee.Inspector
   alias Bee.UI.View
 
   def ast(_ui, views, _schema) do
-    view = module(views, Children)
+    view = module(views, Actions)
 
     definition =
-      {:div, [class: "block", "x-data": {:slot, :data}, "x-init": {:slot, :init}],
+      {:div, [class: "block"],
        [
          {:slot, :items,
           [
@@ -16,7 +16,7 @@ defmodule Bee.Views.Children do
              [
                {:a, [class: "button is-text", "x-bind:href": {:slot, :url}],
                 [
-                  {:span, ["x-text": {:slot, :label}], []}
+                  {:span, [], [{:slot, :label}]}
                 ]}
              ]}
           ]}
