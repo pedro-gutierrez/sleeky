@@ -8,21 +8,18 @@ defmodule Bee.Views.Parents do
     view = module(views, Parents)
 
     definition =
-      {:aside, [class: "menu mt-4"],
+      {:div, [class: "block"],
        [
-         {:ul, [class: "menu-list"],
-          {:slot, :items,
-           [
-             {:li, [],
-              [
-                {:a, [class: "", "x-bind:href": {:slot, :url}],
-                 [
-                   {:span, [], [{:slot, :label}]},
-                   {:i, [class: "is-pulled-right fa-solid fa-arrow-right has-text-primary mr-1"],
-                    []}
-                 ]}
-              ]}
-           ]}}
+         {:slot, :items,
+          [
+            {:p, [],
+             [
+               {:a, [class: "button is-text", "x-bind:href": {:slot, :url}],
+                [
+                  {:span, [], [{:slot, :label}]}
+                ]}
+             ]}
+          ]}
        ]}
 
     quote do

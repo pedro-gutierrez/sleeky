@@ -131,7 +131,7 @@ defmodule Bee.Views.EntityDetail do
 
   defp parent_link(%Relation{} = rel) do
     [
-      {:label, rel.name},
+      {:label, "Show #{rel.name}"},
       {:url, parent_url(rel)}
     ]
   end
@@ -152,8 +152,7 @@ defmodule Bee.Views.EntityDetail do
     {:view, field_view,
      [
        {:label, attr.label},
-       {:model, "item.#{attr.name}"},
-       {:name, attr.name}
+       {:model, "item.#{attr.name}"}
      ]}
   end
 

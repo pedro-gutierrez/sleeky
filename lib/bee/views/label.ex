@@ -18,7 +18,7 @@ defmodule Bee.Views.Label do
   defp definition(_ui, _schema) do
     {:div, [class: "field"],
      [
-       {:label, [class: "label"], [{:slot, :name}]},
+       {:label, [class: "label"], [{:slot, :label}]},
        {:div, [class: "control"],
         [
           {:span,

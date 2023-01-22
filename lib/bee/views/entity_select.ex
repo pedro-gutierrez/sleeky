@@ -21,7 +21,11 @@ defmodule Bee.Views.EntitySelect do
        {:label, [class: "label"], [{:slot, :label}]},
        {:div, ["x-show": "!modifying"],
         [
-          {:span, ["x-text": "item.{{ name }}?.display || 'No selection'"], []},
+          {:span,
+           [
+             "x-text":
+               "item.{{ name }} ? ( item.{{ name }}.display || item.{{ name }}.id ) : 'No selection'"
+           ], []},
           {:button,
            [
              class: "button is-rounded is-light is-small ml-2",
