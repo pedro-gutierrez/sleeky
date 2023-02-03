@@ -28,10 +28,11 @@ defmodule Bee.Entity.Ecto.Read do
     context = var(:context)
     id = var(:id)
     item = var(:item)
+    default_preloads = entity.preloads
 
     quote do
       def unquote(function_name)(unquote(id), unquote(context) \\ %{}) do
-        preloads = unquote(context)[:preloads] || []
+        preloads = unquote(context)[:preloads] || unquote(default_preloads)
 
         with unquote_splicing(
                flatten([
@@ -50,14 +51,15 @@ defmodule Bee.Entity.Ecto.Read do
   defp read_by_unique_key_functions(entity) do
     context = var(:context)
     item = var(:item)
+    default_preloads = entity.preloads
 
-    for key <- entity.keys() |> Enum.filter(& &1.unique) do
+    for key <- entity.keys |> Enum.filter(& &1.unique) do
       function_name = function_name(:read_by, names(key.fields))
       args = key.fields |> names() |> vars()
 
       quote do
         def unquote(function_name)(unquote_splicing(args), unquote(context) \\ %{}) do
-          preloads = unquote(context)[:preloads] || []
+          preloads = unquote(context)[:preloads] || unquote(default_preloads)
 
           with unquote_splicing(
                  flatten([

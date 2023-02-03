@@ -8,7 +8,7 @@ defmodule Bee.Entity.Ecto.Preload do
   end
 
   defp preload_query_function(entity) do
-    case entity.preloads() do
+    case entity.preloads do
       [] ->
         quote do
           def preload_query(query), do: {:ok, query}

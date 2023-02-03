@@ -48,6 +48,8 @@ defmodule Bee.Entity.Dsl do
       |> with_opts(opts)
       |> add_to(:parents, entity)
 
+    entity = add_to(name, :preloads, entity)
+
     Module.put_attribute(module, :entity, entity)
   end
 

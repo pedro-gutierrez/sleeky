@@ -79,8 +79,8 @@ defmodule Bee.UI.View.Resolve do
     resolve({:loop, path, children}, args)
   end
 
-  def resolve({:each, var, children}, args) when is_binary(var) do
-    var = sanitize_attr(var, args)
+  def resolve({:each, var, children}, args) when is_binary(var) or is_atom(var) do
+    var = var |> to_string() |> sanitize_attr(args)
 
     {:template,
      [

@@ -20,21 +20,15 @@ defmodule Bee.Views.Breadcrumbs do
      [
        {:ul, [],
         [
-          {:li, [],
-           [
-             {:a, [href: "/", class: "has-text-primary"],
-              [
-                {:span, [],
-                 [
-                   {:i, [class: "fa-solid fa-house"], []}
-                 ]}
-              ]}
-           ]},
           {:loop, [:path],
            [
              {:li, [],
               [
-                {:a, ["x-bind:href": "item.location", class: "has-text-primary"],
+                {:a,
+                 [
+                   "x-bind:href": "item.location",
+                   class: "has-text-primary"
+                 ],
                  [
                    {:span, ["x-text": "item.label"], []}
                  ]}

@@ -28,28 +28,33 @@ defmodule Bee.Views.Entities do
 
   defp views(views, entity) do
     views =
-      entity.actions |> Enum.map(&view(&1, views)) |> flatten() |> Enum.map(&{:view, &1, []})
+      entity.actions
+      |> Enum.map(&view(&1, views, entity))
+      |> flatten()
+      |> Enum.map(&{:view, &1, []})
 
     {:entity, entity, views}
   end
 
-  defp view(%Action{name: :create, entity: entity}, views) do
-    Forms.module_name(views, entity.module, :create)
+  defp view(%Action{name: :create}, views, entity) do
+    Forms.module_name(views, entity, :create)
   end
 
-  defp view(%Action{name: :update, entity: entity}, views) do
-    Forms.module_name(views, entity.module, :update)
+  defp view(%Action{name: :update}, views, entity) do
+    Forms.module_name(views, entity, :update)
   end
 
-  defp view(%Action{name: :list, entity: entity}, views) do
-    Lists.module_name(views, entity.module)
+  defp view(%Action{name: :list}, views, entity) do
+    list_view = Lists.module_name(views, entity)
+
+    list_view
   end
 
-  defp view(%Action{name: :read, entity: entity}, views) do
-    EntityDetail.module_name(views, entity.module)
+  defp view(%Action{name: :read}, views, entity) do
+    EntityDetail.module_name(views, entity)
   end
 
-  defp view(%Action{name: :delete, entity: entity}, views) do
-    Forms.module_name(views, entity.module, :delete)
+  defp view(%Action{name: :delete}, views, entity) do
+    Forms.module_name(views, entity, :delete)
   end
 end

@@ -41,7 +41,7 @@ defmodule Bee.Views.EntitySelect do
              type: "text",
              class: "input is-light is-rounded",
              "x-on:input.debounce":
-               "({items, messages} = await search_items('{{ entity }}', filter))",
+               "({items, messages} = await search_items('{{ entity }}', {query: filter, page: 1, page_size: 10}))",
              "x-model": "filter",
              placeholder: "Search {{ entity }} ",
              autocomplete: "off",
