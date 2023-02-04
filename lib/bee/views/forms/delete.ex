@@ -44,7 +44,13 @@ defmodule Bee.Views.Forms.Delete do
   end
 
   defp init(entity) do
-    "$watch('$store.default.item', (v) => { if (#{show(entity)}) item = v })"
+    """
+    $watch('$store.default.path', async (v) => {
+      if (#{show(entity)}) {
+        ({item, messages} = await read_item('#{entity.plural()}', $store.default.id))
+      }
+    })
+    """
   end
 
   def data(_entity) do
