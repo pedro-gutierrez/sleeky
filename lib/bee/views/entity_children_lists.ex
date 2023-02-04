@@ -41,7 +41,7 @@ defmodule Bee.Views.EntityChildrenLists do
          [[{:field, attr.name}, {:binding, "i.#{attr.name}"}] | fields]}
       end)
 
-    show = show(entity)
+    show = show(entity, rel)
     data = data(entity)
     init = init(entity, rel)
 
@@ -49,19 +49,19 @@ defmodule Bee.Views.EntityChildrenLists do
      [
        {:view, list_view,
         [
+          {:class, [], "border-top-radius-0"},
           {:headers, [], headers},
           {:fields, [], fields},
-          {:next_page, [], "page = page + 1; #{search(entity, rel)}"},
-          {:previous_page, [], "page = page = 1; #{search(entity, rel)}"},
           {:search, [], "query"},
           {:update, [], search(entity, rel)},
-          {:select, [], "`#/#{target.plural}/${i.id}`"}
+          {:create, [], "#/#{target.plural}/new"},
+          {:select, [], "#/#{target.plural}/${i.id}"}
         ]}
      ]}
   end
 
-  defp show(entity) do
-    "$store.default.should_display('#{entity.plural}', 'show')"
+  defp show(entity, rel) do
+    "$store.default.should_display('#{entity.plural}', 'show') && children === '#{rel.target.plural}'"
   end
 
   defp data(_entity) do
@@ -69,7 +69,7 @@ defmodule Bee.Views.EntityChildrenLists do
   end
 
   defp init(entity, rel) do
-    "$watch('item', async (v) => { if (#{show(entity)}) { #{search(entity, rel)} }})"
+    "$watch('item', async (v) => { if (#{show(entity, rel)}) { #{search(entity, rel)} }})"
   end
 
   defp search(entity, rel) do

@@ -21,7 +21,12 @@ defmodule Bee.Views.EntityDetail do
     init = init(entity)
 
     main = entity_detail(entity, attributes, parents)
-    side = entity_children(entity, views)
+
+    side =
+      {:div, [],
+       [
+         children_switcher(entity) | entity_children(entity, views)
+       ]}
 
     definition =
       {:div, ["x-data": data, "x-show": show, "x-init": init],
@@ -101,26 +106,65 @@ defmodule Bee.Views.EntityDetail do
      ]}
   end
 
+  defp listable_children(entity) do
+    Enum.filter(entity.children, &list_children?(&1))
+  end
+
   defp entity_children(entity, views) do
-    entity.children
-    |> Enum.filter(&list_children?(&1))
-    |> Enum.map(fn rel ->
-      view_name = EntityChildrenLists.module_name(views, entity, rel)
-      {:view, view_name}
-    end)
+    entity
+    |> listable_children()
+    |> Enum.map(&children_view(views, entity, &1))
+  end
+
+  defp children_view(views, entity, rel) do
+    {:view, EntityChildrenLists.module_name(views, entity, rel)}
+  end
+
+  defp children_switcher(entity) do
+    buttons =
+      entity
+      |> listable_children()
+      |> Enum.map(&children_button/1)
+
+    {:div, [], buttons}
+  end
+
+  defp children_button(rel) do
+    entity = rel.entity
+    target = rel.target
+
+    {:a,
+     [
+       class: "button border-bottom-radius-0",
+       "x-bind:href": "`#/#{entity.plural}/${item.id}/#{target.plural}`",
+       "x-bind:class": "children == '#{target.plural}' ? 'is-white' : 'is-ghost has-text-primary'"
+     ], [rel.target.plural]}
   end
 
   defp list_children?(rel), do: Entity.action(:list, rel.target.module)
 
   defp init(entity) do
-    "$watch('$store.default.item', (v) => { if (#{show(entity)}) item = v })"
+    """
+    $watch('$store.default.item', (v) => {
+      if (#{show(entity)}) item = v;
+    });
+    $watch('$store.default.children', (v) => {
+      if (v && #{show(entity)}) children = v;
+    });
+    """
   end
 
   defp show(entity) do
     "$store.default.should_display('#{entity.plural()}', 'show')"
   end
 
-  def data(_entity) do
-    "{ messages: [], item: {} }"
+  def data(entity) do
+    default_children =
+      case entity |> listable_children() |> List.first() do
+        nil -> "null"
+        rel -> "'#{rel.target.plural}'"
+      end
+
+    "{ messages: [], item: {}, children: #{default_children} }"
   end
 end

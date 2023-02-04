@@ -45,10 +45,12 @@ defmodule Bee.Views.Lists do
      [
        {:view, list_view,
         [
+          {:class, [], ""},
           {:headers, [], headers},
           {:fields, [], fields},
           {:search, [], "query"},
           {:update, [], search(entity)},
+          {:create, [], "#/#{entity.plural}/new"},
           {:select, [], "#/#{entity.plural}/${i.id}"}
         ]}
      ]}

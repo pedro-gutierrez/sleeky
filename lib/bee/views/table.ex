@@ -17,7 +17,7 @@ defmodule Bee.Views.Table do
 
   defp definition(_ui, _schema) do
     [
-      {:div, [class: "box is-shadowless"],
+      {:div, [class: "box is-shadowless {{ class }}"],
        [
          {:div, [],
           [
@@ -38,7 +38,7 @@ defmodule Bee.Views.Table do
             {:a,
              [
                class: "ml-2 has-text-primary",
-               "x-bind:href": "`#/${$store.default.entity}/new`"
+               href: {:slot, :create}
              ],
              [
                {:span, [], "Create new"}
