@@ -94,6 +94,12 @@ defmodule Bee.Rest.RouterHelper do
           end
         end
 
+        def with_query(conn) do
+          with {:ok, query} <- cast_param(conn, "q", :string, nil) do
+            {:ok, assign(conn, :q, query)}
+          end
+        end
+
         defp cast(nil, _, :invalid, field), do: invalid(field)
         defp cast("", _, :invalid, field), do: invalid(field)
         defp cast(nil, _, :continue, _), do: {:error, :continue}

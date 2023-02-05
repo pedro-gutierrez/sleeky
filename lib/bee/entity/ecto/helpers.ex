@@ -78,6 +78,7 @@ defmodule Bee.Entity.Ecto.Helpers do
     quote do
       defp list(query, entity, context) do
         with query <- @auth.scope_query(entity.name(), :list, query, context),
+             query <- entity.fuzzy_search(query, context[:q] || nil),
              {:ok, sort_field, sort_direction, limit, offset} <- pagination_arguments(context),
              {:ok, query} <-
                entity.paginate_query(query, sort_field, sort_direction, limit, offset),

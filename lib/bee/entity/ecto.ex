@@ -22,7 +22,8 @@ defmodule Bee.Entity.Ecto do
     Bee.Entity.Ecto.Delete,
     Bee.Entity.Ecto.Query,
     Bee.Entity.Ecto.Join,
-    Bee.Entity.Ecto.Where
+    Bee.Entity.Ecto.Where,
+    Bee.Entity.Ecto.FuzzySearch
   ]
 
   def ast(entity) do

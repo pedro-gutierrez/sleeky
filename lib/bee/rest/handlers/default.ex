@@ -50,6 +50,7 @@ defmodule Bee.Rest.Handlers.Default do
 
     preconditions = [
       pagination_args(),
+      query_arg(),
       api_call(entity, action)
     ]
 

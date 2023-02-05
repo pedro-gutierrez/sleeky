@@ -49,6 +49,7 @@ defmodule Bee.Rest.Handlers.Children do
     preconditions = [
       required_id_arg(),
       pagination_args(),
+      query_arg(),
       api_call(rel)
     ]
 

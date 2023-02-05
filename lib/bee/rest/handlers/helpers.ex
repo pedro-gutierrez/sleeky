@@ -49,4 +49,12 @@ defmodule Bee.Rest.Handlers.Helpers do
       {:ok, unquote(conn)} <- with_pagination(unquote(conn))
     end
   end
+
+  def query_arg do
+    conn = var(:conn)
+
+    quote do
+      {:ok, unquote(conn)} <- with_query(unquote(conn))
+    end
+  end
 end
