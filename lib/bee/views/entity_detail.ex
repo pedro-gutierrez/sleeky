@@ -72,7 +72,7 @@ defmodule Bee.Views.EntityDetail do
       {:div, [class: "box is-shadowless"], parents ++ attributes},
       {:div, [],
        [
-         action_link(entity, "edit", "Edit this #{entity.label}"),
+         action_link(entity, "edit", "Edit this #{String.downcase(entity.label)}"),
          action_link(entity, "delete", "Delete")
        ]}
     ]
@@ -82,7 +82,7 @@ defmodule Bee.Views.EntityDetail do
     {:a,
      [
        "x-bind:href": "`/#/#{entity.plural}/${item.id}/#{action}`",
-       class: "is-size-6 has-text-weight-normal	has-text-primary ml-2"
+       class: "is-size-6 has-text-weight-normal	has-text-primary ml-0 mr-2"
      ], [label]}
   end
 

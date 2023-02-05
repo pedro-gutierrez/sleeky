@@ -36,18 +36,18 @@ defmodule Bee.Views.Breadcrumbs do
   end
 
   defp definition(data, init) do
-    {:nav, ["x-data": data, "x-init": init, class: "breadcrumb has-arrow-separator"],
+    {:nav, ["x-data": data, "x-init": init, class: "block"],
      [
        {:ul, [],
         [
           {:each, "path",
            [
-             {:li, [],
+             {:li, [class: "is-inline mr-2"],
               [
                 {:a,
                  [
                    "x-bind:href": "i.uri",
-                   class: "has-text-primary"
+                   class: "tag is-primary"
                  ],
                  [
                    {:span, ["x-text": "i.id"], []}
