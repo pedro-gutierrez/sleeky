@@ -32,7 +32,7 @@ defmodule Bee.Views.Forms.Create do
   end
 
   defp show(entity) do
-    "$store.default.should_display('#{entity.plural()}', 'create')"
+    "$store.$.should_display('#{entity.plural()}', 'new')"
   end
 
   defp buttons(entity, _ui, _views) do

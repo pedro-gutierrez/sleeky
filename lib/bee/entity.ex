@@ -10,6 +10,7 @@ defmodule Bee.Entity do
     :label,
     :module,
     :plural,
+    :plural_label,
     :table,
     :schema,
     :repo,
@@ -47,6 +48,7 @@ defmodule Bee.Entity do
       repo: repo,
       auth: auth,
       plural: plural,
+      plural_label: label(plural),
       table: table,
       pk_constraint: "#{table}_pkey"
     }

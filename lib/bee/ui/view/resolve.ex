@@ -59,7 +59,7 @@ defmodule Bee.UI.View.Resolve do
 
     {:template,
      [
-       "x-for": "item in $store.default.#{path}",
+       "x-for": "item in $store.$.state.#{path}",
        ":key": "item.id"
      ], resolve(children, args)}
   end

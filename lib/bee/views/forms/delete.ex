@@ -40,14 +40,14 @@ defmodule Bee.Views.Forms.Delete do
   end
 
   defp show(entity) do
-    "$store.default.should_display('#{entity.plural()}', 'delete')"
+    "$store.$.should_display('#{entity.plural()}', 'delete')"
   end
 
   defp init(entity) do
     """
-    $watch('$store.default.path', async (v) => {
+    $watch('$store.$.state', async (s) => {
       if (#{show(entity)}) {
-        ({item, messages} = await read_item('#{entity.plural()}', $store.default.id))
+        ({item, messages} = await read_item('#{entity.plural()}', s.id))
       }
     })
     """

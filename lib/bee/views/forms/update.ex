@@ -30,16 +30,16 @@ defmodule Bee.Views.Forms.Update do
 
   defp init(entity) do
     """
-    $watch('$store.default.path', async (v) => {
+    $watch('$store.$.state', async (s) => {
       if (#{show(entity)}) {
-        ({item, messages} = await read_item('#{entity.plural()}', $store.default.id))
+        ({item, messages} = await read_item('#{entity.plural()}', s.id))
       }
     })
     """
   end
 
   defp show(entity) do
-    "$store.default.should_display('#{entity.plural()}', 'update')"
+    "$store.$.should_display('#{entity.plural()}', 'edit')"
   end
 
   def data(_entity) do

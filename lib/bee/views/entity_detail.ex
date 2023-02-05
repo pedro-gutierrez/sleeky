@@ -145,17 +145,17 @@ defmodule Bee.Views.EntityDetail do
 
   defp init(entity) do
     """
-    $watch('$store.default.path', async (v) => {
+    $watch('$store.$.state', async (s) => {
       if (#{show(entity)}) {
-        ({item, messages} = await read_item('#{entity.plural}', $store.default.id));
-        if ($store.default.children) children = $store.default.children
+        ({item, messages} = await read_item('#{entity.plural}', s.id));
+        if (s.children) children = s.children
       }
     });
     """
   end
 
   defp show(entity) do
-    "$store.default.should_display('#{entity.plural()}', 'show')"
+    "$store.$.should_display('#{entity.plural()}', 'show')"
   end
 
   def data(entity) do

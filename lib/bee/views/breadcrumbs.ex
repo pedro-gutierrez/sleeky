@@ -4,9 +4,12 @@ defmodule Bee.Views.Breadcrumbs do
   import Bee.Inspector
   alias Bee.UI.View
 
-  def ast(ui, views, schema) do
+  def ast(_ui, views, _schema) do
     view = module(views, Breadcrumbs)
-    definition = definition(ui, schema)
+
+    data = data()
+    init = init()
+    definition = definition(data, init)
 
     quote do
       defmodule unquote(view) do
@@ -15,22 +18,39 @@ defmodule Bee.Views.Breadcrumbs do
     end
   end
 
-  defp definition(_ui, _schema) do
-    {:nav, [class: "breadcrumb has-arrow-separator"],
+  defp data do
+    "{ path: [] }"
+  end
+
+  defp init do
+    """
+    $watch('$store.$.state', (v) => {
+      path = [];
+      if (v.collection) path.push({ id: v.collection, uri: `/#/${v.collection}` })
+      if (v.id) path.push({id: v.id, uri: `/#/${v.collection}/${v.id}` })
+      if (v.mode === 'edit' || v.mode === 'new'  || v.mode === 'delete' ) path.push({ id: v.mode,  uri:
+    `/#/${v.collection}/${v.id}/${v.mode}` })
+      if (v.children) path.push({id: v.children, uri: `/#/${v.collection}/${v.id}/${v.children}` })
+    })
+    """
+  end
+
+  defp definition(data, init) do
+    {:nav, ["x-data": data, "x-init": init, class: "breadcrumb has-arrow-separator"],
      [
        {:ul, [],
         [
-          {:loop, [:path],
+          {:each, "path",
            [
              {:li, [],
               [
                 {:a,
                  [
-                   "x-bind:href": "item.location",
+                   "x-bind:href": "i.uri",
                    class: "has-text-primary"
                  ],
                  [
-                   {:span, ["x-text": "item.label"], []}
+                   {:span, ["x-text": "i.id"], []}
                  ]}
               ]}
            ]}

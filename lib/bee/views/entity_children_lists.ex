@@ -61,7 +61,7 @@ defmodule Bee.Views.EntityChildrenLists do
   end
 
   defp show(entity, rel) do
-    "$store.default.should_display('#{entity.plural}', 'show') && children === '#{rel.target.plural}'"
+    "$store.$.should_display('#{entity.plural}', 'show') && children === '#{rel.target.plural}'"
   end
 
   defp data(_entity) do
