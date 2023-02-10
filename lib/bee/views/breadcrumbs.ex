@@ -47,7 +47,7 @@ defmodule Bee.Views.Breadcrumbs do
                 {:a,
                  [
                    "x-bind:href": "i.uri",
-                   class: "tag is-primary is-light"
+                   class: "tag is-medium is-primary is-light"
                  ],
                  [
                    {:span, ["x-text": "i.id"], []}
