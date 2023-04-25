@@ -6,7 +6,8 @@ defmodule Bee.Views.Forms do
   @forms [
     Bee.Views.Forms.Delete,
     Bee.Views.Forms.Create,
-    Bee.Views.Forms.Update
+    Bee.Views.Forms.Update,
+    Bee.Views.Forms.CreateChildren
   ]
 
   def ast(ui, views, schema) do

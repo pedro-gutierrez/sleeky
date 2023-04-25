@@ -5,30 +5,24 @@ defmodule Bee.Views.Forms.Delete do
   alias Bee.UI.View
 
   import Bee.Inspector
+  import Bee.Views.Components
 
   def action(entity), do: Entity.action(:delete, entity)
 
   def ast(_ui, views, entity) do
     form = module(entity.label(), "DeleteForm")
     module_name = module(views, form)
-    show = show(entity)
-    data = data(entity)
-    init = init(entity)
-    buttons = buttons(entity)
+    scope = entity.plural()
 
     definition =
-      {:div,
+      {:div, [scope(scope), mode(:delete)],
        [
-         class: "box hero is-shadowless has-background-danger-light",
-         "x-show": show,
-         "x-data": data,
-         "x-init": init
-       ],
-       [
-         {:div, [class: "container"],
+         {:h1, [data(:name, :display)], []},
+         {:strong, [], ["Are you sure?"]},
+         button_view(:delete, "Delete"),
+         {:p, [],
           [
-            {:p, [class: "block has-text-danger"], ["Are you sure you want to delete this?"]},
-            {:div, [class: "field is-grouped is-grouped-centered"], buttons}
+            link_view("/#{scope}/$id", "Cancel")
           ]}
        ]}
 
@@ -37,47 +31,5 @@ defmodule Bee.Views.Forms.Delete do
         unquote(View.ast(definition))
       end
     end
-  end
-
-  defp show(entity) do
-    "$store.$.should_display('#{entity.plural()}', 'delete')"
-  end
-
-  defp init(entity) do
-    """
-    $watch('$store.$.state', async (s) => {
-      if (#{show(entity)}) {
-        ({item, messages} = await read_item('#{entity.plural()}', s.id))
-      }
-    })
-    """
-  end
-
-  def data(_entity) do
-    "{ messages: [], item: {} }"
-  end
-
-  defp buttons(entity) do
-    [
-      button(
-        "Delete #{entity.name()}",
-        "({item, messages} = await delete_item('#{entity.plural()}', item));
-      if (!messages.length) { visit('/#/#{entity.plural()}') }"
-      )
-    ]
-  end
-
-  defp button(title, click) do
-    {:div, [class: "control"],
-     [
-       {:a,
-        [
-          class: "button is-danger",
-          "x-on:click": click
-        ],
-        [
-          title
-        ]}
-     ]}
   end
 end

@@ -45,16 +45,20 @@ defmodule Bee.Views.Entities do
   end
 
   defp view(%Action{name: :list}, views, entity) do
-    list_view = Lists.module_name(views, entity)
-
-    list_view
+    Lists.module_name(views, entity)
   end
 
   defp view(%Action{name: :read}, views, entity) do
-    EntityDetail.module_name(views, entity)
+    [EntityDetail.module_name(views, entity) | children_create_views(views, entity)]
   end
 
   defp view(%Action{name: :delete}, views, entity) do
     Forms.module_name(views, entity, :delete)
+  end
+
+  defp children_create_views(views, entity) do
+    entity
+    |> Forms.CreateChildren.relations()
+    |> Enum.map(&Forms.CreateChildren.module_name(views, entity, &1))
   end
 end

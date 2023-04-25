@@ -2,10 +2,12 @@ defmodule Bee.Entity.Action do
   @moduledoc false
 
   alias Bee.Entity.Summary
+  import Bee.Inspector
 
   defstruct [
     :name,
     :entity,
+    :label,
     list?: false,
     custom?: false,
     policies: []
@@ -16,9 +18,14 @@ defmodule Bee.Entity.Action do
   def new(opts) do
     __MODULE__
     |> struct(opts)
+    |> with_label()
     |> with_summary_entity()
     |> maybe_custom_action()
     |> maybe_list_action()
+  end
+
+  defp with_label(action) do
+    %{action | label: label(action.name)}
   end
 
   defp with_summary_entity(action) do

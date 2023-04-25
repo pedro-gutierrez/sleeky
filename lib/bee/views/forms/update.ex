@@ -5,21 +5,21 @@ defmodule Bee.Views.Forms.Update do
   alias Bee.UI.View
 
   import Bee.Inspector
-  import Bee.Views.Forms.Helpers
+  import Bee.Views.Components
 
   def action(entity), do: Entity.action(:create, entity)
 
-  def ast(ui, views, entity) do
+  def ast(_ui, views, entity) do
     form = module(entity.label(), "UpdateForm")
     module_name = module(views, form)
-    show = show(entity)
-    data = data(entity)
-    fields = fields(entity, ui, views)
-    buttons = buttons(entity, ui, views)
-    messages = messages(ui, views)
-    init = init(entity)
+    parents = parent_fields(entity)
+    attributes = attribute_fields(entity)
+    scope = entity.plural()
 
-    definition = definition(messages, fields, buttons, show: show, data: data, init: init)
+    definition =
+      {:div, [scope(scope), mode(:edit)],
+       [{:h1, [data(:name, :display)], []}] ++
+         parents ++ attributes ++ [button_view(:edit)]}
 
     quote do
       defmodule unquote(module_name) do
@@ -28,75 +28,19 @@ defmodule Bee.Views.Forms.Update do
     end
   end
 
-  defp init(entity) do
-    """
-    $watch('$store.$.state', async (s) => {
-      if (#{show(entity)}) {
-        ({item, messages} = await read_item('#{entity.plural()}', s.id))
-      }
-    })
-    """
-  end
-
-  defp show(entity) do
-    "$store.$.should_display('#{entity.plural()}', 'edit')"
-  end
-
-  def data(_entity) do
-    "{ messages: [], item: {} }"
-  end
-
-  defp buttons(entity, _ui, _views) do
-    [
-      button(
-        "Update #{entity.name()}",
-        "({item, messages} = await update_item('#{entity.plural()}', item.id, #{payload(entity)}));
-         if (!messages.length) { visit(`/#/#{entity.plural()}/${item.id}`) }"
-      )
-    ]
-  end
-
-  defp fields(entity, ui, views) do
-    parent_fields(entity, ui, views) ++
-      attribute_fields(entity, ui, views)
-  end
-
-  defp attribute_fields(entity, ui, views) do
-    entity
-    |> attributes()
-    |> Enum.map(&field(ui, views, &1))
-  end
-
-  defp parent_fields(entity, ui, views) do
-    entity
-    |> parents()
-    |> Enum.map(&field(ui, views, &1))
-  end
-
-  defp attributes(entity) do
+  defp attribute_fields(entity) do
     entity.attributes
-    |> Enum.reject(& &1.immutable)
     |> Enum.reject(& &1.virtual)
+    |> Enum.reject(& &1.immutable)
     |> Enum.reject(& &1.computed)
     |> Enum.reject(& &1.timestamp)
     |> Enum.reject(& &1.implied)
+    |> Enum.map(&form_input_view(&1.label, :text, &1.name))
   end
 
-  defp parents(entity) do
-    Enum.reject(entity.parents, & &1.computed)
-  end
-
-  defp payload(entity) do
-    attributes =
-      entity
-      |> attributes()
-      |> Enum.map_join(",", &"#{&1.name}: item.#{&1.name}")
-
-    parents =
-      entity
-      |> parents()
-      |> Enum.map_join(",", &"#{&1.name}: item.#{&1.name}?.id")
-
-    "{ #{[attributes, parents] |> flatten() |> Enum.join(",")} }"
+  defp parent_fields(entity) do
+    entity.parents
+    |> Enum.reject(& &1.computed)
+    |> Enum.map(&pickup_view(&1.target.module.plural(), &1.name))
   end
 end
