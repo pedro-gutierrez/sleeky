@@ -18,7 +18,7 @@ defmodule Bee.Schema.Filter do
 
   defp filter_ancestor_function do
     quote do
-      def filter(entity, [:"**", ancestor | rest], op, value, q, last_binding) do
+      def filter(entity, [:**, ancestor | rest], op, value, q, last_binding) do
         ancestor_path =
           with [] <- nearest_path(entity, ancestor) do
             if rest == [], do: [:id], else: []

@@ -44,7 +44,7 @@ defmodule Bee.Schema.Evaluate do
 
   defp trailing_wildcard do
     quote do
-      def evaluate(%{__struct__: _} = context, [:"**"]), do: context
+      def evaluate(%{__struct__: _} = context, [:**]), do: context
     end
   end
 
@@ -76,7 +76,7 @@ defmodule Bee.Schema.Evaluate do
 
   defp nearest_path do
     quote do
-      def evaluate(%{__struct__: entity} = context, [:"**", ancestor | rest]) do
+      def evaluate(%{__struct__: entity} = context, [:**, ancestor | rest]) do
         case nearest_path(entity, ancestor) do
           [] ->
             if entity.name() == ancestor do

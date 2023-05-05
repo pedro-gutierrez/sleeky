@@ -24,10 +24,10 @@ defmodule Bee.Views do
 
   import Bee.Inspector
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
     views = __CALLER__.module
     ui = views |> context() |> module(UI)
-    schema = views |> context() |> module(Schema)
+    schema = opts |> Keyword.fetch!(:schema) |> module()
 
     @generators
     |> Enum.map(& &1.ast(ui, views, schema))

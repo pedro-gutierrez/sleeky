@@ -5,12 +5,26 @@ defmodule Bee.Views.Menu do
   alias Bee.UI.View
 
   import Bee.Inspector
-  import Bee.Views.Components
 
   def ast(_ui, views, schema) do
     view = module(views, Menu)
-    items = schema.entities() |> Enum.filter(&has_menu?/1) |> Enum.map(&menu_item_view/1)
-    definition = {:div, [data(:mode, :nav)], items}
+    menu_container = module(views, MenuContainer)
+    menu_item = module(views, MenuItem)
+
+    definition =
+      {:view, menu_container,
+       [
+         items:
+           schema.entities()
+           |> Enum.filter(&Entity.action(:list, &1))
+           |> Enum.map(fn entity ->
+             {:view, menu_item,
+              [
+                {:link, "/#{entity.plural()}"},
+                {:label, entity.plural_label()}
+              ]}
+           end)
+       ]}
 
     quote do
       defmodule unquote(view) do
@@ -18,10 +32,4 @@ defmodule Bee.Views.Menu do
       end
     end
   end
-
-  defp menu_item_view(entity) do
-    link_view("/#{entity.plural()}", entity.plural_label())
-  end
-
-  defp has_menu?(entity), do: Entity.action(:list, entity)
 end
