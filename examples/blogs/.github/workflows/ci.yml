@@ -1,0 +1,65 @@
+name: CI
+on: push
+env:
+  MIX_ENV: test
+  DEPS_CACHE_VERSION: v1
+  PLT_CACHE_VERSION: v1
+  ELIXIR_VERSION: 1.12
+  ERLANG_VERSION: 24.0
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        env:
+          POSTGRES_DB: blog_test
+          POSTGRES_PASSWORD: blog
+          POSTGRES_USER: blog
+        image: postgres:13-alpine
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ env.ELIXIR_VERSION }}
+          otp-version: ${{ env.ERLANG_VERSION }}
+      - name: Fetch Mix cache
+        id: mix-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+            !_build/${{ env.MIX_ENV }}/blog
+          key: ${{ runner.os }}-deps-erlang-${{ env.ERLANG_VERSION }}-elixir-${{ env.ELIXIR_VERSION }}-mix-${{ hashFiles('**/mix.lock') }}-${{ env.DEPS_CACHE_VERSION }}
+      - name: Get dependencies
+        if: steps.mix-cache.outputs.cache-hit != 'true'
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+      - name: Check Formatting
+        run: mix format --check-formatted
+      - name: Compile
+        run: mix compile
+      - name: Credo
+        run: mix credo --strict
+      - name: Run Tests
+        run: mix test
+      - name: Fetch PLT cache
+        id: plt-cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            .dialyzer_cache
+            ~/.cache/dialyzer/plts
+            _build/${{ env.MIX_ENV }}/*.plt
+          key: ${{ runner.os }}-plt-erlang-${{ env.ERLANG_VERSION }}-elixir-${{ env.ELIXIR_VERSION }}-mix-${{ hashFiles('**/mix.lock') }}-${{ env.PLT_CACHE_VERSION }}
+      - name: Dialyzer
+        run: mix dialyzer
+      - name: Docker image
+        run: docker build -t blog:latest .

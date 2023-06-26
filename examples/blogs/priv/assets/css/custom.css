@@ -1,0 +1,31 @@
+@font-face {
+    font-family: GTEestiDisplayMedium;
+    src: url(../webfonts/GTEestiDisplay-Medium.ttf);
+}
+
+@font-face {
+    font-family: GTEestiDisplayRegular;
+    src: url(../webfonts/GTEestiDisplay-Regular.ttf);
+}
+
+table.is-borderless td, table.is-borderless th {
+  border: 0
+}
+
+html * {
+  /* font-family: GTEestiDisplayRegular; */
+}
+
+.menu-list a:hover {
+  background-color: #fafafa;
+}
+
+.border-top-radius-0 {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.border-bottom-radius-0 {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}

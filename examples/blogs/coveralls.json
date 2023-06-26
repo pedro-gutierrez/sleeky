@@ -1,0 +1,7 @@
+{
+  "skip_files": [
+    "lib/blog/release.ex",
+    "lib/blog/repo.ex",
+    "test/support"
+  ]
+}
