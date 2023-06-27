@@ -1,16 +1,13 @@
-defmodule Blog.Comment do
+defmodule Blog.Schema.Blog do
   use Bee.Entity
 
-  attribute :text, :text do
+  attribute :name, :string do
   end
 
-  attribute :sentiment, :enum do
-    one_of(:sentiment)
-  end
+  unique(:name)
 
-  belongs_to(:post)
   belongs_to(:user)
-  has_many(:votes)
+  has_many(:posts)
 
   action :list do
     allow(:admin, :any)

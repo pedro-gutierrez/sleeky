@@ -9,7 +9,6 @@ defmodule Blog.UI.Views.MenuContainer do
 
       div class: "navbar-end" do
         div class: "navbar-item", "data-public": true do
-          view(Blog.UI.Views.Facebook)
         end
       end
     end

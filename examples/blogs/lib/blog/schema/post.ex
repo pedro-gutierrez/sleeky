@@ -1,18 +1,21 @@
-defmodule Blog.Case do
+defmodule Blog.Schema.Post do
   use Bee.Entity
 
-  attribute :name, :string do
+  attribute :title, :string do
   end
 
-  belongs_to(:user)
+  slug(:title)
 
-  unique(:name)
+  belongs_to(:blog)
+  has_many(:comments)
+
+  key([:blog, :title])
 
   action :list do
     allow(:admin, :any)
   end
 
-  action(:read) do
+  action :read do
     allow(:admin, :any)
   end
 
@@ -21,10 +24,6 @@ defmodule Blog.Case do
   end
 
   action :update do
-    allow(:admin, :any)
-  end
-
-  action :delete do
     allow(:admin, :any)
   end
 end

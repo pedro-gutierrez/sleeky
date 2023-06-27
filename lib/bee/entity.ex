@@ -32,15 +32,16 @@ defmodule Bee.Entity do
   ]
 
   def new(module) do
-    schema = module |> context() |> module(Schema)
-    repo = module |> context() |> module(Repo)
-    auth = module |> context() |> module(Auth)
+    schema = module |> context()
+    schema_context = context(schema)
+    repo = module(schema_context, Repo)
+    auth = module(schema_context, Auth)
     name = name(module)
     plural = plural(name)
     table = plural
 
     %__MODULE__{
-      context: context(module),
+      context: schema,
       module: module,
       name: name,
       label: Inflex.camelize(name),

@@ -1,7 +1,9 @@
-defmodule Blog.Tag do
+defmodule Blog.Schema.Comment do
   use Bee.Entity
 
-  attribute(:name, :string)
+  attribute :text, :text do
+  end
+
   belongs_to(:post)
 
   action :list do

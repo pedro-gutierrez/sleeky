@@ -103,7 +103,10 @@ defmodule Bee.Inspector do
   end
 
   def context(module) do
-    module |> Module.split() |> Enum.drop(-1) |> Module.concat()
+    module
+    |> Module.split()
+    |> Enum.drop(-1)
+    |> Module.concat()
   end
 
   def names(items) do

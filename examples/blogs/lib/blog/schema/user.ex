@@ -1,10 +1,10 @@
-defmodule Blog.User do
+defmodule Blog.Schema.User do
   use Bee.Entity
 
   attribute :email, :string do
   end
 
-  has_many(:cases)
+  has_many(:blogs)
 
   unique(:email)
 
