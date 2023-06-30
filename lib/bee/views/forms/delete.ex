@@ -11,7 +11,7 @@ defmodule Bee.Views.Forms.Delete do
 
   def ast(_ui, views, entity) do
     form = module(entity.label(), "DeleteForm")
-    module_name = module(views, form)
+    view = module(views, form)
     scope = entity.plural()
 
     definition =
@@ -27,8 +27,8 @@ defmodule Bee.Views.Forms.Delete do
        ]}
 
     quote do
-      defmodule unquote(module_name) do
-        unquote(View.ast(definition))
+      defmodule unquote(view) do
+        unquote(View.ast(definition, view))
       end
     end
   end

@@ -11,9 +11,9 @@ defmodule Bee.Views.Forms.Create do
 
   def ast(_ui, views, entity) do
     form = module(entity.label(), "CreateForm")
-    module_name = module(views, form)
+    view = module(views, form)
     parents = parent_fields(entity)
-    attributes = attribute_fields(entity)
+    attributes = attribute_fields(entity, views)
     scope = entity.plural()
 
     definition =
@@ -22,19 +22,25 @@ defmodule Bee.Views.Forms.Create do
          parents ++ attributes ++ [button_view(:create)]}
 
     quote do
-      defmodule unquote(module_name) do
-        unquote(View.ast(definition))
+      defmodule unquote(view) do
+        unquote(View.ast(definition, view))
       end
     end
   end
 
-  def attribute_fields(entity) do
+  def attribute_fields(entity, views) do
     entity.attributes
     |> Enum.reject(& &1.virtual)
     |> Enum.reject(& &1.computed)
     |> Enum.reject(& &1.timestamp)
     |> Enum.reject(& &1.implied)
-    |> Enum.map(&form_input_view(&1.label, :text, &1.name))
+    |> Enum.map(fn attr ->
+      {:view, module(views, TextInput),
+       [
+         {:label, attr.label},
+         {:name, attr.name}
+       ]}
+    end)
   end
 
   def parent_fields(entity) do

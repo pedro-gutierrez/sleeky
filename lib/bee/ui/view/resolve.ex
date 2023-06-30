@@ -1,35 +1,6 @@
 defmodule Bee.UI.View.Resolve do
   @moduledoc false
 
-  defmacro __using__(_opts) do
-    quote do
-      def definition, do: @definition
-
-      def render(args \\ %{}) do
-        html =
-          args
-          |> resolve()
-          |> Bee.UI.Html.render()
-      end
-
-      def resolve(args \\ %{}) do
-        Bee.UI.View.Resolve.resolve(__MODULE__, @definition, args)
-      rescue
-        e ->
-          raise """
-          Error rendering view #{inspect(__MODULE__)}:
-          #{Exception.format(:error, e, __STACKTRACE__)}"
-          """
-      end
-    end
-  end
-
-  def resolve(_view, definition, args) do
-    with {node, attrs, children} when is_list(children) <- resolve(definition, args) do
-      {node, attrs, List.flatten(children)}
-    end
-  end
-
   def resolve({:slot, name, [child]}, args) when is_atom(name) do
     case slot!(name, args) do
       items when is_list(items) ->
@@ -48,45 +19,6 @@ defmodule Bee.UI.View.Resolve do
     name
     |> slot!(args)
     |> resolve(args)
-  end
-
-  def resolve({:loop, [], children}, args) do
-    resolve({:loop, [:items], children}, args)
-  end
-
-  def resolve({:loop, path, children}, args) when is_list(path) do
-    path = Enum.map_join(path, ".", &to_string/1)
-
-    {:template,
-     [
-       "x-for": "item in $store.$.state.#{path}",
-       ":key": "item.id"
-     ], resolve(children, args)}
-  end
-
-  def resolve({:loop, {:slot, _} = path, children}, args) do
-    path = resolve(path, args)
-    resolve({:loop, path, children}, args)
-  end
-
-  def resolve({:loop, path, children}, args) when is_binary(path) do
-    path =
-      path
-      |> sanitize_attr(args)
-      |> String.split(".")
-      |> Enum.map(&String.to_atom/1)
-
-    resolve({:loop, path, children}, args)
-  end
-
-  def resolve({:each, var, children}, args) when is_binary(var) or is_atom(var) do
-    var = var |> to_string() |> sanitize_attr(args)
-
-    {:template,
-     [
-       "x-for": "i in #{var}",
-       ":key": "i.id"
-     ], resolve(children, args)}
   end
 
   def resolve({:entity, entity, children}, args) do

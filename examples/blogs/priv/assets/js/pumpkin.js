@@ -274,13 +274,15 @@ function bindNavMode(parent) {
   parent
     .querySelectorAll('[data-mode="nav"]')
     .forEach((el) => {
+      let exceptions = (el.dataset.navExcept || '').split(",").filter(col => col.length)
+
       el
         .querySelectorAll('[data-show]')
         .forEach((el2) => {
-          let modes = el2.dataset.show;
+          let modes = el2.dataset.show.split(",");
           S(() => {
             let d = state();
-            let display = (modes === "*" || modes.includes(d.mode) || (modes === 'children' && d.children)) ? '' : 'none';
+            let display = (!exceptions.includes(d.collection) && ((modes.includes('*') || modes.includes(d.mode) || (modes === 'children' && d.children)))) ? '' : 'none';
             el2.style.display = display;
           });
         });

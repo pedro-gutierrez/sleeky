@@ -10,7 +10,7 @@ defmodule Bee.Views.NavBar do
 
     quote do
       defmodule unquote(view) do
-        unquote(View.ast(definition))
+        unquote(View.ast(definition, view))
       end
     end
   end

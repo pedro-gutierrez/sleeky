@@ -7,10 +7,9 @@ defmodule Bee.UI.Dsl do
 
   defmacro view({:__aliases__, _, mod}, opts \\ []) do
     ui = __CALLER__.module
-    render = opts[:render] || :compilation
     view = module(mod)
     route = opts[:at] || route(mod)
-    view = View.new(module: view, route: route, render: render)
+    view = View.new(module: view, route: route)
     Module.put_attribute(ui, :views, view)
   end
 

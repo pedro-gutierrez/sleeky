@@ -16,10 +16,10 @@ defmodule Bee.Views.Forms.CreateChildren do
   end
 
   def view(views, entity, relation) do
-    module_name = module_name(views, entity, relation)
+    view = module_name(views, entity, relation)
     target_entity = relation.target.module
     parents = Forms.Create.parent_fields(target_entity)
-    attributes = Forms.Create.attribute_fields(target_entity)
+    attributes = Forms.Create.attribute_fields(target_entity, views)
 
     definition =
       {:div,
@@ -37,8 +37,8 @@ defmodule Bee.Views.Forms.CreateChildren do
          parents ++ attributes ++ [button_view(:create)]}
 
     quote do
-      defmodule unquote(module_name) do
-        unquote(View.ast(definition))
+      defmodule unquote(view) do
+        unquote(View.ast(definition, view))
       end
     end
   end

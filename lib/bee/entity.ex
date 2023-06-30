@@ -18,6 +18,7 @@ defmodule Bee.Entity do
     :pk_constraint,
     actions: [],
     attributes: [],
+    breadcrumbs: true,
     parents: [],
     children: [],
     keys: [],
@@ -51,7 +52,8 @@ defmodule Bee.Entity do
       plural: plural,
       plural_label: label(plural),
       table: table,
-      pk_constraint: "#{table}_pkey"
+      pk_constraint: "#{table}_pkey",
+      breadcrumbs: true
     }
   end
 
@@ -86,10 +88,12 @@ defmodule Bee.Entity do
     Module.get_attribute(entity, :entity)
   end
 
-  defmacro __using__(_) do
+  defmacro __using__(opts) do
     module = __CALLER__.module
 
     entity = new(module)
+
+    breadcrumbs = Keyword.get(opts, :breadcrumbs, true)
 
     entity =
       Enum.reduce(@implied_attributes, entity, fn attr, e ->
@@ -98,6 +102,7 @@ defmodule Bee.Entity do
         |> Attribute.new()
         |> add_to(:attributes, e)
       end)
+      |> Map.put(:breadcrumbs, breadcrumbs)
 
     Module.register_attribute(module, :entity, persist: true, accumulate: false)
     Module.put_attribute(module, :entity, entity)
@@ -105,6 +110,8 @@ defmodule Bee.Entity do
     quote do
       import Bee.Entity.Dsl, only: :macros
       @before_compile Bee.Entity
+
+      def breadcrumbs?, do: unquote(breadcrumbs)
     end
   end
 
@@ -119,18 +126,22 @@ defmodule Bee.Entity do
 
   defp with_display(entity) do
     if !field(:display, entity) do
-      [first | _] = Enum.reject(entity.attributes, & &1.implied)
+      case Enum.reject(entity.attributes, & &1.implied) do
+        [first | _] ->
+          [
+            name: :display,
+            kind: :string,
+            entity: entity,
+            computed: true,
+            using: Bee.Entity.Ecto.Display.module(entity),
+            plugin: {Bee.Entity.Ecto.Display, [first.name]}
+          ]
+          |> Attribute.new()
+          |> add_to(:attributes, entity)
 
-      [
-        name: :display,
-        kind: :string,
-        entity: entity,
-        computed: true,
-        using: Bee.Entity.Ecto.Display.module(entity),
-        plugin: {Bee.Entity.Ecto.Display, [first.name]}
-      ]
-      |> Attribute.new()
-      |> add_to(:attributes, entity)
+        _ ->
+          raise "entity #{inspect(entity.module)} has no attributes to display"
+      end
     else
       entity
     end

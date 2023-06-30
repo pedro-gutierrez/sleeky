@@ -6,11 +6,16 @@ defmodule Bee.Views.Breadcrumbs do
   import Bee.Inspector
   import Bee.Views.Components
 
-  def ast(_ui, views, _schema) do
+  def ast(_ui, views, schema) do
     view = module(views, Breadcrumbs)
 
+    exceptions =
+      schema.entities
+      |> Enum.reject(& &1.breadcrumbs?())
+      |> Enum.map_join(",", & &1.plural())
+
     definition =
-      {:div, [mode("nav")],
+      {:div, [{"data-mode", "nav"}, {"data-nav-except", exceptions}],
        [
          link("*", "/$collection", "collection"),
          link("show,edit,delete,newChild", "/$collection/$id", "id"),
@@ -22,7 +27,7 @@ defmodule Bee.Views.Breadcrumbs do
 
     quote do
       defmodule unquote(view) do
-        unquote(View.ast(definition))
+        unquote(View.ast(definition, view))
       end
     end
   end

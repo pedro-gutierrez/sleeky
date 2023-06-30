@@ -11,7 +11,7 @@ defmodule Bee.Views.Forms.Update do
 
   def ast(_ui, views, entity) do
     form = module(entity.label(), "UpdateForm")
-    module_name = module(views, form)
+    view = module(views, form)
     parents = parent_fields(entity)
     attributes = attribute_fields(entity)
     scope = entity.plural()
@@ -22,8 +22,8 @@ defmodule Bee.Views.Forms.Update do
          parents ++ attributes ++ [button_view(:edit)]}
 
     quote do
-      defmodule unquote(module_name) do
-        unquote(View.ast(definition))
+      defmodule unquote(view) do
+        unquote(View.ast(definition, view))
       end
     end
   end

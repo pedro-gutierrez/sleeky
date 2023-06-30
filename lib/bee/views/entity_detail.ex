@@ -5,7 +5,6 @@ defmodule Bee.Views.EntityDetail do
   alias Bee.Entity.Attribute
   alias Bee.Entity.Relation
   alias Bee.UI.View
-  # alias Bee.Views.EntityChildrenLists
 
   import Bee.Inspector
   import Bee.Views.Components
@@ -15,7 +14,7 @@ defmodule Bee.Views.EntityDetail do
   end
 
   defp detail_view(entity, _ui, views) do
-    module_name = module_name(views, entity)
+    view = module_name(views, entity)
     attributes = attributes(entity, views)
     parents = parents(entity)
     actions = actions(entity)
@@ -28,8 +27,8 @@ defmodule Bee.Views.EntityDetail do
        ]}
 
     quote do
-      defmodule unquote(module_name) do
-        unquote(View.ast(definition))
+      defmodule unquote(view) do
+        unquote(View.ast(definition, view))
       end
     end
   end

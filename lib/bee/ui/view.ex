@@ -13,10 +13,36 @@ defmodule Bee.UI.View do
     parent |> context() |> module(name)
   end
 
-  def ast(definition) do
+  def ast(definition, view) do
     quote do
       @definition unquote(Macro.escape(definition))
-      use Bee.UI.View.Resolve
+
+      def definition, do: @definition
+
+      def render(args \\ %{}) do
+        args
+        |> resolve()
+        |> Bee.UI.Html.render()
+      rescue
+        e ->
+          raise """
+          Error rendering view #{inspect(unquote(view))}:
+          #{Exception.format(:error, e, __STACKTRACE__)}"
+          """
+      end
+
+      def resolve(args \\ %{}) do
+        with {node, attrs, children} when is_list(children) <-
+               Bee.UI.View.Resolve.resolve(@definition, args) do
+          {node, attrs, List.flatten(children)}
+        end
+      rescue
+        e ->
+          raise """
+          Error resolving view #{inspect(unquote(view))}:
+          #{Exception.format(:error, e, __STACKTRACE__)}"
+          """
+      end
     end
   end
 
@@ -28,8 +54,10 @@ defmodule Bee.UI.View do
   end
 
   defmacro __before_compile__(_env) do
-    __CALLER__.module
+    view = __CALLER__.module
+
+    view
     |> Module.get_attribute(:definition)
-    |> ast()
+    |> ast(view)
   end
 end

@@ -8,7 +8,7 @@ defmodule Bee.Views.Lists do
 
   def ast(_ui, views, schema) do
     for entity <- schema.entities() do
-      module_name = module_name(views, entity)
+      view = module_name(views, entity)
       plural = entity.plural()
 
       definition =
@@ -33,8 +33,8 @@ defmodule Bee.Views.Lists do
          ]}
 
       quote do
-        defmodule unquote(module_name) do
-          unquote(View.ast(definition))
+        defmodule unquote(view) do
+          unquote(View.ast(definition, view))
         end
       end
     end

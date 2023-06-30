@@ -1,5 +1,6 @@
 defmodule Blog.Schema.Post do
-  use Bee.Entity
+  use Bee.Entity,
+    breadcrumbs: false
 
   attribute :title, :string do
   end

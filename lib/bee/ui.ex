@@ -2,7 +2,6 @@ defmodule Bee.UI do
   @moduledoc false
 
   @generators [
-    Bee.UI.Client,
     Bee.UI.Router
   ]
 

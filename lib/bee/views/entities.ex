@@ -10,12 +10,12 @@ defmodule Bee.Views.Entities do
   import Bee.Inspector
 
   def ast(_ui, views, schema) do
-    module_name = module(views, Entities)
+    view = module(views, Entities)
     definition = definition(views, schema)
 
     quote do
-      defmodule unquote(module_name) do
-        unquote(View.ast(definition))
+      defmodule unquote(view) do
+        unquote(View.ast(definition, view))
       end
     end
   end
