@@ -18,7 +18,7 @@ defmodule Bee.Views.Forms.CreateChildren do
   def view(views, entity, relation) do
     view = module_name(views, entity, relation)
     target_entity = relation.target.module
-    parents = Forms.Create.parent_fields(target_entity)
+    parents = Forms.Create.parent_fields(target_entity, views)
     attributes = Forms.Create.attribute_fields(target_entity, views)
 
     definition =

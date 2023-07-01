@@ -22,7 +22,7 @@ defmodule Bee.Router do
 
     conn = var(:conn)
 
-    for module <- [rest_router, ui_router, redoc_ui], do: Code.ensure_compiled!(module)
+    # for module <- [rest_router, ui_router, redoc_ui], do: Code.ensure_compiled!(module)
 
     quote do
       use Plug.Router

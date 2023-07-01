@@ -461,13 +461,16 @@ function bindCreateAction(el, form, scope) {
   el
     .querySelectorAll('[data-action="create"]')
     .forEach((control) => {
+      onSuccessLocation = control.dataset.onSuccessLocation || `#/${scope}`;
+
       control.addEventListener("click", async (e) => {
         e.preventDefault();
         let f = form();
-        let {errors} = await createItem(scope, f.item);
+        let {item, errors} = await createItem(scope, f.item);
         if (!errors.length) {
           form({item: {}});
-          visit(`#/${scope}`)
+          publish(`${scope}-create-success`, item);
+          if (onSuccessLocation != 'none') visit(`#/${scope}`)
         }
       });
     });
@@ -631,6 +634,18 @@ function bindPickup(parent, form) {
     });
 }
 
+function publish(event, payload) {
+  document.body.dispatchEvent(new CustomEvent(event, {detail: payload}));
+}
+
+function subscribe(event, callback) {
+  document.body.addEventListener(event, callback);
+}
+
+function unsubscribe(event, callback) {
+  document.body.removeEventListener(event, callback);
+}
+
 window.addEventListener('hashchange', route)
 
 route();
@@ -648,5 +663,3 @@ S.root(() => {
   bindPrivateMode(document);
   bindPublicMode(document);
 });
-
-

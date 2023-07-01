@@ -3,6 +3,7 @@ defmodule Bee.Views.Forms.Update do
 
   alias Bee.Entity
   alias Bee.UI.View
+  alias Bee.Views
 
   import Bee.Inspector
   import Bee.Views.Components
@@ -12,7 +13,7 @@ defmodule Bee.Views.Forms.Update do
   def ast(_ui, views, entity) do
     form = module(entity.label(), "UpdateForm")
     view = module(views, form)
-    parents = parent_fields(entity)
+    parents = parent_fields(entity, views)
     attributes = attribute_fields(entity)
     scope = entity.plural()
 
@@ -38,9 +39,9 @@ defmodule Bee.Views.Forms.Update do
     |> Enum.map(&form_input_view(&1.label, :text, &1.name))
   end
 
-  defp parent_fields(entity) do
+  defp parent_fields(entity, views) do
     entity.parents
     |> Enum.reject(& &1.computed)
-    |> Enum.map(&pickup_view(&1.target.module.plural(), &1.name))
+    |> Enum.map(&Views.pickup_view(&1, views))
   end
 end

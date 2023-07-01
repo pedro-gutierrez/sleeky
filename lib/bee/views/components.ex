@@ -20,30 +20,30 @@ defmodule Bee.Views.Components do
      ]}
   end
 
-  def pickup_view(scope, name) do
-    {:div, [data("pickup", scope), data("pickup-name", name)],
-     [
-       {:p, [], [label_view(name)]},
-       {:p, [],
-        [
-          {:span, [data("pickup-selection", "display")], []}
-        ]},
-       {:p, [],
-        [
-          {:input, [data("pickup-input"), type: "text"], []}
-        ]},
-       {:div, [],
-        [
-          {:template, [data(:each)],
-           [
-             {:p, [],
-              [
-                field_view(:display)
-              ]}
-           ]}
-        ]}
-     ]}
-  end
+  # def pickup_view(scope, name) do
+  #  {:div, [data("pickup", scope), data("pickup-name", name)],
+  #   [
+  #     {:p, [], [label_view(name)]},
+  #     {:p, [],
+  #      [
+  #        {:span, [data("pickup-selection", "display")], []}
+  #      ]},
+  #     {:p, [],
+  #      [
+  #        {:input, [data("pickup-input"), type: "text"], []}
+  #      ]},
+  #     {:div, [],
+  #      [
+  #        {:template, [data(:each)],
+  #         [
+  #           {:p, [],
+  #            [
+  #              field_view(:display)
+  #            ]}
+  #         ]}
+  #      ]}
+  #   ]}
+  # end
 
   def button_view(action, label \\ "Submit") do
     {:button, [data(:action, action)], [label]}

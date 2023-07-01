@@ -22,4 +22,10 @@ defmodule Bee.Views do
     |> Enum.map(& &1.ast(ui, views, schema))
     |> flatten()
   end
+
+  def pickup_view(rel, views) do
+    pickup_view = module(views, PickUp)
+    scope = rel.target.module.plural()
+    {:view, pickup_view, [scope: scope, name: rel.name]}
+  end
 end

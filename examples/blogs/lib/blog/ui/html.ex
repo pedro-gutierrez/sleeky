@@ -5,7 +5,7 @@ defmodule Blog.UI.Html do
     html class: "has-background-white-bis" do
       head do
         meta(charset: "UTF-8")
-        script(src: "/assets/js/s.js")
+        script(src: "/assets/js/s.min.js")
         script(defer: true, src: "/assets/js/pumpkin.js")
 
         link(
