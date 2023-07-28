@@ -25,7 +25,7 @@ defmodule Sleeki.MixProject do
       {:calendar, "~> 1.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
-      {:estree, "~> 2.7"},
+      # {:estree, "~> 2.7"},
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
