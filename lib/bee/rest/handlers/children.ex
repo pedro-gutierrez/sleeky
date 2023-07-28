@@ -1,9 +1,9 @@
-defmodule Bee.Rest.Handlers.Children do
+defmodule Sleeki.Rest.Handlers.Children do
   @moduledoc false
 
-  alias Bee.Entity.Relation
-  import Bee.Inspector
-  import Bee.Rest.Handlers.Helpers
+  alias Sleeki.Entity.Relation
+  import Sleeki.Inspector
+  import Sleeki.Rest.Handlers.Helpers
 
   def handlers(entity, rest) do
     for child <- entity.children() do

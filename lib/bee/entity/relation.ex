@@ -1,9 +1,9 @@
-defmodule Bee.Entity.Relation do
-  alias Bee.Entity
-  alias Bee.Entity.Aliases
-  alias Bee.Entity.ForeignKey
-  alias Bee.Entity.Summary
-  import Bee.Inspector
+defmodule Sleeki.Entity.Relation do
+  alias Sleeki.Entity
+  alias Sleeki.Entity.Aliases
+  alias Sleeki.Entity.ForeignKey
+  alias Sleeki.Entity.Summary
+  import Sleeki.Inspector
 
   defstruct [
     :name,

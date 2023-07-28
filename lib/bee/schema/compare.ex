@@ -1,4 +1,4 @@
-defmodule Bee.Schema.Compare do
+defmodule Sleeki.Schema.Compare do
   @moduledoc false
 
   def ast(_schema) do

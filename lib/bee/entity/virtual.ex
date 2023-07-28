@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Virtual do
+defmodule Sleeki.Entity.Virtual do
   @moduledoc false
 
   def ast(_entity) do

@@ -1,8 +1,8 @@
-defmodule Bee.Entity.Ecto.List do
+defmodule Sleeki.Entity.Ecto.List do
   @moduledoc false
 
-  alias Bee.Entity
-  import Bee.Inspector
+  alias Sleeki.Entity
+  import Sleeki.Inspector
 
   def ast(entity) do
     if Entity.action(:list, entity) do

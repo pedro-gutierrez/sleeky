@@ -1,8 +1,8 @@
-defmodule Bee.Router do
+defmodule Sleeki.Router do
   @moduledoc """
   A macro that sets up a standard router, including default paths for ui, api and api docs
   """
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defmacro __using__(opts) do
     otp_app = Keyword.fetch!(opts, :otp_app)

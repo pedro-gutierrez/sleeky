@@ -1,4 +1,4 @@
-defmodule Bee.Inspector do
+defmodule Sleeki.Inspector do
   def print(ast, condition \\ true) do
     if condition do
       ast

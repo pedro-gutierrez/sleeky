@@ -1,4 +1,4 @@
-defmodule Bee.Rest.RouterHelper do
+defmodule Sleeki.Rest.RouterHelper do
   @moduledoc false
 
   def ast(rest, _schema) do
@@ -154,7 +154,7 @@ defmodule Bee.Rest.RouterHelper do
         defp status(:invalid), do: 400
         defp status(:unauthorized), do: 401
         defp status(:conflict), do: 409
-        defp status([%{detail: "has already been taken"}]), do: 409
+        defp status([%{detail: "has already sleekin taken"}]), do: 409
         defp status(%{reason: reason}), do: status(reason)
         defp status(_), do: 500
       end

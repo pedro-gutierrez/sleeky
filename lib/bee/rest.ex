@@ -1,18 +1,18 @@
-defmodule Bee.Rest do
+defmodule Sleeki.Rest do
   @generators [
-    Bee.Rest.OpenApi,
-    Bee.Rest.RouterHelper,
-    Bee.Rest.Handlers,
-    Bee.Rest.Router,
-    Bee.Rest.Redoc
+    Sleeki.Rest.OpenApi,
+    Sleeki.Rest.RouterHelper,
+    Sleeki.Rest.Handlers,
+    Sleeki.Rest.Router,
+    Sleeki.Rest.Redoc
   ]
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defmacro __using__(_) do
     quote do
-      import Bee.Rest.Dsl, only: :macros
-      @before_compile Bee.Rest
+      import Sleeki.Rest.Dsl, only: :macros
+      @before_compile Sleeki.Rest
     end
   end
 

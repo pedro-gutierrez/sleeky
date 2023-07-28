@@ -1,13 +1,13 @@
-defmodule Bee.Migrations.CreateTable do
+defmodule Sleeki.Migrations.CreateTable do
   @moduledoc false
-  @behaviour Bee.Migrations.Step
+  @behaviour Sleeki.Migrations.Step
 
-  alias Bee.Database.State
-  alias Bee.Database.Table
-  alias Bee.Database.Column
-  alias Bee.Migrations.Step
+  alias Sleeki.Database.State
+  alias Sleeki.Database.Table
+  alias Sleeki.Database.Column
+  alias Sleeki.Migrations.Step
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defstruct [:table]
 

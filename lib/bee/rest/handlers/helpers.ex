@@ -1,8 +1,8 @@
-defmodule Bee.Rest.Handlers.Helpers do
+defmodule Sleeki.Rest.Handlers.Helpers do
   @moduledoc false
-  import Bee.Inspector
+  import Sleeki.Inspector
 
-  alias Bee.Entity.Action
+  alias Sleeki.Entity.Action
 
   def handler(rest, entity, action, body) when is_list(body) do
     module_name = module_name(rest, entity, action)

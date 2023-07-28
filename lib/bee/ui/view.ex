@@ -1,7 +1,7 @@
-defmodule Bee.UI.View do
+defmodule Sleeki.UI.View do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defstruct [:route, :module, :render]
 
@@ -22,7 +22,7 @@ defmodule Bee.UI.View do
       def render(args \\ %{}) do
         args
         |> resolve()
-        |> Bee.UI.Html.render()
+        |> Sleeki.UI.Html.render()
       rescue
         e ->
           raise """
@@ -33,7 +33,7 @@ defmodule Bee.UI.View do
 
       def resolve(args \\ %{}) do
         with {node, attrs, children} when is_list(children) <-
-               Bee.UI.View.Resolve.resolve(@definition, args) do
+               Sleeki.UI.View.Resolve.resolve(@definition, args) do
           {node, attrs, List.flatten(children)}
         end
       rescue
@@ -48,8 +48,8 @@ defmodule Bee.UI.View do
 
   defmacro __using__(_opts) do
     quote do
-      import Bee.UI.View.Dsl, only: :macros
-      @before_compile Bee.UI.View
+      import Sleeki.UI.View.Dsl, only: :macros
+      @before_compile Sleeki.UI.View
     end
   end
 

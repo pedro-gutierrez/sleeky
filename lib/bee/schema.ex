@@ -1,15 +1,15 @@
-defmodule Bee.Schema do
+defmodule Sleeki.Schema do
   @moduledoc false
 
   @generators [
-    Bee.Schema.Preamble,
-    Bee.Schema.NearestPath,
-    Bee.Schema.Evaluate,
-    Bee.Schema.Filter,
-    Bee.Schema.Compare
+    Sleeki.Schema.Preamble,
+    Sleeki.Schema.NearestPath,
+    Sleeki.Schema.Evaluate,
+    Sleeki.Schema.Filter,
+    Sleeki.Schema.Compare
   ]
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def entities!(schema) do
     ensure!(schema, :entities)
@@ -46,8 +46,8 @@ defmodule Bee.Schema do
     Module.put_attribute(schema, :auth, auth)
 
     quote do
-      import Bee.Schema.Dsl, only: :macros
-      @before_compile unquote(Bee.Schema)
+      import Sleeki.Schema.Dsl, only: :macros
+      @before_compile unquote(Sleeki.Schema)
     end
   end
 

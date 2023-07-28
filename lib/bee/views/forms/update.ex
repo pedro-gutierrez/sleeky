@@ -1,12 +1,12 @@
-defmodule Bee.Views.Forms.Update do
+defmodule Sleeki.Views.Forms.Update do
   @moduledoc false
 
-  alias Bee.Entity
-  alias Bee.UI.View
-  alias Bee.Views
+  alias Sleeki.Entity
+  alias Sleeki.UI.View
+  alias Sleeki.Views
 
-  import Bee.Inspector
-  import Bee.Views.Components
+  import Sleeki.Inspector
+  import Sleeki.Views.Components
 
   def action(entity), do: Entity.action(:create, entity)
 

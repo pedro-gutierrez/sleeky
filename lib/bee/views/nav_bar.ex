@@ -1,8 +1,8 @@
-defmodule Bee.Views.NavBar do
+defmodule Sleeki.Views.NavBar do
   @moduledoc false
 
-  import Bee.Inspector
-  alias Bee.UI.View
+  import Sleeki.Inspector
+  alias Sleeki.UI.View
 
   def ast(ui, views, schema) do
     view = module(views, NavBar)

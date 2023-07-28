@@ -1,6 +1,6 @@
-defmodule Bee.Entity.Ecto.Changesets do
+defmodule Sleeki.Entity.Ecto.Changesets do
   @moduledoc false
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(entity) do
     fields = fields_changeset(entity)

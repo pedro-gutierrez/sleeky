@@ -1,6 +1,6 @@
-defmodule Bee.Entity.Key do
+defmodule Sleeki.Entity.Key do
   @moduledoc false
-  alias Bee.Entity.Summary
+  alias Sleeki.Entity.Summary
 
   defstruct [
     :name,

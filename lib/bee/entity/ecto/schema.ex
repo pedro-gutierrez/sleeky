@@ -1,6 +1,6 @@
-defmodule Bee.Entity.Ecto.Schema do
+defmodule Sleeki.Entity.Ecto.Schema do
   @moduledoc false
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(entity) do
     source = to_string(entity.plural)

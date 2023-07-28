@@ -1,8 +1,8 @@
-defmodule Bee.Database.Index do
+defmodule Sleeki.Database.Index do
   @moduledoc false
 
-  alias Bee.Entity.Key
-  import Bee.Inspector
+  alias Sleeki.Entity.Key
+  import Sleeki.Inspector
 
   defstruct [:name, :table, :columns, unique: false]
 

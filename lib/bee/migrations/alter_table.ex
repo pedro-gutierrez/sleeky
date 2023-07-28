@@ -1,14 +1,14 @@
-defmodule Bee.Migrations.AlterTable do
+defmodule Sleeki.Migrations.AlterTable do
   @moduledoc false
-  @behaviour Bee.Migrations.Step
+  @behaviour Sleeki.Migrations.Step
 
-  alias Bee.Database.Table
-  alias Bee.Database.Column
-  alias Bee.Database.ColumnChanges
-  alias Bee.Database.State
-  alias Bee.Migrations.Step
+  alias Sleeki.Database.Table
+  alias Sleeki.Database.Column
+  alias Sleeki.Database.ColumnChanges
+  alias Sleeki.Database.State
+  alias Sleeki.Migrations.Step
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defstruct [:table, add: %{}, remove: %{}, modify: %{}]
 

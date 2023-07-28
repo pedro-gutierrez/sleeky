@@ -1,10 +1,10 @@
-defmodule Bee.UI.Client.Item do
+defmodule Sleeki.UI.Client.Item do
   @moduledoc false
 
-  import Bee.Inspector
-  import Bee.UI.Client.Helpers
+  import Sleeki.Inspector
+  import Sleeki.UI.Client.Helpers
 
-  alias Bee.Entity.Attribute
+  alias Sleeki.Entity.Attribute
   alias ESTree.Tools.Builder, as: JS
 
   def ast(entity) do

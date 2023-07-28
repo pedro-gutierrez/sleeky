@@ -1,10 +1,10 @@
-defmodule Bee.Migrations.DropConstraint do
+defmodule Sleeki.Migrations.DropConstraint do
   @moduledoc false
-  @behaviour Bee.Migrations.Step
+  @behaviour Sleeki.Migrations.Step
 
-  alias Bee.Database.Constraint
-  alias Bee.Database.State
-  alias Bee.Migrations.Step
+  alias Sleeki.Database.Constraint
+  alias Sleeki.Database.State
+  alias Sleeki.Migrations.Step
 
   defstruct [:constraint]
 

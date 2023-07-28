@@ -1,10 +1,10 @@
-defmodule Bee.Entity.Ecto.Delete do
+defmodule Sleeki.Entity.Ecto.Delete do
   @moduledoc false
 
-  alias Bee.Entity
-  import Bee.Inspector
+  alias Sleeki.Entity
+  import Sleeki.Inspector
 
-  import Bee.Entity.Ecto.Helpers,
+  import Sleeki.Entity.Ecto.Helpers,
     only: [
       allowed?: 2,
       context_with_item: 1,

@@ -1,7 +1,7 @@
-defmodule Bee.Auth.Dsl do
+defmodule Sleeki.Auth.Dsl do
   @moduledoc false
 
-  alias Bee.Auth.Scope
+  alias Sleeki.Auth.Scope
 
   defmacro roles(expr) do
     auth = __CALLER__.module

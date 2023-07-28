@@ -1,9 +1,9 @@
-defmodule Bee.Auth.Scope.Parser do
+defmodule Sleeki.Auth.Scope.Parser do
   @moduledoc false
 
-  alias Bee.Auth.Scope
+  alias Sleeki.Auth.Scope
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def parse(name, do: expr) do
     parse(name, expr)

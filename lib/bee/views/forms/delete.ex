@@ -1,11 +1,11 @@
-defmodule Bee.Views.Forms.Delete do
+defmodule Sleeki.Views.Forms.Delete do
   @moduledoc false
 
-  alias Bee.Entity
-  alias Bee.UI.View
+  alias Sleeki.Entity
+  alias Sleeki.UI.View
 
-  import Bee.Inspector
-  import Bee.Views.Components
+  import Sleeki.Inspector
+  import Sleeki.Views.Components
 
   def action(entity), do: Entity.action(:delete, entity)
 

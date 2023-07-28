@@ -1,10 +1,10 @@
-defmodule Bee.UI.Client.Actions do
+defmodule Sleeki.UI.Client.Actions do
   @moduledoc false
 
-  import Bee.Inspector
-  import Bee.UI.Client.Helpers
+  import Sleeki.Inspector
+  import Sleeki.UI.Client.Helpers
 
-  alias Bee.Entity.Action
+  alias Sleeki.Entity.Action
   alias ESTree.Tools.Builder, as: JS
 
   @json "application/json; charset=UTF-8"

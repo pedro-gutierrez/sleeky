@@ -1,12 +1,12 @@
-defmodule Bee.Schema.Api do
+defmodule Sleeki.Schema.Api do
   @moduledoc false
 
   @generators [
-    Bee.Schema.Api.Helpers,
-    Bee.Schema.Api.Entities
+    Sleeki.Schema.Api.Helpers,
+    Sleeki.Schema.Api.Entities
   ]
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(schema) do
     @generators

@@ -1,11 +1,11 @@
-defmodule Bee.Views.Forms.CreateChildren do
+defmodule Sleeki.Views.Forms.CreateChildren do
   @moduledoc false
 
-  alias Bee.Entity
-  alias Bee.UI.View
-  alias Bee.Views.Forms
+  alias Sleeki.Entity
+  alias Sleeki.UI.View
+  alias Sleeki.Views.Forms
 
-  import Bee.Views.Components
+  import Sleeki.Views.Components
 
   def action(_), do: true
 

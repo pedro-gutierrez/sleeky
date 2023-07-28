@@ -1,10 +1,10 @@
-defmodule Bee.Views.Menu do
+defmodule Sleeki.Views.Menu do
   @moduledoc false
 
-  alias Bee.Entity
-  alias Bee.UI.View
+  alias Sleeki.Entity
+  alias Sleeki.UI.View
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(_ui, views, schema) do
     view = module(views, Menu)

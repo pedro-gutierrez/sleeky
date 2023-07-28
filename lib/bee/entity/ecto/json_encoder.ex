@@ -1,6 +1,6 @@
-defmodule Bee.Entity.Ecto.JsonEncoder do
+defmodule Sleeki.Entity.Ecto.JsonEncoder do
   @moduledoc false
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(entity) do
     module_name = module(entity.module, JsonEncoder)

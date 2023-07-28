@@ -1,12 +1,12 @@
-defmodule Bee.Auth do
+defmodule Sleeki.Auth do
   @moduledoc false
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   @generators [
-    Bee.Auth.Role,
-    Bee.Auth.Policy,
-    Bee.Auth.Scope,
-    Bee.Auth.Allow
+    Sleeki.Auth.Role,
+    Sleeki.Auth.Policy,
+    Sleeki.Auth.Scope,
+    Sleeki.Auth.Allow
   ]
 
   def schema!(auth) do
@@ -28,17 +28,17 @@ defmodule Bee.Auth do
     Module.put_attribute(auth, :schema, schema)
 
     quote do
-      import Bee.Auth.Dsl, only: :macros
+      import Sleeki.Auth.Dsl, only: :macros
       import Ecto.Query
       @schema unquote(schema)
-      @before_compile unquote(Bee.Auth)
+      @before_compile unquote(Sleeki.Auth)
     end
   end
 
   defmacro __before_compile__(_env) do
     auth = __CALLER__.module
-    scopes = Bee.Auth.Scope.Resolver.scopes(auth)
-    schema = Bee.Auth.schema!(auth)
+    scopes = Sleeki.Auth.Scope.Resolver.scopes(auth)
+    schema = Sleeki.Auth.schema!(auth)
     default_policy = :deny
 
     @generators

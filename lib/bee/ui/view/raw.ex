@@ -1,4 +1,4 @@
-defmodule Bee.UI.View.Raw do
+defmodule Sleeki.UI.View.Raw do
   def parse({:__aliases__, _, module}) do
     Module.concat(module)
   end

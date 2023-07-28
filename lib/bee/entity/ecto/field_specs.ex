@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Ecto.FieldSpecs do
+defmodule Sleeki.Entity.Ecto.FieldSpecs do
   @moduledoc false
 
   def ast(entity) do

@@ -1,10 +1,10 @@
-defmodule Bee.Entity.Ecto.Create do
+defmodule Sleeki.Entity.Ecto.Create do
   @moduledoc false
 
-  alias Bee.Entity
-  import Bee.Inspector
+  alias Sleeki.Entity
+  import Sleeki.Inspector
 
-  import Bee.Entity.Ecto.Helpers,
+  import Sleeki.Entity.Ecto.Helpers,
     only: [
       parent_function_args: 1,
       context_with_parents: 1,

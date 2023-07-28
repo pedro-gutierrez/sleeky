@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Ecto.Pagination do
+defmodule Sleeki.Entity.Ecto.Pagination do
   @moduledoc false
 
   def ast(_entity) do

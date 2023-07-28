@@ -1,4 +1,4 @@
-defmodule Bee.Views.Components do
+defmodule Sleeki.Views.Components do
   @moduledoc false
 
   def data(name), do: {"data-#{name}", ""}

@@ -1,9 +1,9 @@
-defmodule Bee.Views.Forms.Helpers do
+defmodule Sleeki.Views.Forms.Helpers do
   @moduledoc false
 
-  alias Bee.Entity.Attribute
-  alias Bee.Entity.Relation
-  import Bee.Inspector
+  alias Sleeki.Entity.Attribute
+  alias Sleeki.Entity.Relation
+  import Sleeki.Inspector
 
   def definition(messages, fields, buttons, opts) do
     contents = flatten([messages, fields, {:div, [class: "field is-grouped"], buttons}])

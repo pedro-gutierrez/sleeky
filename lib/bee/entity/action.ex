@@ -1,8 +1,8 @@
-defmodule Bee.Entity.Action do
+defmodule Sleeki.Entity.Action do
   @moduledoc false
 
-  alias Bee.Entity.Summary
-  import Bee.Inspector
+  alias Sleeki.Entity.Summary
+  import Sleeki.Inspector
 
   defstruct [
     :name,

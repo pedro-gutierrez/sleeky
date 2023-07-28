@@ -1,6 +1,6 @@
-defmodule Bee.Entity.Ecto.FieldAttributes do
+defmodule Sleeki.Entity.Ecto.FieldAttributes do
   @moduledoc false
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(entity) do
     [

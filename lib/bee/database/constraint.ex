@@ -1,7 +1,7 @@
-defmodule Bee.Database.Constraint do
+defmodule Sleeki.Database.Constraint do
   @moduledoc false
-  import Bee.Inspector
-  alias Bee.Entity.Relation
+  import Sleeki.Inspector
+  alias Sleeki.Entity.Relation
 
   defstruct [:name, :table, :column, :target, type: :uuid, null: false, on_delete: :nothing]
 

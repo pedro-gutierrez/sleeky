@@ -1,11 +1,11 @@
-defmodule Bee.Rest.Handlers.Default do
+defmodule Sleeki.Rest.Handlers.Default do
   @moduledoc false
 
-  alias Bee.Entity.Action
-  alias Bee.Entity.Attribute
+  alias Sleeki.Entity.Action
+  alias Sleeki.Entity.Attribute
 
-  import Bee.Inspector
-  import Bee.Rest.Handlers.Helpers
+  import Sleeki.Inspector
+  import Sleeki.Rest.Handlers.Helpers
 
   def handlers(entity, rest) do
     for action <- entity.actions do

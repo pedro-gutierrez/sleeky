@@ -1,12 +1,12 @@
-defmodule Bee.Entity.Dsl do
-  alias Bee.Entity
-  alias Bee.Entity.Attribute
-  alias Bee.Entity.Key
-  alias Bee.Entity.Relation
-  alias Bee.Entity.Action
-  import Bee.Entity
-  import Bee.Inspector
-  import Bee.Opts
+defmodule Sleeki.Entity.Dsl do
+  alias Sleeki.Entity
+  alias Sleeki.Entity.Attribute
+  alias Sleeki.Entity.Key
+  alias Sleeki.Entity.Relation
+  alias Sleeki.Entity.Action
+  import Sleeki.Entity
+  import Sleeki.Inspector
+  import Sleeki.Opts
 
   defmacro action(name, block \\ nil) do
     module = __CALLER__.module
@@ -99,7 +99,7 @@ defmodule Bee.Entity.Dsl do
     module = __CALLER__.module
     entity = Entity.entity(module)
 
-    slug_module = Bee.Entity.Ecto.Slug.module(entity)
+    slug_module = Sleeki.Entity.Ecto.Slug.module(entity)
 
     fields = as_list(fields)
 
@@ -110,7 +110,7 @@ defmodule Bee.Entity.Dsl do
         entity: entity,
         computed: true,
         using: slug_module,
-        plugin: {Bee.Entity.Ecto.Slug, fields}
+        plugin: {Sleeki.Entity.Ecto.Slug, fields}
       ]
       |> Attribute.new()
       |> with_opts(opts)

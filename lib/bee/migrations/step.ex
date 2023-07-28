@@ -1,7 +1,7 @@
-defmodule Bee.Migrations.Step do
+defmodule Sleeki.Migrations.Step do
   @moduledoc false
 
-  alias Bee.Database.State
+  alias Sleeki.Database.State
 
   @type step :: struct()
   @type code :: tuple()

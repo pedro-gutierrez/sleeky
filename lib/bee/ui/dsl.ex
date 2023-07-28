@@ -1,9 +1,9 @@
-defmodule Bee.UI.Dsl do
+defmodule Sleeki.UI.Dsl do
   @moduledoc false
 
-  alias Bee.UI.View
+  alias Sleeki.UI.View
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defmacro view({:__aliases__, _, mod}, opts \\ []) do
     ui = __CALLER__.module

@@ -1,7 +1,7 @@
-defmodule Bee.UI.View.Dsl do
+defmodule Sleeki.UI.View.Dsl do
   @moduledoc false
 
-  alias Bee.UI.View.Raw
+  alias Sleeki.UI.View.Raw
 
   defmacro render(do: raw) do
     view = __CALLER__.module

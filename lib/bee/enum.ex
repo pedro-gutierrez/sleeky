@@ -1,7 +1,7 @@
-defmodule Bee.Enum do
+defmodule Sleeki.Enum do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defmacro __using__(values) do
     name = name(__CALLER__.module)

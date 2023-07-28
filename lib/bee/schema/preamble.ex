@@ -1,4 +1,4 @@
-defmodule Bee.Schema.Preamble do
+defmodule Sleeki.Schema.Preamble do
   @moduledoc false
 
   def ast(schema) do
@@ -9,7 +9,7 @@ defmodule Bee.Schema.Preamble do
   end
 
   defp entities_function(schema) do
-    entities = Bee.Schema.entities!(schema)
+    entities = Sleeki.Schema.entities!(schema)
 
     quote do
       def entities, do: unquote(entities)
@@ -17,7 +17,7 @@ defmodule Bee.Schema.Preamble do
   end
 
   defp enums_function(schema) do
-    enums = Bee.Schema.enums!(schema)
+    enums = Sleeki.Schema.enums!(schema)
 
     quote do
       def enums, do: unquote(enums)

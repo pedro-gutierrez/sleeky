@@ -1,8 +1,8 @@
-defmodule Bee.Auth.Scope.Resolver do
+defmodule Sleeki.Auth.Scope.Resolver do
   @moduledoc false
-  alias Bee.Auth
+  alias Sleeki.Auth
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def scopes(auth) do
     scopes =

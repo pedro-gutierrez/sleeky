@@ -1,24 +1,24 @@
-defmodule Bee.Migrations.Migration do
+defmodule Sleeki.Migrations.Migration do
   @moduledoc false
-  import Bee.Inspector
-  import Bee.Migrations.Ecto
+  import Sleeki.Inspector
+  import Sleeki.Migrations.Ecto
 
   @mutations [
-    Bee.Migrations.CreateEnum,
-    Bee.Migrations.CreateTable,
-    Bee.Migrations.AlterTable,
-    Bee.Migrations.CreateConstraint,
-    Bee.Migrations.CreateIndex,
-    Bee.Migrations.DropConstraint,
-    Bee.Migrations.DropIndex,
-    Bee.Migrations.DropTable,
-    Bee.Migrations.DropEnum
+    Sleeki.Migrations.CreateEnum,
+    Sleeki.Migrations.CreateTable,
+    Sleeki.Migrations.AlterTable,
+    Sleeki.Migrations.CreateConstraint,
+    Sleeki.Migrations.CreateIndex,
+    Sleeki.Migrations.DropConstraint,
+    Sleeki.Migrations.DropIndex,
+    Sleeki.Migrations.DropTable,
+    Sleeki.Migrations.DropEnum
   ]
 
   defstruct [
     :version,
     :ts,
-    name: "bee",
+    name: "sleeki",
     skip: false,
     steps: []
   ]

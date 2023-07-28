@@ -1,10 +1,10 @@
-defmodule Bee.Migrations.DropTable do
+defmodule Sleeki.Migrations.DropTable do
   @moduledoc false
-  @behaviour Bee.Migrations.Step
+  @behaviour Sleeki.Migrations.Step
 
-  alias Bee.Database.State
-  alias Bee.Database.Table
-  alias Bee.Migrations.Step
+  alias Sleeki.Database.State
+  alias Sleeki.Database.Table
+  alias Sleeki.Migrations.Step
 
   defstruct [:table]
 

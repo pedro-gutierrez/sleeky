@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Ecto.Relation do
+defmodule Sleeki.Entity.Ecto.Relation do
   @moduledoc false
 
   def ast(entity) do

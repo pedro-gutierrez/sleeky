@@ -1,7 +1,7 @@
-defmodule Bee.UI.Client.Collection do
+defmodule Sleeki.UI.Client.Collection do
   @moduledoc false
 
-  import Bee.UI.Client.Helpers
+  import Sleeki.UI.Client.Helpers
 
   alias ESTree.Tools.Builder, as: JS
 

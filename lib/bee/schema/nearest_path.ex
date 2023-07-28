@@ -1,10 +1,10 @@
-defmodule Bee.Schema.NearestPath do
+defmodule Sleeki.Schema.NearestPath do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(schema) do
-    entities = Bee.Schema.entities!(schema)
+    entities = Sleeki.Schema.entities!(schema)
 
     hierarchies = for entity <- entities, into: %{}, do: {entity, hierarchy(entity)}
 

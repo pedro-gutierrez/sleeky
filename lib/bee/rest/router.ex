@@ -1,8 +1,8 @@
-defmodule Bee.Rest.Router do
+defmodule Sleeki.Rest.Router do
   @moduledoc false
 
-  import Bee.Inspector
-  alias Bee.Rest.Handlers
+  import Sleeki.Inspector
+  alias Sleeki.Rest.Handlers
 
   def ast(rest, schema) do
     router = module(rest, Router)

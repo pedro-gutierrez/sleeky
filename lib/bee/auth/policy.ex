@@ -1,4 +1,4 @@
-defmodule Bee.Auth.Policy do
+defmodule Sleeki.Auth.Policy do
   @moduledoc false
 
   def ast(_auth, _schema, _scopes, _default_policy) do

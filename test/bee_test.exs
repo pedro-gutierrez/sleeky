@@ -1,8 +1,8 @@
-defmodule BeeTest do
+defmodule SleekiTest do
   use ExUnit.Case
-  doctest Bee
+  doctest Sleeki
 
   test "greets the world" do
-    assert Bee.hello() == :world
+    assert Sleeki.hello() == :world
   end
 end

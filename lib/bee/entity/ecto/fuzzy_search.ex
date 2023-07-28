@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Ecto.FuzzySearch do
+defmodule Sleeki.Entity.Ecto.FuzzySearch do
   @moduledoc "Naive fuzzy search capabilities for entities"
 
   def ast(entity) do

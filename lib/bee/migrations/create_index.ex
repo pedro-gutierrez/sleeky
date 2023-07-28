@@ -1,10 +1,10 @@
-defmodule Bee.Migrations.CreateIndex do
+defmodule Sleeki.Migrations.CreateIndex do
   @moduledoc false
-  @behaviour Bee.Migrations.Step
+  @behaviour Sleeki.Migrations.Step
 
-  alias Bee.Database.Index
-  alias Bee.Database.State
-  alias Bee.Migrations.Step
+  alias Sleeki.Database.Index
+  alias Sleeki.Database.State
+  alias Sleeki.Migrations.Step
 
   defstruct [:index]
 

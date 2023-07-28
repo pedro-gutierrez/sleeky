@@ -1,13 +1,13 @@
-defmodule Bee.Views.Forms do
+defmodule Sleeki.Views.Forms do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   @forms [
-    Bee.Views.Forms.Delete,
-    Bee.Views.Forms.Create,
-    Bee.Views.Forms.Update,
-    Bee.Views.Forms.CreateChildren
+    Sleeki.Views.Forms.Delete,
+    Sleeki.Views.Forms.Create,
+    Sleeki.Views.Forms.Update,
+    Sleeki.Views.Forms.CreateChildren
   ]
 
   def ast(ui, views, schema) do

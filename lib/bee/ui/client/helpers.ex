@@ -1,4 +1,4 @@
-defmodule Bee.UI.Client.Helpers do
+defmodule Sleeki.UI.Client.Helpers do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS

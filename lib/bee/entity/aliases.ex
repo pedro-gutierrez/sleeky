@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Aliases do
+defmodule Sleeki.Entity.Aliases do
   @moduledoc false
 
   def new(%{aliases: _} = field) do

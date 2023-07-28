@@ -1,7 +1,7 @@
-defmodule Bee.Migrations.Ecto do
+defmodule Sleeki.Migrations.Ecto do
   @moduledoc false
 
-  def version({:defmodule, _, [{:__aliases__, _, [:Bee, :Migration, v]} | _]}) do
+  def version({:defmodule, _, [{:__aliases__, _, [:Sleeki, :Migration, v]} | _]}) do
     v |> to_string() |> String.trim_leading("V") |> String.to_integer()
   end
 
@@ -15,7 +15,7 @@ defmodule Bee.Migrations.Ecto do
   end
 
   def migration(version, body) do
-    name = [:Bee, :Migration, String.to_atom("V#{version}")]
+    name = [:Sleeki, :Migration, String.to_atom("V#{version}")]
 
     {:defmodule, [line: 1],
      [

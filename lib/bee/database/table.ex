@@ -1,8 +1,8 @@
-defmodule Bee.Database.Table do
+defmodule Sleeki.Database.Table do
   @moduledoc false
-  alias Bee.Database.Column
-  alias Bee.Database.ColumnChanges
-  import Bee.Inspector
+  alias Sleeki.Database.Column
+  alias Sleeki.Database.ColumnChanges
+  import Sleeki.Inspector
 
   defstruct [
     :name,

@@ -1,4 +1,4 @@
-defmodule Bee.Database.Enum do
+defmodule Sleeki.Database.Enum do
   @moduledoc false
 
   defstruct [:name, :values]

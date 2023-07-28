@@ -1,4 +1,4 @@
-defmodule Bee.Opts do
+defmodule Sleeki.Opts do
   def with_opts(field, nil), do: field
 
   def with_opts(field, do: {:__block__, _, opts}) do

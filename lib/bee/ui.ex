@@ -1,11 +1,11 @@
-defmodule Bee.UI do
+defmodule Sleeki.UI do
   @moduledoc false
 
   @generators [
-    Bee.UI.Router
+    Sleeki.UI.Router
   ]
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defmacro __using__(_) do
     ui = __CALLER__.module
@@ -17,8 +17,8 @@ defmodule Bee.UI do
     Module.put_attribute(ui, :schema, schema)
 
     quote do
-      import Bee.UI.Dsl, only: :macros
-      @before_compile Bee.UI
+      import Sleeki.UI.Dsl, only: :macros
+      @before_compile Sleeki.UI
     end
   end
 

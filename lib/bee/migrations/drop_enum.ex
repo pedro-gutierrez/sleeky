@@ -1,10 +1,10 @@
-defmodule Bee.Migrations.DropEnum do
+defmodule Sleeki.Migrations.DropEnum do
   @moduledoc false
-  @behaviour Bee.Migrations.Step
+  @behaviour Sleeki.Migrations.Step
 
-  alias Bee.Migrations.Step
-  alias Bee.Database
-  alias Bee.Database.State
+  alias Sleeki.Migrations.Step
+  alias Sleeki.Database
+  alias Sleeki.Database.State
 
   defstruct [:enum]
 

@@ -1,10 +1,10 @@
-defmodule Bee.Views.Lists do
+defmodule Sleeki.Views.Lists do
   @moduledoc false
 
-  alias Bee.UI.View
+  alias Sleeki.UI.View
 
-  import Bee.Inspector
-  import Bee.Views.Components
+  import Sleeki.Inspector
+  import Sleeki.Views.Components
 
   def ast(_ui, views, schema) do
     for entity <- schema.entities() do

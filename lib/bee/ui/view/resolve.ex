@@ -1,4 +1,4 @@
-defmodule Bee.UI.View.Resolve do
+defmodule Sleeki.UI.View.Resolve do
   @moduledoc false
 
   def resolve({:slot, name, [child]}, args) when is_atom(name) do

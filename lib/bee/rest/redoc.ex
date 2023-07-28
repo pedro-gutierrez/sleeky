@@ -1,7 +1,7 @@
-defmodule Bee.Rest.Redoc do
+defmodule Sleeki.Rest.Redoc do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(rest, _schema) do
     module_name = module(rest, RedocUI)

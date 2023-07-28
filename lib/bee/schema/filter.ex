@@ -1,4 +1,4 @@
-defmodule Bee.Schema.Filter do
+defmodule Sleeki.Schema.Filter do
   @moduledoc false
 
   def ast(_schema) do

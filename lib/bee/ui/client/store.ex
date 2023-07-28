@@ -1,16 +1,16 @@
-defmodule Bee.UI.Client.Store do
+defmodule Sleeki.UI.Client.Store do
   @moduledoc false
 
   @generators [
-    Bee.UI.Client.Collection,
-    Bee.UI.Client.Item,
-    Bee.UI.Client.Actions
+    Sleeki.UI.Client.Collection,
+    Sleeki.UI.Client.Item,
+    Sleeki.UI.Client.Actions
   ]
 
   alias ESTree.Tools.Builder, as: JS
 
-  import Bee.Inspector
-  import Bee.UI.Client.Helpers
+  import Sleeki.Inspector
+  import Sleeki.UI.Client.Helpers
 
   def ast(schema) do
     Enum.map(schema.entities, &store/1)

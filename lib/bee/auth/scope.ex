@@ -1,7 +1,7 @@
-defmodule Bee.Auth.Scope do
+defmodule Sleeki.Auth.Scope do
   @moduledoc false
 
-  alias Bee.Entity.Action
+  alias Sleeki.Entity.Action
 
   defstruct [:name, :expression]
 

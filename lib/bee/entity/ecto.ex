@@ -1,29 +1,29 @@
-defmodule Bee.Entity.Ecto do
+defmodule Sleeki.Entity.Ecto do
   @moduledoc false
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   @generators [
-    Bee.Entity.Ecto.Helpers,
-    Bee.Entity.Ecto.FieldAttributes,
-    Bee.Entity.Ecto.Schema,
-    Bee.Entity.Ecto.Changesets,
-    Bee.Entity.Ecto.FieldSpecs,
-    Bee.Entity.Ecto.ColumnSpecs,
-    Bee.Entity.Ecto.Pagination,
-    Bee.Entity.Ecto.Preload,
-    Bee.Entity.Ecto.Relation,
-    Bee.Entity.Ecto.Slug,
-    Bee.Entity.Ecto.Display,
-    Bee.Entity.Ecto.JsonEncoder,
-    Bee.Entity.Ecto.List,
-    Bee.Entity.Ecto.Read,
-    Bee.Entity.Ecto.Create,
-    Bee.Entity.Ecto.Update,
-    Bee.Entity.Ecto.Delete,
-    Bee.Entity.Ecto.Query,
-    Bee.Entity.Ecto.Join,
-    Bee.Entity.Ecto.Where,
-    Bee.Entity.Ecto.FuzzySearch
+    Sleeki.Entity.Ecto.Helpers,
+    Sleeki.Entity.Ecto.FieldAttributes,
+    Sleeki.Entity.Ecto.Schema,
+    Sleeki.Entity.Ecto.Changesets,
+    Sleeki.Entity.Ecto.FieldSpecs,
+    Sleeki.Entity.Ecto.ColumnSpecs,
+    Sleeki.Entity.Ecto.Pagination,
+    Sleeki.Entity.Ecto.Preload,
+    Sleeki.Entity.Ecto.Relation,
+    Sleeki.Entity.Ecto.Slug,
+    Sleeki.Entity.Ecto.Display,
+    Sleeki.Entity.Ecto.JsonEncoder,
+    Sleeki.Entity.Ecto.List,
+    Sleeki.Entity.Ecto.Read,
+    Sleeki.Entity.Ecto.Create,
+    Sleeki.Entity.Ecto.Update,
+    Sleeki.Entity.Ecto.Delete,
+    Sleeki.Entity.Ecto.Query,
+    Sleeki.Entity.Ecto.Join,
+    Sleeki.Entity.Ecto.Where,
+    Sleeki.Entity.Ecto.FuzzySearch
   ]
 
   def ast(entity) do

@@ -1,7 +1,7 @@
-defmodule Bee.Entity.Ecto.Slug do
+defmodule Sleeki.Entity.Ecto.Slug do
   @moduledoc false
-  alias Bee.Entity
-  alias Bee.Entity.Attribute
+  alias Sleeki.Entity
+  alias Sleeki.Entity.Attribute
 
   def module(entity) do
     Module.concat(entity.module, Slug)

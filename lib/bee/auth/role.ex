@@ -1,7 +1,7 @@
-defmodule Bee.Auth.Role do
+defmodule Sleeki.Auth.Role do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(auth, _schema, _scopes, _default_policy) do
     [

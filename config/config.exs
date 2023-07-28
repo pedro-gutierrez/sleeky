@@ -1,7 +1,7 @@
 import Config
 
-config :bee, ecto_repos: [Blog.Repo]
+config :sleeki, ecto_repos: [Blog.Repo]
 
-config :bee, Blog.Repo,
+config :sleeki, Blog.Repo,
   database: "blog",
   username: "pedrogutierrez"

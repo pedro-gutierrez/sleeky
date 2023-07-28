@@ -1,13 +1,13 @@
-defmodule Bee.Views.EntityDetail do
+defmodule Sleeki.Views.EntityDetail do
   @moduledoc false
 
-  alias Bee.Entity
-  alias Bee.Entity.Attribute
-  alias Bee.Entity.Relation
-  alias Bee.UI.View
+  alias Sleeki.Entity
+  alias Sleeki.Entity.Attribute
+  alias Sleeki.Entity.Relation
+  alias Sleeki.UI.View
 
-  import Bee.Inspector
-  import Bee.Views.Components
+  import Sleeki.Inspector
+  import Sleeki.Views.Components
 
   def ast(ui, views, schema) do
     schema.entities() |> Enum.map(&detail_view(&1, ui, views))

@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Ecto.Preload do
+defmodule Sleeki.Entity.Ecto.Preload do
   @moduledoc false
 
   def ast(entity) do

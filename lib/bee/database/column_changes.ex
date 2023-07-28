@@ -1,4 +1,4 @@
-defmodule Bee.Database.ColumnChanges do
+defmodule Sleeki.Database.ColumnChanges do
   @moduledoc false
 
   defstruct [

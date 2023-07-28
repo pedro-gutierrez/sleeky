@@ -1,7 +1,7 @@
-defmodule Bee.Entity.Ecto.Query do
+defmodule Sleeki.Entity.Ecto.Query do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(entity) do
     [

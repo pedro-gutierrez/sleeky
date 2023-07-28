@@ -1,13 +1,13 @@
-defmodule Bee.Migrations do
+defmodule Sleeki.Migrations do
   @moduledoc false
-  alias Bee.Migrations.Migration
-  alias Bee.Database.Constraint
-  alias Bee.Database.Index
-  alias Bee.Database.State
-  alias Bee.Database.Table
+  alias Sleeki.Migrations.Migration
+  alias Sleeki.Database.Constraint
+  alias Sleeki.Database.Index
+  alias Sleeki.Database.State
+  alias Sleeki.Database.Table
 
   def existing(dir) do
-    Path.join([dir, "*_bee_*.exs"])
+    Path.join([dir, "*_sleeki_*.exs"])
     |> Path.wildcard()
     |> Enum.sort()
     |> Enum.map(&File.read!(&1))

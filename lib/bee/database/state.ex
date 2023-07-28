@@ -1,4 +1,4 @@
-defmodule Bee.Database.State do
+defmodule Sleeki.Database.State do
   @moduledoc false
 
   @type t :: %__MODULE__{}

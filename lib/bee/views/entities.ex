@@ -1,13 +1,13 @@
-defmodule Bee.Views.Entities do
+defmodule Sleeki.Views.Entities do
   @moduledoc false
 
-  alias Bee.Entity.Action
-  alias Bee.UI.View
-  alias Bee.Views.EntityDetail
-  alias Bee.Views.Forms
-  alias Bee.Views.Lists
+  alias Sleeki.Entity.Action
+  alias Sleeki.UI.View
+  alias Sleeki.Views.EntityDetail
+  alias Sleeki.Views.Forms
+  alias Sleeki.Views.Lists
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(_ui, views, schema) do
     view = module(views, Entities)

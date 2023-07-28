@@ -1,4 +1,4 @@
-defmodule Bee.Schema.Evaluate do
+defmodule Sleeki.Schema.Evaluate do
   @moduledoc false
 
   def ast(_schema) do

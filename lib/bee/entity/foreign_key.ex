@@ -1,7 +1,7 @@
-defmodule Bee.Entity.ForeignKey do
+defmodule Sleeki.Entity.ForeignKey do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defstruct [:name, :field]
 

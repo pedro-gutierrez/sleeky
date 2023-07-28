@@ -1,8 +1,8 @@
-defmodule Bee.Entity.Attribute do
+defmodule Sleeki.Entity.Attribute do
   @moduledoc false
-  alias Bee.Entity.Aliases
-  alias Bee.Entity.Summary
-  import Bee.Inspector
+  alias Sleeki.Entity.Aliases
+  alias Sleeki.Entity.Summary
+  import Sleeki.Inspector
 
   defstruct [
     :name,

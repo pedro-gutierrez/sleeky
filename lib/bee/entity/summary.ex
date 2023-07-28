@@ -1,6 +1,6 @@
-defmodule Bee.Entity.Summary do
+defmodule Sleeki.Entity.Summary do
   @moduledoc false
-  alias Bee.Entity
+  alias Sleeki.Entity
 
   def new(%Entity{} = entity) do
     entity

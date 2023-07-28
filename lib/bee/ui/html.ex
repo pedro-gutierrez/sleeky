@@ -1,4 +1,4 @@
-defmodule Bee.UI.Html do
+defmodule Sleeki.UI.Html do
   @moduledoc false
 
   @self_closing_tags [

@@ -1,13 +1,13 @@
-defmodule Bee.Rest.Handlers do
+defmodule Sleeki.Rest.Handlers do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def generators do
     [
-      Bee.Rest.Handlers.Default,
-      Bee.Rest.Handlers.Aggregates,
-      Bee.Rest.Handlers.Children
+      Sleeki.Rest.Handlers.Default,
+      Sleeki.Rest.Handlers.Aggregates,
+      Sleeki.Rest.Handlers.Children
     ]
   end
 

@@ -1,8 +1,8 @@
-defmodule Bee.Entity do
-  alias Bee.Entity.Attribute
-  alias Bee.Entity.Ecto
-  alias Bee.Entity.Virtual
-  import Bee.Inspector
+defmodule Sleeki.Entity do
+  alias Sleeki.Entity.Attribute
+  alias Sleeki.Entity.Ecto
+  alias Sleeki.Entity.Virtual
+  import Sleeki.Inspector
 
   defstruct [
     :context,
@@ -108,8 +108,8 @@ defmodule Bee.Entity do
     Module.put_attribute(module, :entity, entity)
 
     quote do
-      import Bee.Entity.Dsl, only: :macros
-      @before_compile Bee.Entity
+      import Sleeki.Entity.Dsl, only: :macros
+      @before_compile Sleeki.Entity
 
       def breadcrumbs?, do: unquote(breadcrumbs)
     end
@@ -133,8 +133,8 @@ defmodule Bee.Entity do
             kind: :string,
             entity: entity,
             computed: true,
-            using: Bee.Entity.Ecto.Display.module(entity),
-            plugin: {Bee.Entity.Ecto.Display, [first.name]}
+            using: Sleeki.Entity.Ecto.Display.module(entity),
+            plugin: {Sleeki.Entity.Ecto.Display, [first.name]}
           ]
           |> Attribute.new()
           |> add_to(:attributes, entity)

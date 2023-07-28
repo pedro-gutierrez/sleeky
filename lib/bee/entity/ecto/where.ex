@@ -1,4 +1,4 @@
-defmodule Bee.Entity.Ecto.Where do
+defmodule Sleeki.Entity.Ecto.Where do
   @moduledoc false
 
   def ast(entity) do

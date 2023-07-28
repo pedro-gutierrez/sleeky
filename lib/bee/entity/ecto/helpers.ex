@@ -1,9 +1,9 @@
-defmodule Bee.Entity.Ecto.Helpers do
+defmodule Sleeki.Entity.Ecto.Helpers do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
-  alias Bee.Entity.Attribute
+  alias Sleeki.Entity.Attribute
 
   def ast(_entity) do
     [

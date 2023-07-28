@@ -1,4 +1,4 @@
-defmodule Bee.Rest.Dsl do
+defmodule Sleeki.Rest.Dsl do
   @moduledoc false
 
   defmacro schema({:__aliases__, _, mod}) do

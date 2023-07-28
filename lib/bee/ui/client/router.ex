@@ -1,9 +1,9 @@
-defmodule Bee.UI.Client.Router do
+defmodule Sleeki.UI.Client.Router do
   @moduledoc false
 
   alias ESTree.Tools.Builder, as: JS
 
-  import Bee.UI.Client.Helpers
+  import Sleeki.UI.Client.Helpers
 
   def ast(_schema) do
     [

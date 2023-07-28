@@ -1,7 +1,7 @@
-defmodule Bee.Auth.Allow do
+defmodule Sleeki.Auth.Allow do
   @moduledoc false
 
-  alias Bee.Entity.Action
+  alias Sleeki.Entity.Action
 
   def ast(_auth, schema, scopes, default_policy) do
     ok_or_unauthorized_function() ++ allow_actions(schema, scopes, default_policy)

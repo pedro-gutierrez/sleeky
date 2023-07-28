@@ -1,17 +1,17 @@
-defmodule Bee.Views do
+defmodule Sleeki.Views do
   @moduledoc false
 
   @generators [
-    Bee.Views.Forms,
-    Bee.Views.Lists,
-    Bee.Views.EntityDetail,
-    Bee.Views.NavBar,
-    Bee.Views.Menu,
-    Bee.Views.Breadcrumbs,
-    Bee.Views.Entities
+    Sleeki.Views.Forms,
+    Sleeki.Views.Lists,
+    Sleeki.Views.EntityDetail,
+    Sleeki.Views.NavBar,
+    Sleeki.Views.Menu,
+    Sleeki.Views.Breadcrumbs,
+    Sleeki.Views.Entities
   ]
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   defmacro __using__(opts) do
     views = __CALLER__.module

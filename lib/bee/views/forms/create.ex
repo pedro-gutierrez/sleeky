@@ -1,11 +1,11 @@
-defmodule Bee.Views.Forms.Create do
+defmodule Sleeki.Views.Forms.Create do
   @moduledoc false
 
-  alias Bee.Entity
-  alias Bee.UI.View
-  alias Bee.Views
+  alias Sleeki.Entity
+  alias Sleeki.UI.View
+  alias Sleeki.Views
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def action(entity), do: Entity.action(:create, entity)
 

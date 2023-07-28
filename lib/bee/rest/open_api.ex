@@ -1,7 +1,7 @@
-defmodule Bee.Rest.OpenApi do
+defmodule Sleeki.Rest.OpenApi do
   @moduledoc false
 
-  import Bee.Inspector
+  import Sleeki.Inspector
 
   def ast(rest, schema) do
     module_name = module(rest, OpenApi)

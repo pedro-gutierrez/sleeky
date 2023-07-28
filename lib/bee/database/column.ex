@@ -1,8 +1,8 @@
-defmodule Bee.Database.Column do
+defmodule Sleeki.Database.Column do
   @moduledoc false
-  alias Bee.Database.ColumnChanges
-  alias Bee.Entity.Attribute
-  alias Bee.Entity.Relation
+  alias Sleeki.Database.ColumnChanges
+  alias Sleeki.Entity.Attribute
+  alias Sleeki.Entity.Relation
 
   defstruct [
     :name,
