@@ -4,7 +4,7 @@ defmodule Sleeki.MixProject do
   def project do
     [
       app: :sleeki,
-      version: "0.1.0",
+      version: "0.0.1",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -21,12 +21,12 @@ defmodule Sleeki.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:bandit, ">= 0.6.3"},
-      {:calendar, "~> 1.0.0"},
+      {:bandit, "~> 1.0-pre"},
+      {:calendar, "~> 1.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
-      {:estree, "~> 2.7.0"},
-      {:inflex, "~> 2.0.0"},
+      {:estree, "~> 2.7"},
+      {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
       {:plug, "~> 1.14"},
