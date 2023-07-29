@@ -13,13 +13,8 @@ defmodule Sleeki.MixProject do
         ],
         licenses: ["MIT"],
         links: %{"GitHub" => "https://github.com/pedro-gutierrez/sleeki"},
-        files: ~w(lib mix.exs README.md),
-        description: """
-        Sleeki project generator.
-
-        Provides a `mix sleeki.new` task to bootstrap a new Elixir application
-        with Sleeki dependencies.
-        """
+        files: ~w(lib mix.exs .formatter.exs LICENSE.md README.md),
+        description: "Minimalist Elixir application framework"
       ],
       deps: deps()
     ]
