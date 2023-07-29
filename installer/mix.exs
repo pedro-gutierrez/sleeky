@@ -1,9 +1,9 @@
-defmodule Sleeki.New.MixProject do
+defmodule Sleeky.New.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :sleeki_new,
+      app: :sleeky_new,
       version: "0.0.1",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
@@ -13,13 +13,13 @@ defmodule Sleeki.New.MixProject do
           "Pedro Gutiérrez"
         ],
         licenses: ["MIT"],
-        links: %{"GitHub" => "https://github.com/pedro-gutierrez/sleeki"},
+        links: %{"GitHub" => "https://github.com/pedro-gutierrez/sleeky"},
         files: ~w(lib mix.exs README.md),
         description: """
-        Sleeki project generator.
+        Sleeky project generator.
 
-        Provides a `mix sleeki.new` task to bootstrap a new Elixir application
-        with Sleeki dependencies.
+        Provides a `mix sleeky.new` task to bootstrap a new Elixir application
+        with Sleeky dependencies.
         """
       ]
     ]

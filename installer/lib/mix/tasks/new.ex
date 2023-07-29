@@ -1,12 +1,12 @@
-defmodule Mix.Tasks.Sleeki.New do
-  @shortdoc "Creates a new Sleeki project"
+defmodule Mix.Tasks.Sleeky.New do
+  @shortdoc "Creates a new Sleeky project"
 
   @moduledoc """
-  Creates a new Sleeki project.
+  Creates a new Sleeky project.
 
   It expects the path of the project as argument.
 
-      mix sleeki.new PATH [--app APP] [--module MODULE]
+      mix sleeky.new PATH [--app APP] [--module MODULE]
 
   A project at the given PATH will be created. The
   application name and module name will be retrieved
@@ -20,11 +20,11 @@ defmodule Mix.Tasks.Sleeki.New do
 
   ## Examples
 
-      mix sleeki.new hello_world
+      mix sleeky.new hello_world
 
   Is equivalent to:
 
-      mix sleeki.new hello_world --module HelloWorld
+      mix sleeky.new hello_world --module HelloWorld
   """
   use Mix.Task
 
@@ -111,7 +111,7 @@ defmodule Mix.Tasks.Sleeki.New do
     create_directory("priv/repo/migrations")
 
     """
-    Your Sleeki project was created successfully.
+    Your Sleeky project was created successfully.
 
     This generator relies on Direnv, so make sure you run "direnv allow" in order
     to setup your environment.
@@ -124,7 +124,7 @@ defmodule Mix.Tasks.Sleeki.New do
     Then initialise your database:
 
         createuser #{app} -d
-        mix sleeki.migrations
+        mix sleeky.migrations
         mix ecto.create
         mix ecto.migrate
 
@@ -340,7 +340,7 @@ defmodule Mix.Tasks.Sleeki.New do
     # Run "mix help compile.app" to learn about applications.
     def application do
       [
-        extra_applications: [:logger, :sleeki],
+        extra_applications: [:logger, :sleeky],
         mod: {<%= @mod %>.Application, []}
       ]
     end
@@ -351,7 +351,7 @@ defmodule Mix.Tasks.Sleeki.New do
         {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
         {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
         {:excoveralls, "~> 0.14", only: [:test]},
-        {:sleeki, git: "https://github.com/pedro-gutierrez/sleeki.git", branch: "main"}
+        {:sleeky, git: "https://github.com/pedro-gutierrez/sleeky.git", branch: "main"}
       ]
     end
   end
@@ -400,7 +400,7 @@ defmodule Mix.Tasks.Sleeki.New do
   embed_template(:lib_auth, """
   defmodule <%= @mod %>.Auth do
     @moduledoc false
-    use Sleeki.Auth
+    use Sleeky.Auth
 
     roles [:current_user, :roles]
 
@@ -433,7 +433,7 @@ defmodule Mix.Tasks.Sleeki.New do
   embed_template(:lib_router, """
   defmodule <%= @mod %>.Router do
     @moduledoc false
-    use Sleeki.Router,
+    use Sleeky.Router,
       otp_app: :<%= @app %>,
       plugs: [<%= @mod %>.PutUser]
   end
@@ -460,7 +460,7 @@ defmodule Mix.Tasks.Sleeki.New do
   embed_template(:lib_rest, """
   defmodule <%= @mod %>.Rest do
     @moduledoc false
-    use Sleeki.Rest
+    use Sleeky.Rest
 
     schema <%= @mod %>.Schema
   end
@@ -469,7 +469,7 @@ defmodule Mix.Tasks.Sleeki.New do
   embed_template(:lib_schema, """
   defmodule <%= @mod %>.Schema do
     @moduledoc false
-    use Sleeki.Schema
+    use Sleeky.Schema
 
     entity(<%= @mod %>.Schema.User)
   end
@@ -478,7 +478,7 @@ defmodule Mix.Tasks.Sleeki.New do
   embed_template(:lib_schema_user, """
   defmodule <%= @mod %>.Schema.User do
     @moduledoc false
-    use Sleeki.Entity
+    use Sleeky.Entity
 
     attribute :email, :string do
     end
@@ -510,7 +510,7 @@ defmodule Mix.Tasks.Sleeki.New do
   embed_template(:lib_ui, """
   defmodule <%= @mod %>.UI do
     @moduledoc false
-    use Sleeki.UI
+    use Sleeky.UI
 
     view <%= @mod %>.UI.Index
   end
@@ -519,18 +519,18 @@ defmodule Mix.Tasks.Sleeki.New do
   embed_template(:lib_ui_index, """
   defmodule <%= @mod %>.UI.Index do
     @moduledoc false
-    use Sleeki.UI.View
+    use Sleeky.UI.View
 
     render do
       html do
         head do
           meta charset: "utf-8"
-          title "Welcome to Sleeki"
+          title "Welcome to Sleeky"
         end
 
         body do
           h1 do
-            "Welcome to Sleeki!"
+            "Welcome to Sleeky!"
           end
 
           p do
@@ -546,7 +546,7 @@ defmodule Mix.Tasks.Sleeki.New do
   import Config
 
   config :<%= @app %>, ecto_repos: [<%= @mod %>.Repo]
-  config :sleeki, schema: <%= @mod %>.Schema
+  config :sleeky, schema: <%= @mod %>.Schema
 
   config :logger, :console,
     format: "$time [$level] $message: $metadata\n",

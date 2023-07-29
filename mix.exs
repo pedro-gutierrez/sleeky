@@ -1,9 +1,9 @@
-defmodule Sleeki.MixProject do
+defmodule Sleeky.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :sleeki,
+      app: :sleeky,
       version: "0.0.1",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
@@ -12,7 +12,7 @@ defmodule Sleeki.MixProject do
           "Pedro Gutiérrez"
         ],
         licenses: ["MIT"],
-        links: %{"GitHub" => "https://github.com/pedro-gutierrez/sleeki"},
+        links: %{"GitHub" => "https://github.com/pedro-gutierrez/sleeky"},
         files: ~w(lib mix.exs .formatter.exs LICENSE.md README.md),
         description: "Minimalist Elixir application framework"
       ],

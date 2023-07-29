@@ -1,15 +1,15 @@
-# Mix sleeki.new
+# Mix sleeky.new
 
-Provides `sleeki_new` installer as an archive.
+Provides `sleeky_new` installer as an archive.
 
 ## Installation
 
 To install from Hex, run:
 
-    $ mix archive.install hex sleeki_new
+    $ mix archive.install hex sleeky_new
 
 ## Usage
 
-Create a new `sleeki` project with:
+Create a new `sleeky` project with:
 
-    $ mix sleeki.new hello_world
+    $ mix sleeky.new hello_world

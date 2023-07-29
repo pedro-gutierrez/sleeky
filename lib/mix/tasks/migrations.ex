@@ -1,12 +1,12 @@
-defmodule Mix.Tasks.Sleeki.Migrations do
+defmodule Mix.Tasks.Sleeky.Migrations do
   @moduledoc """
   A Mix task that generates all Ecto migrations for your schema
   """
 
   use Mix.Task
 
-  alias Sleeki.Migrations
-  alias Sleeki.Migrations.Migration
+  alias Sleeky.Migrations
+  alias Sleeky.Migrations.Migration
 
   @shortdoc """
   A Mix task that generates all Ecto migrations for your schema
