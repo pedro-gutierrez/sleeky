@@ -34,6 +34,7 @@ defmodule Sleeky.MixProject do
       {:calendar, "~> 1.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
+      {:ex_doc, ">= 0.0.0"},
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
