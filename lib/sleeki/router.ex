@@ -30,10 +30,7 @@ defmodule Sleeki.Router do
       plug(Plug.Static, at: "/assets", from: {unquote(otp_app), "priv/assets"})
 
       plug(:match)
-
       unquote_splicing(plugs)
-
-      plug(Blog.PutUser)
       plug(:dispatch)
 
       forward("/api", to: unquote(rest_router))

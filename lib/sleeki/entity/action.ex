@@ -59,6 +59,7 @@ defmodule Sleeki.Entity.Action do
     |> Enum.map(fn
       {:allow, _, [role, [do: {:scope, _, [scope]}]]} -> {role, scope}
       {:allow, _, [role, scope]} -> {role, scope}
+      {:allow, _, [role]} -> {role, :any}
     end)
     |> Enum.into(%{})
   end
