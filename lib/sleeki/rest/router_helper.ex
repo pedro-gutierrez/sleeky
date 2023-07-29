@@ -7,9 +7,12 @@ defmodule Sleeki.Rest.RouterHelper do
     quote do
       defmodule unquote(helper_module) do
         import Plug.Conn
+        require Logger
         @json "application/json"
 
         def send_json(conn, body, status \\ 200) do
+          if status >= 500, do: Logger.error("application error", reason: inspect(body))
+
           conn
           |> put_resp_content_type(@json)
           |> send_resp(status, Jason.encode!(body))
@@ -154,7 +157,7 @@ defmodule Sleeki.Rest.RouterHelper do
         defp status(:invalid), do: 400
         defp status(:unauthorized), do: 401
         defp status(:conflict), do: 409
-        defp status([%{detail: "has already sleekin taken"}]), do: 409
+        defp status([%{detail: "has already been taken"}]), do: 409
         defp status(%{reason: reason}), do: status(reason)
         defp status(_), do: 500
       end
