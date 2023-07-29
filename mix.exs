@@ -7,6 +7,20 @@ defmodule Sleeki.MixProject do
       version: "0.0.1",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
+      package: [
+        maintainers: [
+          "Pedro Gutiérrez"
+        ],
+        licenses: ["MIT"],
+        links: %{"GitHub" => "https://github.com/pedro-gutierrez/sleeki"},
+        files: ~w(lib mix.exs README.md),
+        description: """
+        Sleeki project generator.
+
+        Provides a `mix sleeki.new` task to bootstrap a new Elixir application
+        with Sleeki dependencies.
+        """
+      ],
       deps: deps()
     ]
   end
@@ -25,7 +39,6 @@ defmodule Sleeki.MixProject do
       {:calendar, "~> 1.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
-      # {:estree, "~> 2.7"},
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
