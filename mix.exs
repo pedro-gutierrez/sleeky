@@ -30,7 +30,7 @@ defmodule Sleeky.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:bandit, "~> 1.0-pre"},
+      {:bandit, "~> 0.7"},
       {:calendar, "~> 1.0"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
