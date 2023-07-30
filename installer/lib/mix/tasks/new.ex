@@ -351,7 +351,7 @@ defmodule Mix.Tasks.Sleeky.New do
         {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
         {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
         {:excoveralls, "~> 0.14", only: [:test]},
-        {:sleeky, "~> 0.0.1"}
+        {:sleeky, git: "https://github.com/pedro-gutierrez/sleeky.git"}
       ]
     end
   end
