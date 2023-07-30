@@ -563,7 +563,7 @@ defmodule Mix.Tasks.Sleeky.New do
     url: "postgres://<%= @app %>:<%= @app %>@localhost/<%= @app %>_test",
     pool: Ecto.Adapters.SQL.Sandbox
 
-  config :<%= @app %>, <%= @mod %>.Port,
+  config :<%= @app %>, <%= @mod %>.Endpoint,
     scheme: :http,
     port: 8079
   """)
