@@ -91,7 +91,7 @@ defmodule Mix.Tasks.Sleeky.New do
     create_file("lib/#{mod_filename}/application.ex", lib_app_template(assigns))
     create_file("lib/#{mod_filename}/repo.ex", lib_repo_template(assigns))
     create_file("lib/#{mod_filename}/auth.ex", lib_auth_template(assigns))
-    create_file("lib/#{mod_filename}/port.ex", lib_port_template(assigns))
+    create_file("lib/#{mod_filename}/endpoint.ex", lib_endpoint_template(assigns))
     create_file("lib/#{mod_filename}/router.ex", lib_router_template(assigns))
     create_file("lib/#{mod_filename}/put_user.ex", lib_put_user_template(assigns))
     create_file("lib/#{mod_filename}/rest.ex", lib_rest_template(assigns))
@@ -381,7 +381,7 @@ defmodule Mix.Tasks.Sleeky.New do
     def start(_type, _args) do
       children = [
         <%= @mod %>.Repo,
-        <%= @mod %>.Port
+        <%= @mod %>.Endpoint
       ]
 
       opts = [strategy: :one_for_one, name: <%= @mod %>.Supervisor]
@@ -414,19 +414,10 @@ defmodule Mix.Tasks.Sleeky.New do
   end
   """)
 
-  embed_template(:lib_port, """
-  defmodule <%= @mod %>.Port do
+  embed_template(:lib_endpoint, """
+  defmodule <%= @mod %>.Endpoint do
     @moduledoc false
-
-    def child_spec(_) do
-      Supervisor.child_spec(
-        {Bandit,
-         :<%= @app %>
-         |> Application.fetch_env!(__MODULE__)
-         |> Keyword.put(:plug, <%= @mod %>.Router)},
-        []
-      )
-    end
+    use Sleeky.Endpoint, otp_app: :<%= @app %>, router: <%= @mod %>.Router
   end
   """)
 
@@ -588,7 +579,7 @@ defmodule Mix.Tasks.Sleeky.New do
       url: System.fetch_env!("DATABASE_URL"),
       pool_size: "DATABASE_POOL_SIZE" |> System.fetch_env!() |> String.to_integer()
 
-    config :<%= @app %>, <%= @mod %>.Port,
+    config :<%= @app %>, <%= @mod %>.Endpoint,
       scheme: :http,
       port: "PORT" |> System.fetch_env!() |> String.to_integer()
   end
