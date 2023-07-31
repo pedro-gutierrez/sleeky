@@ -89,6 +89,7 @@ defmodule Mix.Tasks.Sleeky.New do
 
     create_directory("lib")
     create_file("lib/#{mod_filename}/application.ex", lib_app_template(assigns))
+    create_file("lib/#{mod_filename}/migrate.ex", lib_migrate_template(assigns))
     create_file("lib/#{mod_filename}/repo.ex", lib_repo_template(assigns))
     create_file("lib/#{mod_filename}/auth.ex", lib_auth_template(assigns))
     create_file("lib/#{mod_filename}/endpoint.ex", lib_endpoint_template(assigns))
@@ -381,6 +382,7 @@ defmodule Mix.Tasks.Sleeky.New do
     def start(_type, _args) do
       children = [
         <%= @mod %>.Repo,
+        <%= @mod %>.Migrate,
         <%= @mod %>.Endpoint
       ]
 
@@ -394,6 +396,25 @@ defmodule Mix.Tasks.Sleeky.New do
   defmodule <%= @mod %>.Repo do
     @moduledoc false
     use Ecto.Repo, otp_app: :<%= @app %>, adapter: Ecto.Adapters.Postgres
+  end
+  """)
+
+  embed_template(:lib_migrate, """
+  defmodule <%= @mod %>.Migrate do
+    @moduledoc false
+    use Task
+
+    @otp_app :<%= @app %>
+
+    @doc false
+    def start_link(_), do: Task.start_link(__MODULE__, :run, [])
+
+    @doc false
+    def run do
+      for repo <- Application.fetch_env!(@otp_app, :ecto_repos) do
+        {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
+      end
+    end
   end
   """)
 
