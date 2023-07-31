@@ -94,7 +94,6 @@ defmodule Mix.Tasks.Sleeky.New do
     create_file("lib/#{mod_filename}/auth.ex", lib_auth_template(assigns))
     create_file("lib/#{mod_filename}/endpoint.ex", lib_endpoint_template(assigns))
     create_file("lib/#{mod_filename}/router.ex", lib_router_template(assigns))
-    create_file("lib/#{mod_filename}/put_user.ex", lib_put_user_template(assigns))
     create_file("lib/#{mod_filename}/rest.ex", lib_rest_template(assigns))
     create_file("lib/#{mod_filename}/schema.ex", lib_schema_template(assigns))
     create_file("lib/#{mod_filename}/schema/user.ex", lib_schema_user_template(assigns))
@@ -403,8 +402,17 @@ defmodule Mix.Tasks.Sleeky.New do
 
   embed_template(:lib_auth, """
   defmodule <%= @mod %>.Auth do
-    @moduledoc false
+    @moduledoc "Takes care of authentication and authorization concerns"
+    use Plug.Builder
     use Sleeky.Auth
+
+    plug :put_user
+
+    @doc false
+    def put_user(conn, _opts) do
+      # sample user
+      assign(conn, :current_user, %{id: "123", roles: [:admin]})
+    end
 
     roles [:current_user, :roles]
 
@@ -430,25 +438,7 @@ defmodule Mix.Tasks.Sleeky.New do
     @moduledoc false
     use Sleeky.Router,
       otp_app: :<%= @app %>,
-      plugs: [<%= @mod %>.PutUser]
-  end
-  """)
-
-  embed_template(:lib_put_user, """
-  defmodule <%= @mod %>.PutUser do
-    @moduledoc false
-
-    @behaviour Plug
-    import Plug.Conn
-
-    @impl true
-    def init(opts), do: opts
-
-    @impl true
-    def call(conn, _opts) do
-      # sample user
-      assign(conn, :current_user, %{id: "123", roles: [:admin]})
-    end
+      plugs: [<%= @mod %>.Auth]
   end
   """)
 
