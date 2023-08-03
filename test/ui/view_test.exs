@@ -1,58 +1,39 @@
-defmodule Sleeky.Ui.ViewTest do
+defmodule Sleeky.UI.ViewTest do
   use ExUnit.Case
 
   describe "views" do
-    defmodule SomeView do
-      use Sleeky.UI.View
-
-      render do
-        html do
-          head do
-            meta charset: "utf-8"
-            title "Some title"
-            link rel: "stylesheet", href: "/some.css"
-          end
-
-          body do
-            section class: "hero" do
-              div class: "hero-body" do
-                p class: "title" do
-                  "Hero title"
-                end
-
-                p class: "subtitle" do
-                  "Hero subtitle"
-                end
-              end
-            end
-          end
-        end
-      end
-    end
-
     test "have an internal definition" do
+      assert {:nav, [], [{:a, [href: "/"], ["Home"]}]} == HeaderView.definition()
+
+      assert {:section, [id: "main"],
+              [
+                {:p, [class: "title"], ["Hero title"]},
+                {:label, [], ["Enter your username"]},
+                {:input, [type: "text"], []},
+                {:button, [], ["Submit"]}
+              ]} == MainView.definition()
+
       assert {:html, [],
               [
-                {:head, [], head},
-                {:body, [], body}
-              ]} = SomeView.definition()
+                {:head, [],
+                 [
+                   {:meta, [charset: "utf-8"], []},
+                   {:title, [], ["Some title"]},
+                   {:link, [rel: "stylesheet", href: "/some.css"], []}
+                 ]},
+                {:body, [],
+                 [
+                   {:header, [], [{:slot, [], [:header]}]},
+                   {:main, [], [{:slot, [], [:main]}]},
+                   {:footer, [], [{:footer, [], ["This is the footer"]}]}
+                 ]}
+              ]} == LayoutView.definition()
 
-      assert [
-               {:meta, [charset: "utf-8"], []},
-               {:title, [], ["Some title"]},
-               {:link, [rel: "stylesheet", href: "/some.css"], []}
-             ] == head
-
-      assert [
-               {:section, [class: "hero"],
-                [
-                  {:div, [class: "hero-body"],
-                   [
-                     {:p, [class: "title"], ["Hero title"]},
-                     {:p, [class: "subtitle"], ["Hero subtitle"]}
-                   ]}
-                ]}
-             ] == body
+      assert {:view, LayoutView,
+              [
+                {:header, [], [{:view, [], [HeaderView]}]},
+                {:main, [], [{:view, [], [MainView]}]}
+              ]} == IndexView.definition()
     end
   end
 end
