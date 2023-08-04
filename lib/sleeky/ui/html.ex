@@ -1,15 +1,18 @@
 defmodule Sleeky.Ui.Html do
   @moduledoc """
-  Provides with all the support needed to parse, resolve and render Html
+  Provides with basic Html support:
+
+  * a DSL to define views with valid html markup, and translate into its internal definition
+  * resolution and sanitization of internal definitions
   """
 
-  defmodule Parse do
-    @moduledoc "Parses the html DSL into an internal definition"
+  defmodule Dsl do
+    @moduledoc false
 
     defmacro __using__(_opts) do
       quote do
         import Kernel, except: [div: 2]
-        import Sleeky.Ui.Html.Parse
+        import Sleeky.Ui.Html.Dsl
       end
     end
 
@@ -157,9 +160,7 @@ defmodule Sleeky.Ui.Html do
   end
 
   defmodule Resolve do
-    @moduledoc """
-    Provides with resolution and sanitization of html nodes
-    """
+    @moduledoc false
 
     defmacro __using__(_opts) do
       quote do
@@ -211,66 +212,6 @@ defmodule Sleeky.Ui.Html do
           for {key, value} <- map, into: %{}, do: {to_string(key), value}
         end
       end
-    end
-  end
-
-  defmodule Render do
-    @moduledoc "Converts internal definition into a html string"
-
-    @self_closing_tags [
-      :area,
-      :base,
-      :br,
-      :col,
-      :embed,
-      :hr,
-      :img,
-      :input,
-      :keygen,
-      :link,
-      :meta,
-      :param,
-      :source,
-      :track,
-      :wbr
-    ]
-
-    def to_html(data), do: "<!DOCTYPE html>#{do_tags(data)}"
-
-    defp do_tags({tag, attrs, _}) when tag in @self_closing_tags do
-      "<#{tag}#{do_attrs(attrs)}>"
-    end
-
-    defp do_tags({tag, attrs, children}) do
-      "<#{tag}#{do_attrs(attrs)}>#{do_tags(children)}</#{tag}>"
-    end
-
-    defp do_tags(items) when is_list(items) do
-      Enum.map(items, &do_tags/1)
-    end
-
-    defp do_tags(literal) when is_binary(literal) or is_number(literal) or is_number(literal) do
-      literal
-    end
-
-    defp do_tags(atom) when is_atom(atom), do: to_string(atom)
-
-    defp do_attrs([]), do: ""
-
-    defp do_attrs(attrs) do
-      " #{Enum.map_join(attrs, " ", &do_attr/1)}"
-    end
-
-    defp do_attr({name, _}) when name in [:defer] do
-      "#{name}"
-    end
-
-    defp do_attr({name, value}) when is_boolean(value) do
-      "#{name}=#{value}"
-    end
-
-    defp do_attr({name, value}) do
-      "#{name}=\"#{value}\""
     end
   end
 end

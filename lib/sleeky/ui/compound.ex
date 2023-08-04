@@ -49,14 +49,12 @@ defmodule Sleeky.Ui.Compound do
     dependencies.
   """
 
-  defmodule Parse do
-    @moduledoc """
-    This module provides the DSL for including views inside others
-    """
+  defmodule Dsl do
+    @moduledoc false
 
     defmacro __using__(_opts) do
       quote do
-        import Sleeky.Ui.Compound.Parse
+        import Sleeky.Ui.Compound.Dsl
       end
     end
 

@@ -55,8 +55,8 @@ defmodule Sleeky.Ui.View do
 
   defmacro __using__(_opts) do
     quote do
-      use Sleeky.Ui.Html.Parse
-      use Sleeky.Ui.Compound.Parse
+      use Sleeky.Ui.Html.Dsl
+      use Sleeky.Ui.Compound.Dsl
 
       import Sleeky.Ui.View, only: :macros
 
@@ -64,7 +64,7 @@ defmodule Sleeky.Ui.View do
       def to_html(args \\ %{}) do
         args
         |> resolve()
-        |> Sleeky.Ui.Html.Render.to_html()
+        |> Sleeky.Ui.Render.to_html()
       rescue
         e ->
           trace = Exception.format(:error, e, __STACKTRACE__)
