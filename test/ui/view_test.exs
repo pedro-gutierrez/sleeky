@@ -29,11 +29,8 @@ defmodule Sleeky.UI.ViewTest do
                  ]}
               ]} == LayoutView.definition()
 
-      assert {:view, LayoutView,
-              [
-                {:header, [], [{:view, [], [HeaderView]}]},
-                {:main, [], [{:view, [], [MainView]}]}
-              ]} == IndexView.definition()
+      assert {:view, LayoutView, [header: {:view, HeaderView, []}, main: {:view, MainView, []}]} ==
+               IndexView.definition()
     end
   end
 end

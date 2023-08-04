@@ -38,7 +38,7 @@ defmodule Sleeky.UI.Router do
   end
 
   defp route(%View{module: view, route: route}) do
-    html = view.render()
+    html = view.to_html()
     conn = var(:conn)
 
     quote do

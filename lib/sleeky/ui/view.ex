@@ -13,51 +13,52 @@ defmodule Sleeky.UI.View do
     parent |> context() |> module(name)
   end
 
-  def ast(definition, view) do
+  def ast(definition, _view) do
     quote do
-      @definition unquote(Macro.escape(definition))
+      use Sleeky.UI.View
 
-      def definition, do: @definition
-
-      def render(args \\ %{}) do
-        args
-        |> resolve()
-        |> Sleeky.UI.Html.render()
-      rescue
-        e ->
-          raise """
-          Error rendering view #{inspect(unquote(view))}:
-          #{Exception.format(:error, e, __STACKTRACE__)}"
-          """
-      end
-
-      def resolve(args \\ %{}) do
-        with {node, attrs, children} when is_list(children) <-
-               Sleeky.UI.View.Resolve.resolve(@definition, args) do
-          {node, attrs, List.flatten(children)}
-        end
-      rescue
-        e ->
-          raise """
-          Error resolving view #{inspect(unquote(view))}:
-          #{Exception.format(:error, e, __STACKTRACE__)}"
-          """
-      end
+      def definition, do: unquote(Macro.escape(definition))
     end
   end
 
   defmacro __using__(_opts) do
     quote do
-      import Sleeky.UI.View.Dsl, only: :macros
-      @before_compile Sleeky.UI.View
+      use Sleeky.Ui.Html
+      use Sleeky.Ui.Composition
+      import Sleeky.UI.View, only: :macros
+
+      def to_html(args \\ %{}) do
+        args
+        |> resolve()
+        |> Sleeky.Ui.Html.to_html()
+      rescue
+        e ->
+          trace = Exception.format(:error, e, __STACKTRACE__)
+          raise_error("Error converting to html", trace)
+      end
+
+      def resolve(args \\ %{}) do
+        with {node, attrs, children} when is_list(children) <-
+               definition() |> Sleeky.UI.View.Resolve.resolve(args) do
+          {node, attrs, List.flatten(children)}
+        end
+      rescue
+        e ->
+          trace = Exception.format(:error, e, __STACKTRACE__)
+          raise_error("Error resolving", trace)
+      end
+
+      defp raise_error(reason, trace) do
+        raise """
+        #{reason} #{inspect(__MODULE__)}: #{trace}
+        """
+      end
     end
   end
 
-  defmacro __before_compile__(_env) do
-    view = __CALLER__.module
-
-    view
-    |> Module.get_attribute(:definition)
-    |> ast(view)
+  defmacro render(do: child) do
+    quote do
+      def definition, do: unquote(child)
+    end
   end
 end
