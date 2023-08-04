@@ -4,8 +4,9 @@ defmodule Sleeky.MixProject do
   def project do
     [
       app: :sleeky,
-      version: "0.0.1",
+      version: "0.0.2",
       elixir: "~> 1.14",
+      elixirc_paths: elixirc_paths(),
       start_permanent: Mix.env() == :prod,
       package: [
         maintainers: [
@@ -35,6 +36,7 @@ defmodule Sleeky.MixProject do
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:ex_doc, ">= 0.0.0"},
+      {:floki, "~> 0.34.0"},
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
@@ -42,5 +44,12 @@ defmodule Sleeky.MixProject do
       {:slugify, "~> 1.3"},
       {:solid, "~> 0.14"}
     ]
+  end
+
+  defp elixirc_paths do
+    case Mix.env() do
+      :test -> ["lib", "test/support"]
+      _env -> ["lib"]
+    end
   end
 end

@@ -1,8 +1,8 @@
-defmodule Sleeky.UI do
+defmodule Sleeky.Ui do
   @moduledoc false
 
   @generators [
-    Sleeky.UI.Router
+    Sleeky.Ui.Router
   ]
 
   import Sleeky.Inspector
@@ -17,8 +17,8 @@ defmodule Sleeky.UI do
     Module.put_attribute(ui, :schema, schema)
 
     quote do
-      import Sleeky.UI.Dsl, only: :macros
-      @before_compile Sleeky.UI
+      import Sleeky.Ui.Dsl, only: :macros
+      @before_compile Sleeky.Ui
     end
   end
 

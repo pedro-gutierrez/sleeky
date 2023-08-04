@@ -1,8 +1,8 @@
-defmodule Sleeky.UI.Router do
+defmodule Sleeky.Ui.Router do
   @moduledoc false
   import Sleeky.Inspector
 
-  alias Sleeky.UI.View
+  alias Sleeky.Ui.View
 
   def ast(ui, views, _schema) do
     router = module(ui, Router)
@@ -38,7 +38,7 @@ defmodule Sleeky.UI.Router do
   end
 
   defp route(%View{module: view, route: route}) do
-    html = view.render()
+    html = view.to_html()
     conn = var(:conn)
 
     quote do
