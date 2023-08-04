@@ -1,5 +1,37 @@
 defmodule Sleeky.Ui.View do
-  @moduledoc false
+  @moduledoc """
+  A Sleeky UI is made of Sleeky views.
+
+  Views are expressed in pure Elixir, then compiled into an internal representation made of simple
+    tuples nested one within another, quite similar to what Floki does. Views can be expressed in
+    terms of other views. Resolving a view traverses all these dependencies and produces a final,
+    single internal representation that no longer depends on anything. Finally, once resolved, a
+    view gets rendered into plain html, in order to be served by a router. All this process happens
+    during compile time.
+
+  Usage:
+
+  ```elixir
+  defmodule MyApp.Ui.SomeView do
+    use Sleeky.Ui.View
+
+    render do
+      html do
+        head do
+          title "This is some nice title"
+          meta charset: "utf-8"
+        end
+
+        body do
+          h1 class: "title" do
+            "It works!"
+          end
+        end
+      end
+    end
+  end
+  ```
+  """
 
   import Sleeky.Inspector
 
@@ -28,6 +60,7 @@ defmodule Sleeky.Ui.View do
 
       import Sleeky.Ui.View, only: :macros
 
+      @doc "Resolves and renders the view into html"
       def to_html(args \\ %{}) do
         args
         |> resolve()
@@ -38,6 +71,7 @@ defmodule Sleeky.Ui.View do
           raise_error("Error converting to html", trace)
       end
 
+      @doc "Resolves all dependencies, recursively, and returns a new internal definition"
       def resolve(args \\ %{}) do
         with {node, attrs, children} when is_list(children) <-
                definition() |> Sleeky.Ui.Resolve.resolve(args) do

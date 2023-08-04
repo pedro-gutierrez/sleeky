@@ -1,6 +1,6 @@
 defmodule Sleeky.Ui.Html do
   @moduledoc """
-  Provides with the DSL to build html
+  Provides with all the support needed to parse, resolve and render Html
   """
 
   defmodule Parse do
@@ -157,6 +157,10 @@ defmodule Sleeky.Ui.Html do
   end
 
   defmodule Resolve do
+    @moduledoc """
+    Provides with resolution and sanitization of html nodes
+    """
+
     defmacro __using__(_opts) do
       quote do
         def resolve({node, attrs, children}, args) do
@@ -177,37 +181,6 @@ defmodule Sleeky.Ui.Html do
 
         def resolve(other, _args) when is_binary(other) or is_number(other) or is_atom(other) do
           other
-        end
-
-        def resolve(other, _args) do
-          raise """
-          Don't know how to resolve markup:
-          #{inspect(other)}
-          """
-        end
-
-        defp resolve_slots(slots, args) do
-          resolve_slots(slots, args, fn
-            {name, _, value} -> {name, value}
-            {name, value} -> {name, value}
-          end)
-        end
-
-        defp resolve_slots(slots, args, fun) do
-          slots
-          |> resolve(args)
-          |> case do
-            args when is_list(args) -> args
-            arg -> [arg]
-          end
-          |> Enum.map(fun)
-          |> Enum.into(%{})
-        end
-
-        defp slot!(name, args) do
-          with nil <- Map.get(args, name) do
-            raise "No value for slot #{inspect(name)} in #{inspect(args)}"
-          end
         end
 
         defp sanitize_attrs(attrs, args) do
