@@ -1,6 +1,6 @@
 defmodule LayoutView do
   @moduledoc false
-  use Sleeky.UI.View
+  use Sleeky.Ui.View
 
   render do
     html do

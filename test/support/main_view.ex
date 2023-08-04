@@ -1,6 +1,6 @@
 defmodule MainView do
   @moduledoc false
-  use Sleeky.UI.View
+  use Sleeky.Ui.View
 
   render do
     section id: "main" do

@@ -495,16 +495,16 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:lib_ui, """
   defmodule <%= @mod %>.UI do
     @moduledoc false
-    use Sleeky.UI
+    use Sleeky.Ui
 
-    view <%= @mod %>.UI.Index
+    view <%= @mod %>.Ui.Index
   end
   """)
 
   embed_template(:lib_ui_index, """
   defmodule <%= @mod %>.UI.Index do
     @moduledoc false
-    use Sleeky.UI.View
+    use Sleeky.Ui.View
 
     render do
       html do

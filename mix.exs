@@ -36,6 +36,7 @@ defmodule Sleeky.MixProject do
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:ex_doc, ">= 0.0.0"},
+      {:floki, "~> 0.34.0"},
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
@@ -51,5 +52,4 @@ defmodule Sleeky.MixProject do
       _env -> ["lib"]
     end
   end
-
 end

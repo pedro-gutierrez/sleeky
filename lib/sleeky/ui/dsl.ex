@@ -1,7 +1,7 @@
-defmodule Sleeky.UI.Dsl do
+defmodule Sleeky.Ui.Dsl do
   @moduledoc false
 
-  alias Sleeky.UI.View
+  alias Sleeky.Ui.View
 
   import Sleeky.Inspector
 

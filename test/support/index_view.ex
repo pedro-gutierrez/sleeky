@@ -1,6 +1,6 @@
 defmodule IndexView do
   @moduledoc false
-  use Sleeky.UI.View
+  use Sleeky.Ui.View
 
   render do
     view LayoutView do

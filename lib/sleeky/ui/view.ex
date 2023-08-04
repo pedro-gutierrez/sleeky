@@ -1,4 +1,4 @@
-defmodule Sleeky.UI.View do
+defmodule Sleeky.Ui.View do
   @moduledoc false
 
   import Sleeky.Inspector
@@ -15,7 +15,7 @@ defmodule Sleeky.UI.View do
 
   def ast(definition, _view) do
     quote do
-      use Sleeky.UI.View
+      use Sleeky.Ui.View
 
       def definition, do: unquote(Macro.escape(definition))
     end
@@ -25,7 +25,7 @@ defmodule Sleeky.UI.View do
     quote do
       use Sleeky.Ui.Html
       use Sleeky.Ui.Composition
-      import Sleeky.UI.View, only: :macros
+      import Sleeky.Ui.View, only: :macros
 
       def to_html(args \\ %{}) do
         args
@@ -39,7 +39,7 @@ defmodule Sleeky.UI.View do
 
       def resolve(args \\ %{}) do
         with {node, attrs, children} when is_list(children) <-
-               definition() |> Sleeky.UI.View.Resolve.resolve(args) do
+               definition() |> Sleeky.Ui.View.Resolve.resolve(args) do
           {node, attrs, List.flatten(children)}
         end
       rescue
