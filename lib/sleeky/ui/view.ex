@@ -23,14 +23,15 @@ defmodule Sleeky.Ui.View do
 
   defmacro __using__(_opts) do
     quote do
-      use Sleeky.Ui.Html
-      use Sleeky.Ui.Composition
+      use Sleeky.Ui.Html.Parse
+      use Sleeky.Ui.Compound.Parse
+
       import Sleeky.Ui.View, only: :macros
 
       def to_html(args \\ %{}) do
         args
         |> resolve()
-        |> Sleeky.Ui.Html.to_html()
+        |> Sleeky.Ui.Html.Render.to_html()
       rescue
         e ->
           trace = Exception.format(:error, e, __STACKTRACE__)
@@ -39,7 +40,7 @@ defmodule Sleeky.Ui.View do
 
       def resolve(args \\ %{}) do
         with {node, attrs, children} when is_list(children) <-
-               definition() |> Sleeky.Ui.View.Resolve.resolve(args) do
+               definition() |> Sleeky.Ui.Resolve.resolve(args) do
           {node, attrs, List.flatten(children)}
         end
       rescue

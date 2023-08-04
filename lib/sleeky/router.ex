@@ -8,7 +8,7 @@ defmodule Sleeky.Router do
     otp_app = Keyword.fetch!(opts, :otp_app)
     context = context(__CALLER__.module)
     rest_router = module(context, Rest.Router)
-    ui_router = module(context, UI.Router)
+    ui_router = module(context, Ui.Router)
     redoc_ui = module(context, Rest.RedocUI)
 
     plugs =
