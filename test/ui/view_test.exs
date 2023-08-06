@@ -60,6 +60,35 @@ defmodule Sleeky.Ui.ViewTest do
               ]} == IndexView.resolve()
     end
 
+    test "support solid templating" do
+      assert {:h1, [class: "title is-1"], ["Some title"]} ==
+               SolidView.resolve(style: "is-1")
+    end
+
+    test "raise an error when children slots don't have a value" do
+      defmodule InvalidView do
+        use Sleeky.Ui.View
+
+        render do
+          view LayoutView do
+            main do
+              view MainView
+            end
+          end
+        end
+      end
+
+      assert_raise RuntimeError,
+                   ~r/No value for slot :header/,
+                   &InvalidView.resolve/0
+    end
+
+    test "raise an error when slots in attributes don't have a value" do
+      assert_raise RuntimeError,
+                   ~r/Error rendering attribute title/,
+                   &SolidView.resolve/0
+    end
+
     test "are converted to valid html" do
       assert {:ok, _document} = IndexView.to_html() |> Floki.parse_document()
     end
