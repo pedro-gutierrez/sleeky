@@ -31,17 +31,8 @@ defmodule Sleeky.Ui.View do
     single internal representation that no longer depends on anything. Finally, once resolved, a
     view gets rendered into plain html, in order to be served by a router.
 
-  By default, all this process happens during compile time. However, it is also possible to delay
-    the resolution right to the point when the view is about to be served by the Ui router:
-
-  ```elixir
-  defmodule Sleeky.Ui.SomeView do
-    use Sleeky.View, resolution: :runtime
-    ...
-  end
-  ```
-
-  This can be handy for example when running in development mode.
+  By default, all this process happens during compile time. In development mode however views
+    are resolved at runtime.
   """
 
   import Sleeky.Inspector
@@ -64,17 +55,12 @@ defmodule Sleeky.Ui.View do
     end
   end
 
-  defmacro __using__(opts) do
-    resolution = Keyword.get(opts, :resolution, :compilation)
-
+  defmacro __using__(_opts) do
     quote do
       use Sleeky.Ui.Html.Dsl
       use Sleeky.Ui.Compound.Dsl
 
       import Sleeky.Ui.View, only: :macros
-
-      @doc "Determines whether the view should be resolved during compilation or runtime"
-      def resolution, do: unquote(resolution)
 
       @doc "Resolves and renders the view into html"
       def to_html(args \\ %{}) do

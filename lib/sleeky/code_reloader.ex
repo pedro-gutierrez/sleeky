@@ -23,7 +23,7 @@ defmodule Sleeky.CodeReloader do
   @impl true
   def handle_info({:file_event, pid, {path, events}}, pid) do
     if interested?(path, events) do
-      IEx.Helpers.recompile(force: true)
+      IEx.Helpers.recompile()
     end
 
     {:noreply, pid}
