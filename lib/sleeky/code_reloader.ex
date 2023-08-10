@@ -6,6 +6,8 @@ defmodule Sleeky.CodeReloader do
   """
   use GenServer
 
+  require Logger
+
   @doc false
   def start_link(opts), do: GenServer.start_link(__MODULE__, opts)
 
@@ -17,6 +19,8 @@ defmodule Sleeky.CodeReloader do
     path = File.cwd!()
     {:ok, pid} = FileSystem.start_link(dirs: [path])
     FileSystem.subscribe(pid)
+
+    Logger.info("Code reloader enabled")
     {:ok, pid}
   end
 
