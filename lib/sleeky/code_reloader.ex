@@ -22,17 +22,12 @@ defmodule Sleeky.CodeReloader do
 
   @impl true
   def handle_info({:file_event, pid, {path, events}}, pid) do
-    if interested?(path, events) do
-      IEx.Helpers.recompile()
-    end
+    if interested?(path, events), do: IEx.Helpers.recompile()
 
     {:noreply, pid}
   end
 
-  def handle_info({:file_event, pid, :stop}, pid) do
-    IO.inspect(:watcher_stopped)
-    {:noreply, pid}
-  end
+  def handle_info({:file_event, pid, :stop}, pid), do: {:noreply, pid}
 
   defp interested?(path, events) do
     Enum.any?(@filter_patterns, &String.contains?(path, &1)) &&
