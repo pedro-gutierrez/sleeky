@@ -2,13 +2,6 @@ defmodule Sleeky.Ui.View do
   @moduledoc """
   A Sleeky UI is made of Sleeky views.
 
-  Views are expressed in pure Elixir, then compiled into an internal representation made of simple
-    tuples nested one within another, quite similar to what Floki does. Views can be expressed in
-    terms of other views. Resolving a view traverses all these dependencies and produces a final,
-    single internal representation that no longer depends on anything. Finally, once resolved, a
-    view gets rendered into plain html, in order to be served by a router. All this process happens
-    during compile time.
-
   Usage:
 
   ```elixir
@@ -31,6 +24,24 @@ defmodule Sleeky.Ui.View do
     end
   end
   ```
+
+  Views are expressed in pure Elixir, then compiled into an internal representation made of simple
+    tuples nested one within another, quite similar to what Floki does. Views can be expressed in
+    terms of other views. Resolving a view traverses all these dependencies and produces a final,
+    single internal representation that no longer depends on anything. Finally, once resolved, a
+    view gets rendered into plain html, in order to be served by a router.
+
+  By default, all this process happens during compile time. However, it is also possible to delay
+    the resolution right to the point when the view is about to be served by the Ui router:
+
+  ```elixir
+  defmodule Sleeky.Ui.SomeView do
+    use Sleeky.View, resolution: :runtime
+    ...
+  end
+  ```
+
+  This can be handy for example when running in development mode.
   """
 
   import Sleeky.Inspector
@@ -53,12 +64,17 @@ defmodule Sleeky.Ui.View do
     end
   end
 
-  defmacro __using__(_opts) do
+  defmacro __using__(opts) do
+    resolution = Keyword.get(opts, :resolution, :compilation)
+
     quote do
       use Sleeky.Ui.Html.Dsl
       use Sleeky.Ui.Compound.Dsl
 
       import Sleeky.Ui.View, only: :macros
+
+      @doc "Determines whether the view should be resolved during compilation or runtime"
+      def resolution, do: unquote(resolution)
 
       @doc "Resolves and renders the view into html"
       def to_html(args \\ %{}) do

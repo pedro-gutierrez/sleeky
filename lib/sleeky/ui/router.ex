@@ -41,9 +41,17 @@ defmodule Sleeky.Ui.Router do
     html = view.to_html()
     conn = var(:conn)
 
-    quote do
-      get unquote(route) do
-        send_html(unquote(conn), unquote(html), 200)
+    if view.resolution() == :compilation do
+      quote do
+        get unquote(route) do
+          send_html(unquote(conn), unquote(html), 200)
+        end
+      end
+    else
+      quote do
+        get unquote(route) do
+          send_html(unquote(conn), unquote(view).to_html(), 200)
+        end
       end
     end
   end
