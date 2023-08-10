@@ -24,7 +24,7 @@ defmodule Sleeky.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger, :file_system]
     ]
   end
 
@@ -36,6 +36,7 @@ defmodule Sleeky.MixProject do
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:ex_doc, ">= 0.0.0"},
+      {:file_system, "~> 0.2"},
       {:floki, "~> 0.34.0"},
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},

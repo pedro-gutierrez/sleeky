@@ -26,14 +26,29 @@ defmodule Sleeky.Endpoint do
     router = Keyword.fetch!(opts, :router)
 
     quote do
+      use Supervisor
+
       @doc false
-      def child_spec(_) do
-        Supervisor.child_spec(
-          {Bandit,
-           unquote(otp_app)
-           |> Application.fetch_env!(__MODULE__)
-           |> Keyword.put(:plug, unquote(router))},
-          []
+      def start_link(opts), do: Supervisor.start_link(__MODULE__, opts)
+
+      if Mix.env() == :dev do
+        @default_children [Sleeky.CodeReloader]
+      else
+        @default_children []
+      end
+
+      @impl true
+      def init(_opts) do
+        bandit_opts =
+          unquote(otp_app)
+          |> Application.fetch_env!(__MODULE__)
+          |> Keyword.put(:plug, unquote(router))
+
+        Supervisor.init(
+          [
+            {Bandit, bandit_opts}
+          ] ++ @default_children,
+          strategy: :one_for_one
         )
       end
     end
