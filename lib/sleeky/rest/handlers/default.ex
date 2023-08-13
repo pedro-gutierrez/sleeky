@@ -42,7 +42,12 @@ defmodule Sleeky.Rest.Handlers.Default do
     end
   end
 
-  defp resource_http_path(entity), do: "/#{entity.plural}/:id"
+  defp resource_http_path(entity) do
+    pk_name = entity.primary_key.field
+
+    "/#{entity.plural}/:#{pk_name}"
+  end
+
   defp collection_http_path(entity), do: "/#{entity.plural}"
 
   defp action_handler(rest, entity, %Action{name: :list} = action) do
@@ -101,7 +106,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       api_get(entity),
       attribute_args(entity, action),
       parent_args(entity, action),
@@ -130,7 +135,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       api_call(entity, action)
     ]
 
@@ -156,7 +161,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       api_get(entity),
       api_call(entity, action)
     ]
@@ -188,7 +193,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
     conn = var(:conn)
 
-    for %Attribute{implied: false, computed: false} = attr <- entity.attributes do
+    for %Attribute{implied?: false, computed?: false} = attr <- entity.attributes do
       default = :invalid
 
       quote do
@@ -204,7 +209,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
     conn = var(:conn)
 
-    for %Attribute{implied: false, computed: false} = attr <- entity.attributes do
+    for %Attribute{implied?: false, computed?: false} = attr <- entity.attributes do
       quote do
         {:ok, unquote(args)} <-
           unquote(conn)
@@ -333,11 +338,12 @@ defmodule Sleeky.Rest.Handlers.Default do
   end
 
   defp api_call(entity, %Action{name: :read}) do
+    pk_name = entity.primary_key.field
     conn = var(:conn)
     args = var(:args)
 
     quote do
-      {:ok, item} <- unquote(entity).read(unquote(args).id, unquote(conn).assigns)
+      {:ok, item} <- unquote(entity).read(unquote(args).unquote(pk_name), unquote(conn).assigns)
     end
   end
 

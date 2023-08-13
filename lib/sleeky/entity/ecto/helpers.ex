@@ -192,7 +192,7 @@ defmodule Sleeky.Entity.Ecto.Helpers do
     attrs = var(:attrs)
     context = var(:context)
 
-    for %Attribute{computed: true, using: mod} = attr <- entity.attributes do
+    for %Attribute{computed?: true, using: mod} = attr <- entity.attributes do
       var = var(attr.name)
 
       [

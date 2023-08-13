@@ -34,6 +34,7 @@ defmodule Sleeky.Entity.Ecto do
     children = entity.children
     keys = entity.keys
     actions = entity.actions
+    primary_key = entity.primary_key
 
     quote do
       use Ecto.Schema
@@ -55,6 +56,7 @@ defmodule Sleeky.Entity.Ecto do
       def children, do: unquote(Macro.escape(children))
       def keys, do: unquote(Macro.escape(keys))
       def actions, do: unquote(Macro.escape(actions))
+      def primary_key, do: unquote(Macro.escape(primary_key))
 
       unquote_splicing(
         @generators

@@ -17,8 +17,8 @@ defmodule Sleeky.Entity.Ecto.FuzzySearch do
   defp fuzzy_search_function(entity) do
     [first | rest] =
       entity.attributes
-      |> Enum.reject(& &1.virtual)
-      |> Enum.reject(& &1.implied)
+      |> Enum.reject(& &1.virtual?)
+      |> Enum.reject(& &1.implied?)
       |> Enum.filter(&(&1.kind in [:string, :text]))
 
     first =

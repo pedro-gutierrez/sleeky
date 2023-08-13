@@ -15,14 +15,15 @@ defmodule Sleeky.Entity.Attribute do
     :using,
     enum: nil,
     aliases: [],
-    implied: false,
     column: nil,
-    unique: false,
-    required: true,
-    immutable: false,
-    virtual: false,
-    computed: false,
-    timestamp: false
+    unique?: false,
+    implied?: false,
+    required?: true,
+    immutable?: false,
+    virtual?: false,
+    computed?: false,
+    timestamp?: false,
+    primary_key?: false
   ]
 
   def new(fields) do
@@ -33,13 +34,19 @@ defmodule Sleeky.Entity.Attribute do
     |> with_column()
     |> with_storage()
     |> with_aliases()
-    |> maybe_implied()
     |> maybe_timestamp()
   end
 
-  def id?(attr) do
-    attr.name == :id
-  end
+  def id?(attr), do: attr.name == :id
+
+  @doc """
+  Translates an abstract field type into its physical storage datatype in the db
+  """
+  def storage(:id), do: :uuid
+  def storage(:text), do: :string
+  def storage(:datetime), do: :utc_datetime
+  def storage(:enum), do: :string
+  def storage(kind), do: kind
 
   def with_label(attr) do
     %{attr | label: label(attr.name)}
@@ -54,42 +61,21 @@ defmodule Sleeky.Entity.Attribute do
   end
 
   defp with_storage(attr) do
-    case attr.kind do
-      :id ->
-        %{attr | storage: :uuid}
-
-      :text ->
-        %{attr | storage: :string}
-
-      :datetime ->
-        %{attr | storage: :utc_datetime}
-
-      :enum ->
-        %{attr | storage: :string}
-
-      kind ->
-        %{attr | storage: kind}
-    end
+    %{attr | storage: storage(attr.kind)}
   end
 
   defp with_aliases(attr) do
     Aliases.new(attr)
   end
 
-  defp maybe_implied(attr) do
-    implied = attr.name in [:id, :inserted_at, :updated_at]
-
-    %{attr | implied: implied}
-  end
-
   defp maybe_timestamp(attr) do
     timestamp = attr.name in [:inserted_at, :updated_at]
 
-    %{attr | timestamp: timestamp}
+    %{attr | timestamp?: timestamp}
   end
 
   def maybe_immutable(attr, do: {:immutable, _, _}) do
-    %{attr | immutable: true}
+    %{attr | immutable?: true}
   end
 
   def maybe_immutable(attr, _), do: attr

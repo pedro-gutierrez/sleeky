@@ -10,12 +10,13 @@ defmodule Sleeky.Entity.Ecto.Relation do
 
   defp relation_function(entity) do
     entity_module = entity.module
+    pk_name = entity.primary_key.field
 
     quote do
-      def relation(%unquote(entity_module){id: id} = item, field) do
+      def relation(%unquote(entity_module){unquote(pk_name) => pk_value} = item, field) do
         with rel when rel != nil <- Map.get(item, field) do
           if unloaded?(rel) do
-            key = {id, field}
+            key = {pk_value, field}
 
             with nil <- Process.get(key) do
               rel = item |> @repo.preload(field) |> Map.get(field)

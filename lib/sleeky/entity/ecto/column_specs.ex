@@ -10,7 +10,7 @@ defmodule Sleeky.Entity.Ecto.ColumnSpecs do
   end
 
   defp attributes(entity) do
-    attrs = Enum.reject(entity.attributes, & &1.virtual)
+    attrs = Enum.reject(entity.attributes, & &1.virtual?)
 
     for attr <- attrs do
       aliases = attr.aliases

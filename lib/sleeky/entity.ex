@@ -1,6 +1,11 @@
 defmodule Sleeky.Entity do
+  @moduledoc """
+  A entity describes your data.
+  """
+
   alias Sleeky.Entity.Attribute
   alias Sleeky.Entity.Ecto
+  alias Sleeky.Entity.PrimaryKey
   alias Sleeky.Entity.Virtual
   import Sleeky.Inspector
 
@@ -16,6 +21,7 @@ defmodule Sleeky.Entity do
     :repo,
     :auth,
     :pk_constraint,
+    :primary_key,
     actions: [],
     attributes: [],
     breadcrumbs: true,
@@ -24,12 +30,6 @@ defmodule Sleeky.Entity do
     keys: [],
     preloads: [],
     virtual?: false
-  ]
-
-  @implied_attributes [
-    [name: :id, kind: :id],
-    [name: :inserted_at, kind: :datetime],
-    [name: :updated_at, kind: :datetime]
   ]
 
   def new(module) do
@@ -52,6 +52,7 @@ defmodule Sleeky.Entity do
       plural: plural,
       plural_label: label(plural),
       table: table,
+      primary_key: PrimaryKey.default(),
       pk_constraint: "#{table}_pkey",
       breadcrumbs: true
     }
@@ -88,21 +89,10 @@ defmodule Sleeky.Entity do
     Module.get_attribute(entity, :entity)
   end
 
-  defmacro __using__(opts) do
+  defmacro __using__(_opts) do
     module = __CALLER__.module
 
     entity = new(module)
-
-    breadcrumbs = Keyword.get(opts, :breadcrumbs, true)
-
-    entity =
-      Enum.reduce(@implied_attributes, entity, fn attr, e ->
-        attr
-        |> Keyword.put(:entity, entity)
-        |> Attribute.new()
-        |> add_to(:attributes, e)
-      end)
-      |> Map.put(:breadcrumbs, breadcrumbs)
 
     Module.register_attribute(module, :entity, persist: true, accumulate: false)
     Module.put_attribute(module, :entity, entity)
@@ -110,8 +100,6 @@ defmodule Sleeky.Entity do
     quote do
       import Sleeky.Entity.Dsl, only: :macros
       @before_compile Sleeky.Entity
-
-      def breadcrumbs?, do: unquote(breadcrumbs)
     end
   end
 
@@ -120,30 +108,37 @@ defmodule Sleeky.Entity do
     generator = if entity.virtual?, do: Virtual, else: Ecto
 
     entity
-    |> with_display()
+    |> with_implied_attributes()
+    |> with_primary_attribute()
     |> generator.ast()
   end
 
-  defp with_display(entity) do
-    if !field(:display, entity) do
-      case Enum.reject(entity.attributes, & &1.implied) do
-        [first | _] ->
-          [
-            name: :display,
-            kind: :string,
-            entity: entity,
-            computed: true,
-            using: Sleeky.Entity.Ecto.Display.module(entity),
-            plugin: {Sleeky.Entity.Ecto.Display, [first.name]}
-          ]
-          |> Attribute.new()
-          |> add_to(:attributes, entity)
+  defp with_implied_attributes(entity) do
+    [
+      [
+        name: entity.primary_key.field,
+        kind: entity.primary_key.kind,
+        implied?: entity.primary_key.implied?
+      ],
+      [name: :inserted_at, kind: :datetime, implied?: true],
+      [name: :updated_at, kind: :datetime, implied?: true]
+    ]
+    |> Enum.reduce(entity, fn attr, e ->
+      attr
+      |> Keyword.put(:entity, entity)
+      |> Attribute.new()
+      |> add_to(:attributes, e)
+    end)
+  end
 
-        _ ->
-          raise "entity #{inspect(entity.module)} has no attributes to display"
-      end
-    else
-      entity
-    end
+  defp with_primary_attribute(entity) do
+    pk_name = entity.primary_key.field
+
+    attrs =
+      Enum.map(entity.attributes, fn attr ->
+        Map.put(attr, :primary_key?, attr.name == pk_name)
+      end)
+
+    Map.put(entity, :attributes, attrs)
   end
 end

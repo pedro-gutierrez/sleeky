@@ -6,6 +6,8 @@ defmodule Sleeky.Entity.Ecto.Schema do
     source = to_string(entity.plural)
 
     quote do
+      unquote(primary_key(entity))
+
       schema unquote(source) do
         (unquote_splicing(
            flatten([
@@ -19,6 +21,15 @@ defmodule Sleeky.Entity.Ecto.Schema do
     end
   end
 
+  defp primary_key(entity) do
+    column = entity.primary_key.field
+    datatype = entity.primary_key.storage
+
+    quote do
+      @primary_key {unquote(column), unquote(datatype), [autogenerate: false]}
+    end
+  end
+
   defp ecto_schema_timestamps do
     quote do
       timestamps()
@@ -26,7 +37,7 @@ defmodule Sleeky.Entity.Ecto.Schema do
   end
 
   defp ecto_schema_attributes(entity) do
-    attrs = Enum.reject(entity.attributes, &(&1.virtual || &1.implied))
+    attrs = Enum.reject(entity.attributes, &(&1.virtual? || &1.implied? || &1.primary_key?))
 
     for attr <- attrs do
       name = attr.name

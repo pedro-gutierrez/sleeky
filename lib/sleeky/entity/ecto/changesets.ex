@@ -120,8 +120,8 @@ defmodule Sleeky.Entity.Ecto.Changesets do
   end
 
   defp immutable_fields_changeset(entity) do
-    attrs = entity.attributes |> Enum.filter(& &1.immutable) |> names()
-    parents = entity.parents |> Enum.filter(& &1.immutable) |> names()
+    attrs = entity.attributes |> Enum.filter(& &1.immutable?) |> names()
+    parents = entity.parents |> Enum.filter(& &1.immutable?) |> names()
 
     fields = attrs ++ parents
 

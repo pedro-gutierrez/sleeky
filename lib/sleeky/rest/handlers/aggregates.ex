@@ -47,7 +47,7 @@ defmodule Sleeky.Rest.Handlers.Aggregates do
     action = action(rel)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       api_call(rel)
     ]
 

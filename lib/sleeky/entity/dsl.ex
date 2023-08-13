@@ -1,12 +1,24 @@
 defmodule Sleeky.Entity.Dsl do
+  @moduledoc """
+  The Dsl to build schemas by defining entities, their attributes and their relations to other entities
+  """
+
   alias Sleeky.Entity
-  alias Sleeky.Entity.Attribute
-  alias Sleeky.Entity.Key
-  alias Sleeky.Entity.Relation
-  alias Sleeky.Entity.Action
+  alias Sleeky.Entity.{Attribute, PrimaryKey, Key, Relation, Action}
+
   import Sleeky.Entity
   import Sleeky.Inspector
   import Sleeky.Opts
+
+  defmacro primary_key(field, kind) do
+    module = __CALLER__.module
+    storage = Attribute.storage(kind)
+    implied? = kind == :id
+    pk = %PrimaryKey{field: field, kind: kind, storage: storage, implied?: implied?}
+    entity = module |> Entity.entity() |> Map.put(:primary_key, pk)
+
+    Module.put_attribute(module, :entity, entity)
+  end
 
   defmacro action(name, block \\ nil) do
     module = __CALLER__.module

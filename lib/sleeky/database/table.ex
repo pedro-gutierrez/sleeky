@@ -18,7 +18,7 @@ defmodule Sleeky.Database.Table do
 
     attribute_columns =
       entity.attributes()
-      |> Enum.reject(&(&1.virtual || &1.timestamp))
+      |> Enum.reject(&(&1.virtual? || &1.timestamp?))
       |> Enum.map(&Column.new/1)
 
     parent_columns = Enum.map(entity.parents(), &Column.new/1)
