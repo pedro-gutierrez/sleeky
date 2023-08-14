@@ -42,11 +42,12 @@ defmodule Sleeky.Entity.Attribute do
   @doc """
   Translates an abstract field type into its physical storage datatype in the db
   """
-  def storage(:id), do: :uuid
-  def storage(:text), do: :string
-  def storage(:datetime), do: :utc_datetime
-  def storage(:enum), do: :string
-  def storage(kind), do: kind
+  def storage(kind, opts \\ [])
+  def storage(:id, _), do: :uuid
+  def storage(:text, _), do: :string
+  def storage(:datetime, _), do: :utc_datetime
+  def storage(:enum, _), do: :string
+  def storage(kind, _), do: kind
 
   def with_label(attr) do
     %{attr | label: label(attr.name)}
@@ -85,4 +86,14 @@ defmodule Sleeky.Entity.Attribute do
   end
 
   def maybe_enum(attr, _), do: attr
+
+  def maybe_primary_key(attr, do: {:primary_key, _, _}) do
+    %{attr | primary_key?: true}
+  end
+
+  def maybe_primary_key(attr, _), do: attr
+
+  def maybe_implied(attr, _) do
+    %{attr | implied?: attr.kind == :id}
+  end
 end

@@ -108,22 +108,18 @@ defmodule Sleeky.Entity do
     generator = if entity.virtual?, do: Virtual, else: Ecto
 
     entity
-    |> with_implied_attributes()
-    |> with_primary_attribute()
+    |> with_primary_key()
+    |> with_timestamps()
     |> generator.ast()
   end
 
-  defp with_implied_attributes(entity) do
-    [
-      [
-        name: entity.primary_key.field,
-        kind: entity.primary_key.kind,
-        implied?: entity.primary_key.implied?
-      ],
-      [name: :inserted_at, kind: :datetime, implied?: true],
-      [name: :updated_at, kind: :datetime, implied?: true]
-    ]
-    |> Enum.reduce(entity, fn attr, e ->
+  @timestamps [
+    [name: :inserted_at, kind: :datetime, implied?: true],
+    [name: :updated_at, kind: :datetime, implied?: true]
+  ]
+
+  defp with_timestamps(entity) do
+    Enum.reduce(@timestamps, entity, fn attr, e ->
       attr
       |> Keyword.put(:entity, entity)
       |> Attribute.new()
@@ -131,14 +127,16 @@ defmodule Sleeky.Entity do
     end)
   end
 
-  defp with_primary_attribute(entity) do
-    pk_name = entity.primary_key.field
+  defp with_primary_key(entity) do
+    pk =
+      case Enum.find(entity.attributes, & &1.primary_key?) do
+        nil ->
+          PrimaryKey.default()
 
-    attrs =
-      Enum.map(entity.attributes, fn attr ->
-        Map.put(attr, :primary_key?, attr.name == pk_name)
-      end)
+        attr ->
+          PrimaryKey.for_attribute(attr)
+      end
 
-    Map.put(entity, :attributes, attrs)
+    Map.put(entity, :primary_key, pk)
   end
 end

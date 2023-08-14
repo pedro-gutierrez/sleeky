@@ -4,21 +4,11 @@ defmodule Sleeky.Entity.Dsl do
   """
 
   alias Sleeky.Entity
-  alias Sleeky.Entity.{Attribute, PrimaryKey, Key, Relation, Action}
+  alias Sleeky.Entity.{Attribute, Key, Relation, Action}
 
   import Sleeky.Entity
   import Sleeky.Inspector
   import Sleeky.Opts
-
-  defmacro primary_key(field, kind) do
-    module = __CALLER__.module
-    storage = Attribute.storage(kind)
-    implied? = kind == :id
-    pk = %PrimaryKey{field: field, kind: kind, storage: storage, implied?: implied?}
-    entity = module |> Entity.entity() |> Map.put(:primary_key, pk)
-
-    Module.put_attribute(module, :entity, entity)
-  end
 
   defmacro action(name, block \\ nil) do
     module = __CALLER__.module
@@ -42,6 +32,8 @@ defmodule Sleeky.Entity.Dsl do
       |> Attribute.new()
       |> with_opts(opts)
       |> Attribute.maybe_immutable(opts)
+      |> Attribute.maybe_primary_key(opts)
+      |> Attribute.maybe_implied(opts)
       |> Attribute.maybe_enum(opts)
       |> add_to(:attributes, entity)
 
