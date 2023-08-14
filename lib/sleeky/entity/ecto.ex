@@ -1,5 +1,6 @@
 defmodule Sleeky.Entity.Ecto do
   @moduledoc false
+  alias Sleeky.Entity
   import Sleeky.Inspector
 
   @generators [
@@ -34,7 +35,7 @@ defmodule Sleeky.Entity.Ecto do
     children = entity.children
     keys = entity.keys
     actions = entity.actions
-    primary_key = entity.primary_key
+    pk = Entity.primary_key(entity)
 
     quote do
       use Ecto.Schema
@@ -42,7 +43,6 @@ defmodule Sleeky.Entity.Ecto do
       @auth unquote(auth)
       @repo unquote(repo)
 
-      @primary_key {:id, :binary_id, autogenerate: false}
       @timestamps_opts [type: :utc_datetime]
 
       def name, do: unquote(entity.name)
@@ -56,7 +56,7 @@ defmodule Sleeky.Entity.Ecto do
       def children, do: unquote(Macro.escape(children))
       def keys, do: unquote(Macro.escape(keys))
       def actions, do: unquote(Macro.escape(actions))
-      def primary_key, do: unquote(Macro.escape(primary_key))
+      def primary_key, do: unquote(Macro.escape(pk))
 
       unquote_splicing(
         @generators

@@ -6,11 +6,14 @@ defmodule Sleeky.Database.Constraint do
   defstruct [:name, :table, :column, :target, type: :uuid, null: false, on_delete: :nothing]
 
   def new(%Relation{kind: :parent} = rel) do
+    target_pk = rel.target.module.primary_key()
+
     new(
       table: rel.entity.table,
       column: rel.column,
       target: rel.target.table,
-      null: !rel.required
+      type: target_pk.storage,
+      null: !rel.required?
     )
   end
 

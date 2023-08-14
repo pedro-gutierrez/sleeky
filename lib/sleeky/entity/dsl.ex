@@ -33,7 +33,6 @@ defmodule Sleeky.Entity.Dsl do
       |> with_opts(opts)
       |> Attribute.maybe_immutable(opts)
       |> Attribute.maybe_primary_key(opts)
-      |> Attribute.maybe_implied(opts)
       |> Attribute.maybe_enum(opts)
       |> add_to(:attributes, entity)
 

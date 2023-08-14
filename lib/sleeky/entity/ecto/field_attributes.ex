@@ -15,7 +15,7 @@ defmodule Sleeky.Entity.Ecto.FieldAttributes do
     attrs =
       entity.attributes |> Enum.filter(& &1.required?) |> Enum.reject(& &1.timestamp?) |> names()
 
-    parents = entity.parents |> Enum.filter(& &1.required) |> columns()
+    parents = entity.parents |> Enum.filter(& &1.required?) |> columns()
 
     quote do
       @required_fields unquote(attrs ++ parents)

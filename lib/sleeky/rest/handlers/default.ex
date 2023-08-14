@@ -2,7 +2,6 @@ defmodule Sleeky.Rest.Handlers.Default do
   @moduledoc false
 
   alias Sleeky.Entity.Action
-  alias Sleeky.Entity.Attribute
 
   import Sleeky.Inspector
   import Sleeky.Rest.Handlers.Helpers
@@ -193,7 +192,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
     conn = var(:conn)
 
-    for %Attribute{implied?: false, computed?: false} = attr <- entity.attributes do
+    for attr <- user_modifiable_attributes(entity) do
       default = :invalid
 
       quote do
@@ -209,7 +208,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
     conn = var(:conn)
 
-    for %Attribute{implied?: false, computed?: false} = attr <- entity.attributes do
+    for attr <- user_modifiable_attributes(entity) do
       quote do
         {:ok, unquote(args)} <-
           unquote(conn)
@@ -222,6 +221,9 @@ defmodule Sleeky.Rest.Handlers.Default do
       end
     end
   end
+
+  defp user_modifiable_attributes(entity),
+    do: Enum.reject(entity.attributes, &(&1.timestamp? || &1.computed?))
 
   defp parent_args(entity, action) do
     [

@@ -5,7 +5,6 @@ defmodule Sleeky.Entity do
 
   alias Sleeky.Entity.Attribute
   alias Sleeky.Entity.Ecto
-  alias Sleeky.Entity.PrimaryKey
   alias Sleeky.Entity.Virtual
   import Sleeky.Inspector
 
@@ -21,7 +20,6 @@ defmodule Sleeky.Entity do
     :repo,
     :auth,
     :pk_constraint,
-    :primary_key,
     actions: [],
     attributes: [],
     breadcrumbs: true,
@@ -52,7 +50,6 @@ defmodule Sleeky.Entity do
       plural: plural,
       plural_label: label(plural),
       table: table,
-      primary_key: PrimaryKey.default(),
       pk_constraint: "#{table}_pkey",
       breadcrumbs: true
     }
@@ -89,6 +86,9 @@ defmodule Sleeky.Entity do
     Module.get_attribute(entity, :entity)
   end
 
+  def primary_key!(entity), do: field!(:id, entity)
+  def primary_key(entity), do: field(:id, entity)
+
   defmacro __using__(_opts) do
     module = __CALLER__.module
 
@@ -114,8 +114,8 @@ defmodule Sleeky.Entity do
   end
 
   @timestamps [
-    [name: :inserted_at, kind: :datetime, implied?: true],
-    [name: :updated_at, kind: :datetime, implied?: true]
+    [name: :inserted_at, kind: :datetime],
+    [name: :updated_at, kind: :datetime]
   ]
 
   defp with_timestamps(entity) do
@@ -128,15 +128,14 @@ defmodule Sleeky.Entity do
   end
 
   defp with_primary_key(entity) do
-    pk =
-      case Enum.find(entity.attributes, & &1.primary_key?) do
-        nil ->
-          PrimaryKey.default()
+    case primary_key(entity) do
+      nil ->
+        attr = Attribute.new(name: :id, kind: :id, entity: entity, primary_key?: true)
 
-        attr ->
-          PrimaryKey.for_attribute(attr)
-      end
+        %{entity | attributes: [attr | entity.attributes]}
 
-    Map.put(entity, :primary_key, pk)
+      _pk ->
+        entity
+    end
   end
 end

@@ -1,5 +1,6 @@
 defmodule Sleeky.Entity.Ecto.Schema do
   @moduledoc false
+  alias Sleeky.Entity
   import Sleeky.Inspector
 
   def ast(entity) do
@@ -22,8 +23,9 @@ defmodule Sleeky.Entity.Ecto.Schema do
   end
 
   defp primary_key(entity) do
-    column = entity.primary_key.field
-    datatype = entity.primary_key.storage
+    pk = Entity.primary_key!(entity)
+    column = pk.column
+    datatype = pk.storage
 
     quote do
       @primary_key {unquote(column), unquote(datatype), [autogenerate: false]}
@@ -37,7 +39,7 @@ defmodule Sleeky.Entity.Ecto.Schema do
   end
 
   defp ecto_schema_attributes(entity) do
-    attrs = Enum.reject(entity.attributes, &(&1.virtual? || &1.implied? || &1.primary_key?))
+    attrs = Enum.reject(entity.attributes, &(&1.virtual? || &1.primary_key? || &1.timestamp?))
 
     for attr <- attrs do
       name = attr.name

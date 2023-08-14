@@ -18,7 +18,7 @@ defmodule Sleeky.Entity.Ecto.FuzzySearch do
     [first | rest] =
       entity.attributes
       |> Enum.reject(& &1.virtual?)
-      |> Enum.reject(& &1.implied?)
+      |> Enum.reject(& &1.timestamp?)
       |> Enum.filter(&(&1.kind in [:string, :text]))
 
     first =

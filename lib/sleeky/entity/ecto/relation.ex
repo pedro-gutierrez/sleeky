@@ -1,6 +1,8 @@
 defmodule Sleeky.Entity.Ecto.Relation do
   @moduledoc false
 
+  alias Sleeky.Entity
+
   def ast(entity) do
     [
       relation_function(entity),
@@ -10,10 +12,10 @@ defmodule Sleeky.Entity.Ecto.Relation do
 
   defp relation_function(entity) do
     entity_module = entity.module
-    pk_name = entity.primary_key.field
+    pk = Entity.primary_key!(entity)
 
     quote do
-      def relation(%unquote(entity_module){unquote(pk_name) => pk_value} = item, field) do
+      def relation(%unquote(entity_module){unquote(pk.name) => pk_value} = item, field) do
         with rel when rel != nil <- Map.get(item, field) do
           if unloaded?(rel) do
             key = {pk_value, field}

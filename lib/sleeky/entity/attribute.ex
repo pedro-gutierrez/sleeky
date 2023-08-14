@@ -17,7 +17,6 @@ defmodule Sleeky.Entity.Attribute do
     aliases: [],
     column: nil,
     unique?: false,
-    implied?: false,
     required?: true,
     immutable?: false,
     virtual?: false,
@@ -43,7 +42,7 @@ defmodule Sleeky.Entity.Attribute do
   Translates an abstract field type into its physical storage datatype in the db
   """
   def storage(kind, opts \\ [])
-  def storage(:id, _), do: :uuid
+  def storage(:id, _), do: :binary_id
   def storage(:text, _), do: :string
   def storage(:datetime, _), do: :utc_datetime
   def storage(:enum, _), do: :string
@@ -69,12 +68,6 @@ defmodule Sleeky.Entity.Attribute do
     Aliases.new(attr)
   end
 
-  defp maybe_timestamp(attr) do
-    timestamp = attr.name in [:inserted_at, :updated_at]
-
-    %{attr | timestamp?: timestamp}
-  end
-
   def maybe_immutable(attr, do: {:immutable, _, _}) do
     %{attr | immutable?: true}
   end
@@ -88,12 +81,19 @@ defmodule Sleeky.Entity.Attribute do
   def maybe_enum(attr, _), do: attr
 
   def maybe_primary_key(attr, do: {:primary_key, _, _}) do
+    if attr.name != :id do
+      raise """
+      Attributes marked as primary keys must be named :id.
+      Found: #{inspect(attr.name)} in entity #{inspect(attr.entity.module)}
+      """
+    end
+
     %{attr | primary_key?: true}
   end
 
   def maybe_primary_key(attr, _), do: attr
 
-  def maybe_implied(attr, _) do
-    %{attr | implied?: attr.kind == :id}
-  end
+  @timestamps [:inserted_at, :updated_at]
+
+  defp maybe_timestamp(attr), do: %{attr | timestamp?: attr.name in @timestamps}
 end

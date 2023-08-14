@@ -165,7 +165,7 @@ defmodule Sleeky.Entity.Ecto.Helpers do
   def attrs_with_required_parents(entity) do
     attrs = var(:attrs)
 
-    for rel <- entity.parents |> Enum.filter(& &1.required) do
+    for rel <- entity.parents |> Enum.filter(& &1.required?) do
       column = rel.column
       var = var(rel.name)
 
@@ -178,7 +178,7 @@ defmodule Sleeky.Entity.Ecto.Helpers do
   def attrs_with_optional_parents(entity) do
     attrs = var(:attrs)
 
-    for rel <- entity.parents |> Enum.reject(& &1.required) do
+    for rel <- entity.parents |> Enum.reject(& &1.required?) do
       column = rel.column
       var = var(rel.name)
 

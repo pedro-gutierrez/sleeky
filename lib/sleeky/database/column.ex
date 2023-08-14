@@ -41,8 +41,11 @@ defmodule Sleeky.Database.Column do
   end
 
   def new(%Relation{kind: :parent} = rel) do
-    new(rel.column, :uuid,
-      null: !rel.required,
+    target_pk = rel.target.module.primary_key()
+    storage = target_pk.storage
+
+    new(rel.column, storage,
+      null: !rel.required?,
       references: rel.target.table
     )
   end
