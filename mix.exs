@@ -4,7 +4,7 @@ defmodule Sleeky.MixProject do
   def project do
     [
       app: :sleeky,
-      version: "0.0.2",
+      version: "0.0.3",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(),
       start_permanent: Mix.env() == :prod,
