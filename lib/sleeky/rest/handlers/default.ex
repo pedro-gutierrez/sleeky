@@ -42,9 +42,9 @@ defmodule Sleeky.Rest.Handlers.Default do
   end
 
   defp resource_http_path(entity) do
-    pk_name = entity.primary_key.field
+    pk = entity.module.primary_key()
 
-    "/#{entity.plural}/:#{pk_name}"
+    "/#{entity.plural}/:#{pk.name}"
   end
 
   defp collection_http_path(entity), do: "/#{entity.plural}"
@@ -340,7 +340,8 @@ defmodule Sleeky.Rest.Handlers.Default do
   end
 
   defp api_call(entity, %Action{name: :read}) do
-    pk_name = entity.primary_key.field
+    pk = entity.primary_key()
+    pk_name = pk.name
     conn = var(:conn)
     args = var(:args)
 
