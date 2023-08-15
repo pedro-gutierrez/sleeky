@@ -1,6 +1,27 @@
 defmodule Sleeky.Entity do
   @moduledoc """
   A entity describes your data.
+
+  Similar to an ecto schema, an entity describes its attributes and relations to other entities:
+
+  ```elixir
+  defmodule MyApp.Schema.Blog do
+    use Sleeky.Entity
+
+    attribute :name, :string
+    has_many :posts
+  end
+
+  defmodule MyApp.Schema.Post do
+    use Sleeky.Entity
+
+    attribute :title, :string
+    belongs_to :blog
+  end
+  ```
+
+  Then we combine multiple entities in order to form a schema. Please refer to the `Sleeky.Schema`
+  module documentation.
   """
 
   alias Sleeky.Entity.Attribute

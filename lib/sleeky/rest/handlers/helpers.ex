@@ -2,7 +2,6 @@ defmodule Sleeky.Rest.Handlers.Helpers do
   @moduledoc false
   import Sleeky.Inspector
 
-  alias Sleeky.Entity
   alias Sleeky.Entity.Action
 
   def handler(rest, entity, action, body) when is_list(body) do
@@ -36,7 +35,7 @@ defmodule Sleeky.Rest.Handlers.Helpers do
   def required_primary_key_arg(entity) do
     conn = var(:conn)
     args = var(:args)
-    pk = Entity.primary_key!(entity)
+    pk = entity.primary_key()
     field = pk.name
     kind = pk.kind
     param_name = to_string(field)
