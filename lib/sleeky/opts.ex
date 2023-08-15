@@ -14,7 +14,7 @@ defmodule Sleeky.Opts do
   end
 
   def with_opt(field, :optional) do
-    Map.put(field, :required, false)
+    Map.put(field, :required?, false)
   end
 
   def with_opt(field, other) do

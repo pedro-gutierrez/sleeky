@@ -1,5 +1,16 @@
 defmodule Sleeky.Schema do
-  @moduledoc false
+  @moduledoc """
+  A schema acts as a container for a set of entities.
+
+  ```elixir
+  defmodule MyApp.Schema do
+    use Sleeky.Schema
+
+    entity MyApp.Schema.Blog
+    entity Myapp.Schema.Post
+  end
+  ```
+  """
 
   @generators [
     Sleeky.Schema.Preamble,

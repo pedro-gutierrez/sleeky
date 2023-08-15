@@ -2,7 +2,6 @@ defmodule Sleeky.Rest.Handlers.Default do
   @moduledoc false
 
   alias Sleeky.Entity.Action
-  alias Sleeky.Entity.Attribute
 
   import Sleeky.Inspector
   import Sleeky.Rest.Handlers.Helpers
@@ -42,7 +41,12 @@ defmodule Sleeky.Rest.Handlers.Default do
     end
   end
 
-  defp resource_http_path(entity), do: "/#{entity.plural}/:id"
+  defp resource_http_path(entity) do
+    pk = entity.module.primary_key()
+
+    "/#{entity.plural}/:#{pk.name}"
+  end
+
   defp collection_http_path(entity), do: "/#{entity.plural}"
 
   defp action_handler(rest, entity, %Action{name: :list} = action) do
@@ -101,7 +105,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       api_get(entity),
       attribute_args(entity, action),
       parent_args(entity, action),
@@ -130,7 +134,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       api_call(entity, action)
     ]
 
@@ -156,7 +160,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       api_get(entity),
       api_call(entity, action)
     ]
@@ -188,7 +192,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
     conn = var(:conn)
 
-    for %Attribute{implied: false, computed: false} = attr <- entity.attributes do
+    for attr <- user_modifiable_attributes(entity) do
       default = :invalid
 
       quote do
@@ -204,7 +208,7 @@ defmodule Sleeky.Rest.Handlers.Default do
     args = var(:args)
     conn = var(:conn)
 
-    for %Attribute{implied: false, computed: false} = attr <- entity.attributes do
+    for attr <- user_modifiable_attributes(entity) do
       quote do
         {:ok, unquote(args)} <-
           unquote(conn)
@@ -217,6 +221,9 @@ defmodule Sleeky.Rest.Handlers.Default do
       end
     end
   end
+
+  defp user_modifiable_attributes(entity),
+    do: Enum.reject(entity.attributes, &(&1.timestamp? || &1.computed?))
 
   defp parent_args(entity, action) do
     [
@@ -333,11 +340,13 @@ defmodule Sleeky.Rest.Handlers.Default do
   end
 
   defp api_call(entity, %Action{name: :read}) do
+    pk = entity.primary_key()
+    pk_name = pk.name
     conn = var(:conn)
     args = var(:args)
 
     quote do
-      {:ok, item} <- unquote(entity).read(unquote(args).id, unquote(conn).assigns)
+      {:ok, item} <- unquote(entity).read(unquote(args).unquote(pk_name), unquote(conn).assigns)
     end
   end
 

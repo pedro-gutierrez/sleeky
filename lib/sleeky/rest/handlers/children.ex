@@ -47,7 +47,7 @@ defmodule Sleeky.Rest.Handlers.Children do
     action = action(rel)
 
     preconditions = [
-      required_id_arg(),
+      required_primary_key_arg(entity),
       pagination_args(),
       query_arg(),
       api_call(rel)

@@ -15,9 +15,9 @@ defmodule Sleeky.Entity.Relation do
     :foreign_key,
     :inverse,
     aliases: [],
-    required: true,
-    immutable: false,
-    computed: false
+    required?: true,
+    immutable?: false,
+    computed?: false
   ]
 
   def new(fields) do

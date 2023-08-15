@@ -13,9 +13,9 @@ defmodule Sleeky.Entity.Ecto.FieldAttributes do
 
   defp required_fields_attribute(entity) do
     attrs =
-      entity.attributes |> Enum.filter(& &1.required) |> Enum.reject(& &1.timestamp) |> names()
+      entity.attributes |> Enum.filter(& &1.required?) |> Enum.reject(& &1.timestamp?) |> names()
 
-    parents = entity.parents |> Enum.filter(& &1.required) |> columns()
+    parents = entity.parents |> Enum.filter(& &1.required?) |> columns()
 
     quote do
       @required_fields unquote(attrs ++ parents)
@@ -23,8 +23,8 @@ defmodule Sleeky.Entity.Ecto.FieldAttributes do
   end
 
   defp optional_fields_attribute(entity) do
-    attrs = entity.attributes |> Enum.filter(&(!&1.required)) |> names()
-    parents = entity.parents |> Enum.filter(&(!&1.required)) |> columns()
+    attrs = entity.attributes |> Enum.filter(&(!&1.required?)) |> names()
+    parents = entity.parents |> Enum.filter(&(!&1.required?)) |> columns()
 
     quote do
       @optional_fields unquote(attrs ++ parents)
@@ -32,8 +32,8 @@ defmodule Sleeky.Entity.Ecto.FieldAttributes do
   end
 
   defp computed_fields_attribute(entity) do
-    attrs = entity.attributes |> Enum.filter(& &1.computed) |> names()
-    parents = entity.parents |> Enum.filter(& &1.computed) |> columns()
+    attrs = entity.attributes |> Enum.filter(& &1.computed?) |> names()
+    parents = entity.parents |> Enum.filter(& &1.computed?) |> columns()
 
     quote do
       @computed_fields unquote(attrs ++ parents)

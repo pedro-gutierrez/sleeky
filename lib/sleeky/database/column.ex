@@ -8,9 +8,9 @@ defmodule Sleeky.Database.Column do
     :name,
     :kind,
     :default,
-    primary_key: false,
     references: nil,
-    null: false
+    null: false,
+    primary_key: false
   ]
 
   def new(name, kind, opts) do
@@ -33,16 +33,19 @@ defmodule Sleeky.Database.Column do
 
   def new(%Attribute{} = attr) do
     new(attr.column, attr.storage,
-      null: !attr.required,
+      null: !attr.required?,
       default: attr.default,
-      primary_key: attr.name == :id,
+      primary_key: attr.primary_key?,
       enum: attr.enum
     )
   end
 
   def new(%Relation{kind: :parent} = rel) do
-    new(rel.column, :uuid,
-      null: !rel.required,
+    target_pk = rel.target.module.primary_key()
+    storage = target_pk.storage
+
+    new(rel.column, storage,
+      null: !rel.required?,
       references: rel.target.table
     )
   end
@@ -88,17 +91,25 @@ defmodule Sleeky.Database.Column do
   end
 
   def diff(%__MODULE__{} = old, %__MODULE__{} = new) do
-    changes = ColumnChanges.new(new.name)
+    fields_changed =
+      ColumnChanges.tracked()
+      |> Enum.reduce(%{}, fn key, acc ->
+        if Map.get(old, key) != Map.get(new, key) do
+          value = Map.get(new, key)
+          Map.put(acc, key, value)
+        else
+          acc
+        end
+      end)
 
-    ColumnChanges.tracked()
-    |> Enum.reduce(changes, fn key, changes ->
-      if Map.get(old, key) != Map.get(new, key) do
-        value = Map.get(new, key)
-        Map.put(changes, key, value)
-      else
-        changes
-      end
-    end)
+    if map_size(fields_changed) == 0 do
+      ColumnChanges.new(new.name)
+    else
+      new.name
+      |> ColumnChanges.new()
+      |> Map.put(:kind, new.kind)
+      |> Map.merge(fields_changed)
+    end
   end
 
   defp with_null(col, opts) do
@@ -112,6 +123,10 @@ defmodule Sleeky.Database.Column do
     end
   end
 
+  defp with_primary_key(col, opts) do
+    %{col | primary_key: Keyword.get(opts, :primary_key, false)}
+  end
+
   defp maybe_encode_default(opts, col) do
     if col.default do
       Keyword.put(opts, :default, col.default)
@@ -121,7 +136,7 @@ defmodule Sleeky.Database.Column do
   end
 
   defp maybe_encode_null(opts, col) do
-    if col.null do
+    if col.null != nil do
       Keyword.put(opts, :null, col.null)
     else
       opts
@@ -130,14 +145,10 @@ defmodule Sleeky.Database.Column do
 
   defp maybe_encode_primary_key(opts, col) do
     if col.primary_key do
-      Keyword.put(opts, :primary_key, true)
+      Keyword.put(opts, :primary_key, col.primary_key)
     else
       opts
     end
-  end
-
-  defp with_primary_key(col, opts) do
-    %{col | primary_key: Keyword.get(opts, :primary_key, false)}
   end
 
   defp with_references(col, opts) do

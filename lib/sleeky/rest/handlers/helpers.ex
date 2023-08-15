@@ -32,13 +32,19 @@ defmodule Sleeky.Rest.Handlers.Helpers do
     module([rest, Handler, entity.name(), action])
   end
 
-  def required_id_arg do
+  def required_primary_key_arg(entity) do
     conn = var(:conn)
     args = var(:args)
+    pk = entity.primary_key()
+    field = pk.name
+    kind = pk.kind
+    param_name = to_string(field)
 
     quote do
       {:ok, unquote(args)} <-
-        unquote(conn) |> cast_param("id", :id, :required) |> as(:id, unquote(args))
+        unquote(conn)
+        |> cast_param(unquote(param_name), unquote(kind), :required)
+        |> as(unquote(field), unquote(args))
     end
   end
 

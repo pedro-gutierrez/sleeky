@@ -105,6 +105,8 @@ defmodule Sleeky.Rest.RouterHelper do
 
         defp cast(nil, _, :invalid, field), do: invalid(field)
         defp cast("", _, :invalid, field), do: invalid(field)
+        defp cast(nil, _, :required, field), do: required(field)
+        defp cast("", _, :required, field), do: required(field)
         defp cast(nil, _, :continue, _), do: {:error, :continue}
         defp cast("", _, :continue, _), do: {:error, :continue}
         defp cast(nil, _, default, _), do: {:ok, default}
@@ -135,9 +137,8 @@ defmodule Sleeky.Rest.RouterHelper do
           end
         end
 
-        defp invalid(field) do
-          error(field, :invalid)
-        end
+        defp invalid(field), do: error(field, :invalid)
+        defp required(field), do: error(field, :required)
 
         defp error(field, reason) do
           {:error, %{reason: reason, field: field}}
@@ -155,6 +156,7 @@ defmodule Sleeky.Rest.RouterHelper do
 
         defp status(:not_found), do: 404
         defp status(:invalid), do: 400
+        defp status(:required), do: 400
         defp status(:unauthorized), do: 401
         defp status(:conflict), do: 409
         defp status([%{detail: "has already been taken"}]), do: 409

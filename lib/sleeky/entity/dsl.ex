@@ -1,9 +1,11 @@
 defmodule Sleeky.Entity.Dsl do
+  @moduledoc """
+  The Dsl to build schemas by defining entities, their attributes and their relations to other entities
+  """
+
   alias Sleeky.Entity
-  alias Sleeky.Entity.Attribute
-  alias Sleeky.Entity.Key
-  alias Sleeky.Entity.Relation
-  alias Sleeky.Entity.Action
+  alias Sleeky.Entity.{Attribute, Key, Relation, Action}
+
   import Sleeky.Entity
   import Sleeky.Inspector
   import Sleeky.Opts
@@ -30,6 +32,7 @@ defmodule Sleeky.Entity.Dsl do
       |> Attribute.new()
       |> with_opts(opts)
       |> Attribute.maybe_immutable(opts)
+      |> Attribute.maybe_primary_key(opts)
       |> Attribute.maybe_enum(opts)
       |> add_to(:attributes, entity)
 

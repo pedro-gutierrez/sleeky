@@ -1,4 +1,29 @@
 defmodule Sleeky.Entity do
+  @moduledoc """
+  A entity describes your data.
+
+  Similar to an ecto schema, an entity describes its attributes and relations to other entities:
+
+  ```elixir
+  defmodule MyApp.Schema.Blog do
+    use Sleeky.Entity
+
+    attribute :name, :string
+    has_many :posts
+  end
+
+  defmodule MyApp.Schema.Post do
+    use Sleeky.Entity
+
+    attribute :title, :string
+    belongs_to :blog
+  end
+  ```
+
+  Then we combine multiple entities in order to form a schema. Please refer to the `Sleeky.Schema`
+  module documentation.
+  """
+
   alias Sleeky.Entity.Attribute
   alias Sleeky.Entity.Ecto
   alias Sleeky.Entity.Virtual
@@ -24,12 +49,6 @@ defmodule Sleeky.Entity do
     keys: [],
     preloads: [],
     virtual?: false
-  ]
-
-  @implied_attributes [
-    [name: :id, kind: :id],
-    [name: :inserted_at, kind: :datetime],
-    [name: :updated_at, kind: :datetime]
   ]
 
   def new(module) do
@@ -88,21 +107,13 @@ defmodule Sleeky.Entity do
     Module.get_attribute(entity, :entity)
   end
 
-  defmacro __using__(opts) do
+  def primary_key!(entity), do: field!(:id, entity)
+  def primary_key(entity), do: field(:id, entity)
+
+  defmacro __using__(_opts) do
     module = __CALLER__.module
 
     entity = new(module)
-
-    breadcrumbs = Keyword.get(opts, :breadcrumbs, true)
-
-    entity =
-      Enum.reduce(@implied_attributes, entity, fn attr, e ->
-        attr
-        |> Keyword.put(:entity, entity)
-        |> Attribute.new()
-        |> add_to(:attributes, e)
-      end)
-      |> Map.put(:breadcrumbs, breadcrumbs)
 
     Module.register_attribute(module, :entity, persist: true, accumulate: false)
     Module.put_attribute(module, :entity, entity)
@@ -110,8 +121,6 @@ defmodule Sleeky.Entity do
     quote do
       import Sleeky.Entity.Dsl, only: :macros
       @before_compile Sleeky.Entity
-
-      def breadcrumbs?, do: unquote(breadcrumbs)
     end
   end
 
@@ -120,30 +129,34 @@ defmodule Sleeky.Entity do
     generator = if entity.virtual?, do: Virtual, else: Ecto
 
     entity
-    |> with_display()
+    |> with_primary_key()
+    |> with_timestamps()
     |> generator.ast()
   end
 
-  defp with_display(entity) do
-    if !field(:display, entity) do
-      case Enum.reject(entity.attributes, & &1.implied) do
-        [first | _] ->
-          [
-            name: :display,
-            kind: :string,
-            entity: entity,
-            computed: true,
-            using: Sleeky.Entity.Ecto.Display.module(entity),
-            plugin: {Sleeky.Entity.Ecto.Display, [first.name]}
-          ]
-          |> Attribute.new()
-          |> add_to(:attributes, entity)
+  @timestamps [
+    [name: :inserted_at, kind: :datetime],
+    [name: :updated_at, kind: :datetime]
+  ]
 
-        _ ->
-          raise "entity #{inspect(entity.module)} has no attributes to display"
-      end
-    else
-      entity
+  defp with_timestamps(entity) do
+    Enum.reduce(@timestamps, entity, fn attr, e ->
+      attr
+      |> Keyword.put(:entity, entity)
+      |> Attribute.new()
+      |> add_to(:attributes, e)
+    end)
+  end
+
+  defp with_primary_key(entity) do
+    case primary_key(entity) do
+      nil ->
+        attr = Attribute.new(name: :id, kind: :id, entity: entity, primary_key?: true)
+
+        %{entity | attributes: [attr | entity.attributes]}
+
+      _pk ->
+        entity
     end
   end
 end

@@ -11,7 +11,7 @@ defmodule Sleeky.Entity.Ecto.FieldSpecs do
   end
 
   defp attributes(entity) do
-    attrs = Enum.reject(entity.attributes, & &1.virtual)
+    attrs = Enum.reject(entity.attributes, & &1.virtual?)
 
     for attr <- attrs do
       aliases = attr.aliases
