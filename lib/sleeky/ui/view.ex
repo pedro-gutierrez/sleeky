@@ -59,6 +59,7 @@ defmodule Sleeky.Ui.View do
     quote do
       use Sleeky.Ui.Html.Dsl
       use Sleeky.Ui.Compound.Dsl
+      use Sleeky.Ui.Each.Dsl
 
       import Sleeky.Ui.View, only: :macros
 

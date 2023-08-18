@@ -165,7 +165,7 @@ defmodule Sleeky.Ui.Html do
     defmacro __using__(_opts) do
       quote do
         def resolve({node, attrs, children}, args) do
-          {node, attrs |> resolve(args) |> sanitize_attrs(args), resolve(children, args)}
+          {node, attrs |> resolve_attrs(args), resolve(children, args)}
         end
 
         def resolve({node, children}, args) when is_list(children) do
@@ -180,36 +180,45 @@ defmodule Sleeky.Ui.Html do
           {name, resolve(value, args)}
         end
 
-        def resolve(other, _args) when is_binary(other) or is_number(other) or is_atom(other) do
-          other
+        def resolve(value, args) when is_binary(value) do
+          case templated_value(value, args) do
+            {:ok, value} ->
+              value
+
+            {:error, reason} ->
+              raise "Error rendering #{value} with args #{inspect(args)}: #{inspect(reason)}"
+          end
         end
 
-        defp sanitize_attrs(attrs, args) do
-          for {name, value} <- attrs, do: {name, sanitize_attr(value, args)}
+        def resolve(other, _args) when is_number(other) or is_boolean(other), do: other
+        def resolve(other, _args) when is_atom(other), do: to_string(other)
+
+        defp resolve_attrs(attrs, args) do
+          for {name, value} <- attrs do
+            try do
+              {name, resolve(value, args)}
+            rescue
+              error ->
+                raise "Error rendering attribute #{name} with args #{inspect(args)}: #{inspect(error)}"
+            end
+          end
         end
 
-        defp sanitize_attr([value], args), do: sanitize_attr(value, args)
+        defp string_keys(map) when is_map(map),
+          do: for({key, value} <- map, into: %{}, do: {to_string(key), string_keys(value)})
 
-        defp sanitize_attr(value, args) when is_binary(value) do
-          args = string_keys(args)
+        defp string_keys(items) when is_list(items), do: Enum.map(items, &string_keys/1)
+        defp string_keys(other), do: other
 
-          value
-          |> Solid.parse!()
-          |> Solid.render!(args, strict_variables: true)
-          |> to_string
-        rescue
-          _ ->
-            raise "Error rendering attribute #{value} with args #{inspect(Map.keys(args))}"
-        end
-
-        defp sanitize_attr(value, _args)
-             when is_boolean(value) or is_number(value),
-             do: value
-
-        defp sanitize_attr(value, _args) when is_atom(value), do: to_string(value)
-
-        defp string_keys(map) do
-          for {key, value} <- map, into: %{}, do: {to_string(key), value}
+        defp templated_value(tpl, args) do
+          with {:ok, tpl} <- Solid.parse(tpl),
+               args <- args |> Enum.into(%{}) |> string_keys(),
+               {:ok, rendered} <- Solid.render(tpl, args, strict_variables: true) do
+            {:ok, to_string(rendered)}
+          else
+            _ ->
+              {:error, :template_error}
+          end
         end
       end
     end

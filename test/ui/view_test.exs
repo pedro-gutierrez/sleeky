@@ -85,7 +85,7 @@ defmodule Sleeky.Ui.ViewTest do
 
     test "raise an error when slots in attributes don't have a value" do
       assert_raise RuntimeError,
-                   ~r/Error rendering attribute title/,
+                   ~r/Error rendering attribute class/,
                    &SolidView.resolve/0
     end
 
