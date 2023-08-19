@@ -60,6 +60,7 @@ defmodule Sleeky.Ui.View do
       use Sleeky.Ui.Html.Dsl
       use Sleeky.Ui.Compound.Dsl
       use Sleeky.Ui.Each.Dsl
+      use Sleeky.Ui.Markdown.Dsl
 
       import Sleeky.Ui.View, only: :macros
 
