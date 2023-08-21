@@ -38,7 +38,6 @@ defmodule Sleeky.Ui.Router do
   end
 
   defp route(%View{module: view, route: route}) do
-    html = view.to_html()
     conn = var(:conn)
 
     if Mix.env() == :dev do
@@ -48,6 +47,8 @@ defmodule Sleeky.Ui.Router do
         end
       end
     else
+      html = view.to_html()
+
       quote do
         get unquote(route) do
           send_html(unquote(conn), unquote(html), 200)
