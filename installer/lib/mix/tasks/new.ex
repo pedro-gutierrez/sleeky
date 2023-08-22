@@ -493,7 +493,7 @@ defmodule Mix.Tasks.Sleeky.New do
   """)
 
   embed_template(:lib_ui, """
-  defmodule <%= @mod %>.UI do
+  defmodule <%= @mod %>.Ui do
     @moduledoc false
     use Sleeky.Ui
 
@@ -502,7 +502,7 @@ defmodule Mix.Tasks.Sleeky.New do
   """)
 
   embed_template(:lib_ui_index, """
-  defmodule <%= @mod %>.UI.Index do
+  defmodule <%= @mod %>.Ui.Index do
     @moduledoc false
     use Sleeky.Ui.View
 
