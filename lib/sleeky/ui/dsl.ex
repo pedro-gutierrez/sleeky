@@ -5,6 +5,16 @@ defmodule Sleeky.Ui.Dsl do
 
   import Sleeky.Inspector
 
+  @doc false
+  def locals_without_parens do
+    [view: :*] ++
+      Sleeky.Ui.View.Dsl.locals_without_parens() ++
+      Sleeky.Ui.Html.Dsl.locals_without_parens() ++
+      Sleeky.Ui.Compound.Dsl.locals_without_parens() ++
+      Sleeky.Ui.Each.Dsl.locals_without_parens() ++
+      Sleeky.Ui.Markdown.Dsl.locals_without_parens()
+  end
+
   defmacro view({:__aliases__, _, mod}, opts \\ []) do
     ui = __CALLER__.module
     view = module(mod)

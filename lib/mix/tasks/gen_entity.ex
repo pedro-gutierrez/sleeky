@@ -6,10 +6,10 @@ defmodule Mix.Tasks.Sleeky.Gen.Entity do
 
   Usage:
 
-      mix sleeky.gen.entity --name Post
-                            --description "A post entity"
-                            --attributes title:string,public:boolean
-                            --relations belongs_to:user
+      mix sleeky.gen.entity --name Post \
+                            --description "A post entity" \
+                            --attributes title:string,public:boolean \
+                            --relations belongs_to:user \
                             --actions read:admin
 
   A new Sleeky entity module will be generated and will be added to your schema.
