@@ -52,6 +52,9 @@ defmodule Sleeky.Ui.Compound do
   defmodule Dsl do
     @moduledoc false
 
+    @doc false
+    def locals_without_parens, do: [view: :*, slot: :*]
+
     defmacro __using__(_opts) do
       quote do
         import Sleeky.Ui.Compound.Dsl

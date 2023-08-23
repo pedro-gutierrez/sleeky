@@ -10,6 +10,18 @@ defmodule Sleeky.Entity.Dsl do
   import Sleeky.Inspector
   import Sleeky.Opts
 
+  @doc false
+  def locals_without_parens,
+    do: [
+      action: :*,
+      attribute: :*,
+      belongs_to: :*,
+      has_many: :*,
+      unique: :*,
+      key: :*,
+      slug: :*
+    ]
+
   defmacro action(name, block \\ nil) do
     module = __CALLER__.module
     entity = Entity.entity(module)

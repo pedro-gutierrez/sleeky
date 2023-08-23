@@ -129,6 +129,9 @@ defmodule Sleeky.Ui.Html do
       :wbr
     ]
 
+    @doc false
+    def locals_without_parens, do: Enum.map(@tags, &{&1, :*})
+
     for tag <- @tags do
       defmacro unquote(tag)(attrs, do: {:__block__, _, children}) do
         {:el, [line: 1], [unquote(tag), attrs, children]}

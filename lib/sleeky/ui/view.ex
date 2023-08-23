@@ -62,7 +62,7 @@ defmodule Sleeky.Ui.View do
       use Sleeky.Ui.Each.Dsl
       use Sleeky.Ui.Markdown.Dsl
 
-      import Sleeky.Ui.View, only: :macros
+      import Sleeky.Ui.View.Dsl
 
       @doc "Resolves and renders the view into html"
       def to_html(args \\ %{}) do
@@ -92,12 +92,6 @@ defmodule Sleeky.Ui.View do
         #{reason} #{inspect(__MODULE__)}: #{trace}
         """
       end
-    end
-  end
-
-  defmacro render(do: child) do
-    quote do
-      def definition, do: unquote(child)
     end
   end
 end
