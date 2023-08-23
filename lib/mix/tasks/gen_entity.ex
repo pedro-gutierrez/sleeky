@@ -60,35 +60,15 @@ defmodule Mix.Tasks.Sleeky.Gen.Entity do
   end
 
   defp add_to_schema(mod, schema) do
-    mod = mod |> Module.split() |> Enum.map(&String.to_atom/1)
-
     schema_file = filename(schema)
-
-    {:defmodule, loc,
-     [
-       aliases,
-       [
-         do: {:__block__, [], body}
-       ]
-     ]} = schema_file |> File.read!() |> Code.string_to_quoted!()
-
-    extra_ast = {:entity, [line: 1000], [{:__aliases__, [line: 1000], mod}]}
+    code = schema_file |> File.read!() |> String.split("\n")
 
     code =
-      {:defmodule, loc,
-       [
-         aliases,
-         [
-           do: {:__block__, [], body ++ [extra_ast]}
-         ]
-       ]}
+      code
+      |> List.insert_at(length(code) - 2, "  entity #{inspect(mod)}")
+      |> Enum.join("\n")
 
-    code = code |> Macro.to_string() |> Code.format_string!()
-    File.write!(schema_file, code)
-
-    Mix.shell().info(
-      "Your schema #{inspect(schema)} has been updated.\nDon't forget to generate your migrations!"
-    )
+    create_file(schema_file, code)
   end
 
   defp description!(opts), do: Keyword.fetch!(opts, :description)
@@ -167,7 +147,7 @@ defmodule Mix.Tasks.Sleeky.Gen.Entity do
   end
 
   embed_template(:entity, """
-  defmodule <%= @mod %> do
+  defmodule <%= inspect(@mod) %> do
     @moduledoc \"\"\"
     <%= @description %>
     \"\"\"
