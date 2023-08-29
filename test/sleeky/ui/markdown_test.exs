@@ -24,6 +24,14 @@ defmodule Sleeky.Ui.MarkdownTest do
     end
   end
 
+  defmodule TemplatedMarkdownView do
+    use Sleeky.Ui.View
+
+    render do
+      markdown "{{ content.summary }}"
+    end
+  end
+
   describe "ui markdown directive" do
     test "resolves markdown into html" do
       assert {:div, [class: "article"],
@@ -46,6 +54,13 @@ defmodule Sleeky.Ui.MarkdownTest do
     test "supports compact notation" do
       assert {:div, [], [{:p, [], [{:strong, [], ["Sleek"]}, " Elixir applications"]}]} ==
                CompactMarkdownView.resolve()
+    end
+
+    test "supports templating" do
+      assert {:div, [], [{:p, [], ["Some title"]}]} ==
+               TemplatedMarkdownView.resolve(%{
+                 content: %{summary: "Some title"}
+               })
     end
   end
 end

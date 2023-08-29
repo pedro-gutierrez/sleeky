@@ -26,7 +26,7 @@ defmodule Sleeky.Ui.Markdown do
 
   defmodule Dsl do
     @moduledoc false
-    
+
     @doc false
     def locals_without_parens, do: [markdown: :*]
 
@@ -63,7 +63,7 @@ defmodule Sleeky.Ui.Markdown do
         import Sleeky.Ui.Markdown.Resolve
 
         def resolve({:markdown, attrs, [content]}, args) when is_binary(content) do
-          case EarmarkParser.as_ast(content) do
+          case content |> resolve(args) |> EarmarkParser.as_ast() do
             {:ok, ast, []} ->
               {:div, attrs, [definition(ast)]}
 
