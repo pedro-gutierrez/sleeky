@@ -1,10 +1,12 @@
 defmodule Sleeky.MixProject do
   use Mix.Project
 
+  @version "0.0.3"
+
   def project do
     [
       app: :sleeky,
-      version: "0.0.3",
+      version: @version,
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(),
       start_permanent: Mix.env() == :prod,
@@ -18,7 +20,8 @@ defmodule Sleeky.MixProject do
         files: ~w(lib mix.exs .formatter.exs LICENSE.md README.md),
         description: "Minimalist Elixir application framework"
       ],
-      deps: deps()
+      deps: deps(),
+      docs: docs()
     ]
   end
 
@@ -53,5 +56,29 @@ defmodule Sleeky.MixProject do
       :test -> ["lib", "test/support"]
       _env -> ["lib"]
     end
+  end
+
+  defp docs do
+    [
+      source_ref: "v#{@version}",
+      main: "overview",
+      extra_section: "GUIDES",
+      extras: extras(),
+      groups_for_extras: groups_for_extras(),
+      formatters: ["html", "epub"]
+    ]
+  end
+
+  defp extras do
+    [
+      "guides/introduction/overview.md",
+      "guides/introduction/installation.md"
+    ]
+  end
+
+  defp groups_for_extras do
+    [
+      Introduction: ~r/guides\/introduction\/.?/
+    ]
   end
 end
