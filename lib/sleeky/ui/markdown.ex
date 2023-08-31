@@ -26,9 +26,12 @@ defmodule Sleeky.Ui.Markdown do
 
   defmodule Dsl do
     @moduledoc false
-    
+
     @doc false
     def locals_without_parens, do: [markdown: :*]
+
+    @doc false
+    def tags, do: [:markdown]
 
     defmacro __using__(_opts) do
       quote do
