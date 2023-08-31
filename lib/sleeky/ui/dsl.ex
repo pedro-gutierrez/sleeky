@@ -15,6 +15,14 @@ defmodule Sleeky.Ui.Dsl do
       Sleeky.Ui.Markdown.Dsl.locals_without_parens()
   end
 
+  @doc false
+  def tags do
+    Sleeky.Ui.Html.Dsl.tags() ++
+      Sleeky.Ui.Compound.Dsl.tags() ++
+      Sleeky.Ui.Each.Dsl.tags() ++
+      Sleeky.Ui.Markdown.Dsl.tags()
+  end
+
   defmacro view({:__aliases__, _, mod}, opts \\ []) do
     ui = __CALLER__.module
     view = module(mod)

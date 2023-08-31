@@ -30,6 +30,9 @@ defmodule Sleeky.Ui.Markdown do
     @doc false
     def locals_without_parens, do: [markdown: :*]
 
+    @doc false
+    def tags, do: [:markdown]
+
     defmacro __using__(_opts) do
       quote do
         import Sleeky.Ui.Markdown.Dsl

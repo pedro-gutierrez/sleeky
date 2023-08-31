@@ -55,6 +55,9 @@ defmodule Sleeky.Ui.Compound do
     @doc false
     def locals_without_parens, do: [view: :*, slot: :*]
 
+    @doc false
+    def tags, do: [:view, :slot]
+
     defmacro __using__(_opts) do
       quote do
         import Sleeky.Ui.Compound.Dsl
