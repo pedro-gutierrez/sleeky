@@ -34,64 +34,12 @@ defmodule Sleeky.Ui.View do
   By default, all this process happens during compile time. In development mode however views
     are resolved at runtime.
   """
-
-  import Sleeky.Inspector
-
-  defstruct [:route, :module, :render]
-
-  def new(opts) do
-    struct(__MODULE__, opts)
-  end
-
-  def named(name, parent) do
-    parent |> context() |> module(name)
-  end
-
-  def ast(definition, _view) do
-    quote do
-      use Sleeky.Ui.View
-
-      def definition, do: unquote(Macro.escape(definition))
-    end
-  end
-
-  defmacro __using__(_opts) do
-    quote do
-      use Sleeky.Ui.Html.Dsl
-      use Sleeky.Ui.Compound.Dsl
-      use Sleeky.Ui.Each.Dsl
-      use Sleeky.Ui.Markdown.Dsl
-
-      import Sleeky.Ui.View.Dsl
-
-      @doc "Resolves and renders the view into html"
-      def to_html(args \\ %{}) do
-        args
-        |> resolve()
-        |> Sleeky.Ui.Render.to_html()
-      rescue
-        e ->
-          trace = Exception.format(:error, e, __STACKTRACE__)
-          raise_error("Error converting to html", trace)
-      end
-
-      @doc "Resolves all dependencies, recursively, and returns a new internal definition"
-      def resolve(args \\ %{}) do
-        with {node, attrs, children} when is_list(children) <-
-               definition() |> Sleeky.Ui.Resolve.resolve(args) do
-          {node, attrs, List.flatten(children)}
-        end
-      rescue
-        e ->
-          trace = Exception.format(:error, e, __STACKTRACE__)
-          raise_error("Error resolving", trace)
-      end
-
-      defp raise_error(reason, trace) do
-        raise """
-        #{reason} #{inspect(__MODULE__)}: #{trace}
-        """
-      end
-    end
-  end
+  use Diesel,
+    otp_app: :sleeky,
+    dsl: Sleeky.Ui.View.Dsl,
+    overrides: [div: 2],
+    generators: [
+      Sleeky.Ui.View.Generators.Html
+    ],
+    compilation_flags: [:strip_root]
 end

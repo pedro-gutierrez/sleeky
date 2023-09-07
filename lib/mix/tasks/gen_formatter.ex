@@ -18,7 +18,7 @@ defmodule Mix.Tasks.Sleeky.Gen.Formatter do
 
   @impl true
   def run(_argv) do
-    assigns = [locals_without_parens: Sleeky.Dsl.locals_without_parens()]
+    assigns = [locals_without_parens: Sleeky.locals_without_parens()]
 
     create_file(".formatter.exs", formatter_template(assigns))
   end
@@ -31,6 +31,7 @@ defmodule Mix.Tasks.Sleeky.Gen.Formatter do
   [
     inputs: ["{mix,.formatter}.exs", "{config,lib,test}/**/*.{ex,exs}"],
     locals_without_parens: locals_without_parens,
+    import_deps: [:ecto, :ecto_sql, :plug, :diesel],
     export: [
       locals_without_parens: locals_without_parens
     ]

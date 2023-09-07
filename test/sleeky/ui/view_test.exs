@@ -3,37 +3,50 @@ defmodule Sleeky.Ui.ViewTest do
 
   describe "views" do
     test "have an internal definition" do
-      assert {:nav, [], [{:a, [href: "/"], ["Home"]}]} == HeaderView.definition()
+      assert {:render, [], [{:nav, [], [{:a, [href: "/"], ["Home"]}]}]} == HeaderView.definition()
 
-      assert {:section, [id: "main"],
+      assert {:render, [],
               [
-                {:p, [class: "title"], ["Hero title"]},
-                {:label, [], ["Enter your username"]},
-                {:input, [type: "text"], []},
-                {:button, [], ["Submit"]}
+                {:section, [id: "main"],
+                 [
+                   {:p, [class: "title"], ["Hero title"]},
+                   {:label, [], ["Enter your username"]},
+                   {:input, [type: "text"], []},
+                   {:button, [], ["Submit"]}
+                 ]}
               ]} == MainView.definition()
 
-      assert {:html, [],
+      assert {:render, [],
               [
-                {:head, [],
+                {:html, [],
                  [
-                   {:meta, [charset: "utf-8"], []},
-                   {:title, [], ["Some title"]},
-                   {:link, [rel: "stylesheet", href: "/some.css"], []}
-                 ]},
-                {:body, [],
-                 [
-                   {:header, [], [{:slot, [], [:header]}]},
-                   {:main, [], [{:slot, [], [:main]}]},
-                   {:footer, [], [{:footer, [], ["This is the footer"]}]}
+                   {:head, [],
+                    [
+                      {:meta, [charset: "utf-8"], []},
+                      {:title, [], ["Some title"]},
+                      {:link, [rel: "stylesheet", href: "/some.css"], []}
+                    ]},
+                   {:body, [],
+                    [
+                      {:header, [], [{:slot, [], [:header]}]},
+                      {:main, [], [{:slot, [], [:main]}]},
+                      {:footer, [], ["This is the footer"]}
+                    ]}
                  ]}
               ]} == LayoutView.definition()
 
-      assert {:view, LayoutView, [header: {:view, HeaderView, []}, main: {:view, MainView, []}]} ==
+      assert {:render, [],
+              [
+                {:view, [name: LayoutView],
+                 [
+                   {:slot, [name: :header], [{:view, [], [HeaderView]}]},
+                   {:slot, [name: :main], [{:view, [], [MainView]}]}
+                 ]}
+              ]} ==
                IndexView.definition()
     end
 
-    test "are resolved" do
+    test "are compiled" do
       assert {:html, [],
               [
                 {:head, [],
@@ -55,14 +68,14 @@ defmodule Sleeky.Ui.ViewTest do
                          {:button, [], ["Submit"]}
                        ]}
                     ]},
-                   {:footer, [], [{:footer, [], ["This is the footer"]}]}
+                   {:footer, [], ["This is the footer"]}
                  ]}
-              ]} == IndexView.resolve()
+              ]} == IndexView.compile()
     end
 
     test "support solid templating" do
       assert {:h1, [class: "title is-1"], ["Some title"]} ==
-               SolidView.resolve(style: "is-1")
+               SolidView.compile(style: "is-1")
     end
 
     test "raise an error when children slots don't have a value" do
@@ -71,7 +84,7 @@ defmodule Sleeky.Ui.ViewTest do
 
         render do
           view LayoutView do
-            main do
+            slot :main do
               view MainView
             end
           end
@@ -80,13 +93,13 @@ defmodule Sleeky.Ui.ViewTest do
 
       assert_raise RuntimeError,
                    ~r/No value for slot :header/,
-                   &InvalidView.resolve/0
+                   &InvalidView.compile/0
     end
 
     test "raise an error when slots in attributes don't have a value" do
       assert_raise RuntimeError,
-                   ~r/Error rendering attribute class/,
-                   &SolidView.resolve/0
+                   ~r/Error rendering template title {{ style }}/,
+                   &SolidView.compile/0
     end
 
     test "are converted to valid html" do
