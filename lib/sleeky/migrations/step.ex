@@ -1,7 +1,7 @@
 defmodule Sleeky.Migrations.Step do
   @moduledoc false
 
-  alias Sleeky.Database.State
+  alias Sleeky.Migrations.State
 
   @type step :: struct()
   @type code :: tuple()

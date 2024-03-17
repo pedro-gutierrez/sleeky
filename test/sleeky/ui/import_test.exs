@@ -1,7 +1,7 @@
 defmodule Sleeky.Ui.ImportTest do
   use ExUnit.Case
 
-  alias Sleeky.Ui.Import
+  alias Sleeky.Ui.Tools.Import
 
   describe "view_module/2" do
     test "returns a new Sleey view module" do
@@ -10,7 +10,6 @@ defmodule Sleeky.Ui.ImportTest do
       assert code =~ "defmodule MyApp.Ui.MyView do\n"
       assert code =~ "render do\n"
       assert code =~ "div do\n"
-      IO.inspect(code)
     end
 
     test "does not output parenthesis" do

@@ -37,17 +37,20 @@ defmodule Sleeky.MixProject do
     [
       {:bandit, "~> 0.7"},
       {:calendar, "~> 1.0"},
+      {:diesel, "~> 0.5"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
+      {:estree, "~> 2.7"},
       {:ex_doc, ">= 0.0.0"},
       {:file_system, "~> 0.2"},
       {:floki, "~> 0.34.0"},
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
+      {:libgraph, "~> 0.16"},
       {:postgrex, ">= 0.0.0"},
       {:plug, "~> 1.14"},
       {:slugify, "~> 1.3"},
-      {:solid, "~> 0.14"}
+      {:solid, "~> 0.15"}
     ]
   end
 
@@ -72,7 +75,8 @@ defmodule Sleeky.MixProject do
   defp extras do
     [
       "guides/introduction/overview.md",
-      "guides/introduction/installation.md"
+      "guides/introduction/installation.md",
+      "guides/introduction/add-to-existing-phoenix-project.md"
     ]
   end
 

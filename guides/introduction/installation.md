@@ -19,4 +19,3 @@ Use the `sleeky.new` task and generate your new app:
 ```console
 $ mix sleeky.new hello
 ```
-

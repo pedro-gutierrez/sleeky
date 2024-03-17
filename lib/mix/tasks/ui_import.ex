@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Sleeky.Ui.Import do
 
   use Mix.Task
 
-  alias Sleeky.Ui.Import
+  alias Sleeky.Ui.Tools.Import
 
   @shortdoc """
   A Mix task that imports raw html into a Sleeky view

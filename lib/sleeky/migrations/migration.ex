@@ -4,15 +4,15 @@ defmodule Sleeky.Migrations.Migration do
   import Sleeky.Migrations.Ecto
 
   @mutations [
-    Sleeky.Migrations.CreateEnum,
-    Sleeky.Migrations.CreateTable,
-    Sleeky.Migrations.AlterTable,
-    Sleeky.Migrations.CreateConstraint,
-    Sleeky.Migrations.CreateIndex,
-    Sleeky.Migrations.DropConstraint,
-    Sleeky.Migrations.DropIndex,
-    Sleeky.Migrations.DropTable,
-    Sleeky.Migrations.DropEnum
+    Sleeky.Migrations.Step.CreateSchema,
+    Sleeky.Migrations.Step.CreateTable,
+    Sleeky.Migrations.Step.AlterTable,
+    Sleeky.Migrations.Step.CreateConstraint,
+    Sleeky.Migrations.Step.CreateIndex,
+    Sleeky.Migrations.Step.DropConstraint,
+    Sleeky.Migrations.Step.DropIndex,
+    Sleeky.Migrations.Step.DropTable,
+    Sleeky.Migrations.Step.DropSchema
   ]
 
   defstruct [
@@ -88,6 +88,7 @@ defmodule Sleeky.Migrations.Migration do
       old
       |> mutation.diff(new)
       |> flatten()
+      |> Enum.reject(&is_nil/1)
       |> Enum.reduce(m, &into/2)
     end)
   end

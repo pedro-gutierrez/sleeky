@@ -1,25 +1,28 @@
 defmodule Sleeky.Migrations do
   @moduledoc false
   alias Sleeky.Migrations.Migration
-  alias Sleeky.Database.Constraint
-  alias Sleeky.Database.Index
-  alias Sleeky.Database.State
-  alias Sleeky.Database.Table
+  alias Sleeky.Migrations.Constraint
+  alias Sleeky.Migrations.Index
+  alias Sleeky.Migrations.State
+  alias Sleeky.Migrations.Table
 
   def existing(dir) do
     Path.join([dir, "*_sleeky_*.exs"])
     |> Path.wildcard()
     |> Enum.sort()
     |> Enum.map(&File.read!(&1))
-    |> Enum.map(&Code.string_to_quoted!(&1))
-    |> Enum.map(&Migration.decode/1)
-    |> Enum.reject(& &1.skip)
   end
 
-  def missing(migrations, schema) do
-    new_state = state_from_schema(schema)
-    old_state = state_from_migrations(migrations)
-    next_version = next_version(migrations)
+  def missing(existing, contexts) do
+    existing =
+      existing
+      |> Enum.map(&Code.string_to_quoted!(&1))
+      |> Enum.map(&Migration.decode/1)
+      |> Enum.reject(& &1.skip)
+
+    new_state = state_from_contexts(contexts)
+    old_state = state_from_migrations(existing)
+    next_version = next_version(existing)
 
     Migration.diff(old_state, new_state, version: next_version)
   end
@@ -30,38 +33,47 @@ defmodule Sleeky.Migrations do
     |> Enum.reduce(State.new(), &Migration.aggregate/2)
   end
 
-  defp state_from_schema(schema) do
-    state =
-      schema.entities
-      |> Enum.reject(& &1.virtual?)
-      |> Enum.reduce(State.new(), &state_with_entity/2)
+  defp state_from_contexts(contexts) do
+    state = Enum.reduce(contexts, State.new(), &state_with_schema/2)
 
-    Enum.reduce(schema.enums, state, &state_with_enum/2)
+    contexts
+    |> Enum.flat_map(& &1.models())
+    |> Enum.reject(& &1.virtual?)
+    |> Enum.reduce(state, &state_with_model/2)
   end
 
-  defp state_with_entity(entity, state) do
-    state =
-      entity
-      |> Table.from_entity()
-      |> State.add!(:tables, state)
-
-    state =
-      entity
-      |> Constraint.all_from_entity()
-      |> Enum.reduce(state, &State.add!(&1, :constraints, &2))
-
-    entity
-    |> Index.all_from_entity()
-    |> Enum.reduce(state, &State.add!(&1, :indices, &2))
+  defp state_with_schema(context, state) do
+    State.add_schema(state, context.name())
   end
 
-  defp state_with_enum(enum, state) do
-    State.add!(enum, :enums, state)
+  defp state_with_model(model, state) do
+    state
+    |> state_with_table(model)
+    |> state_with_constraints(model)
+    |> state_with_indexes(model)
+  end
+
+  defp state_with_table(state, model) do
+    table = Table.from_model(model)
+    State.add!(state, table.prefix, :tables, table)
+  end
+
+  defp state_with_constraints(state, model) do
+    model.parents
+    |> Enum.map(&Constraint.from_relation/1)
+    |> Enum.reduce(state, fn constraint, state ->
+      State.add!(state, constraint.prefix, :constraints, constraint)
+    end)
+  end
+
+  defp state_with_indexes(state, model) do
+    model.keys()
+    |> Enum.map(&Index.from_key/1)
+    |> Enum.reduce(state, fn index, state ->
+      State.add!(state, index.prefix, :indexes, index)
+    end)
   end
 
   defp next_version([]), do: 1
-
-  defp next_version(migrations) do
-    List.last(migrations).version + 1
-  end
+  defp next_version(migrations), do: List.last(migrations).version + 1
 end

@@ -10,6 +10,10 @@ defmodule Sleeky.Inspector do
     ast
   end
 
+  def modules(aliases) when is_list(aliases) do
+    Enum.map(aliases, &module/1)
+  end
+
   def module({:__aliases__, _, mod}) do
     Module.concat(mod)
   end
