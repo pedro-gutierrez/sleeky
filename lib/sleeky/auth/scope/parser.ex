@@ -46,8 +46,8 @@ defmodule Sleeky.Auth.Scope.Parser do
     %{app: app, env: Module.concat(env), key: key}
   end
 
-  defp value(v) when is_boolean(v), do: {:literal, v}
-  defp value({:literal, _, [v]}), do: {:literal, v}
+  defp value(v) when is_boolean(v), do: {:value, v}
+  defp value({:value, _, [v]}), do: {:value, v}
 
   defp value(v) when is_binary(v) do
     tokenize(v)

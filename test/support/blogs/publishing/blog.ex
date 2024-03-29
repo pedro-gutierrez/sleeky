@@ -6,10 +6,14 @@ defmodule Blogs.Publishing.Blog do
   alias Blogs.Publishing.Post
 
   model do
-    attribute :id, kind: :string, primary_key: true
     attribute :name, kind: :string
+    attribute :published, kind: :boolean, required: true, default: false
     belongs_to Author
     has_many Post
     key fields: [:author, :name], unique: true
+
+    action :edit do
+      allow role: :user, scope: :author
+    end
   end
 end

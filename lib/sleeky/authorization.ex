@@ -1,32 +1,25 @@
 defmodule Sleeky.Authorization do
-  @moduledoc """
-  Sleeky's authorization framework
+  @moduledoc false
 
-  Usage:
-
-  ```elixir
-  defmodule MyApp.Blogs.Authorization do
-    use Sleeky.Authorization
-
-    authorization do
-      roles path: "current_user.roles"
-
-      scope :owner do
-        equal do
-          "**.user"
-          "current_user"
-        end
-      end
-    end
-  end
-  ```
-  """
   use Diesel,
     otp_app: :sleeky,
     dsl: Sleeky.Authorization.Dsl,
     generators: [
-      Sleeky.Authorization.Generator.Authorize
+      Sleeky.Authorization.Generator.Metadata
+    ],
+    parsers: [
+      Sleeky.Authorization.Parser
     ]
 
-  defstruct [:roles_path, :scopes]
+  defmodule Scope do
+    @moduledoc false
+    defstruct [:name, :debug, :expression]
+  end
+
+  defmodule Expression do
+    @moduledoc false
+    defstruct [:op, :args]
+  end
+
+  defstruct [:roles, scopes: %{}]
 end

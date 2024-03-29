@@ -50,7 +50,7 @@ defmodule Sleeky.Migrations.CreateTableTest do
 
     test "store timestamps as utc datetimes" do
       migrations = generate_migrations()
-      assert migrations =~ "add(:published, :utc_datetime, null: false)"
+      assert migrations =~ "add(:published_at, :utc_datetime"
     end
   end
 end

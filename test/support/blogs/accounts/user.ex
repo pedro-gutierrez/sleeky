@@ -1,10 +1,16 @@
 defmodule Blogs.Accounts.User do
   use Sleeky.Model
 
-  alias Blog.Blogs.Publishing.Blog
-
   model do
     attribute :email, kind: :string
-    has_many Blog
+    attribute :public, kind: :boolean, default: false
+
+    action :edit do
+      allow role: :user, scope: :self
+    end
+
+    action :list do
+      allow role: :user, scope: :is_public
+    end
   end
 end

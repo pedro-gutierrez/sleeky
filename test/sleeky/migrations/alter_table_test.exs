@@ -19,7 +19,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
       |> generate_migrations()
       |> assert_migrations([
         "alter(table(:topics, prefix: :publishing)) do",
-        "add(:id, :integer, primary_key: true, null: false)",
+        "add(:id, :binary_id, primary_key: true, null: false)",
         "add(:name, :string, null: false)"
       ])
     end
@@ -32,7 +32,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
 
           def up do
             create table(:topics, prefix: :publishing, primary_key: false) do
-              add(:id, :integer, primary_key: true, null: false)
+              add(:id, :binary_id, primary_key: true, null: false)
               add(:name, :string, null: false)
               add(:closed, :boolean, null: true)
             end
@@ -57,7 +57,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
             create(table(:topics, prefix: :publishing, primary_key: false)) do
             end
             alter(table(:topics, prefix: :publishing)) do
-              add(:id, :integer, primary_key: true, null: false)
+              add(:id, :binary_id, primary_key: true, null: false)
               add(:name, :string, null: false)
             end
           end

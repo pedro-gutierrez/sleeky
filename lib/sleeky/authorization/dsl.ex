@@ -4,8 +4,12 @@ defmodule Sleeky.Authorization.Dsl do
     otp_app: :sleeky,
     root: Sleeky.Authorization.Dsl.Authorization,
     tags: [
-      Sleeky.Authorization.Dsl.Equal,
+      Sleeky.Authorization.Dsl.Eq,
+      Sleeky.Authorization.Dsl.Path,
       Sleeky.Authorization.Dsl.Roles,
-      Sleeky.Authorization.Dsl.Scope
+      Sleeky.Authorization.Dsl.Scope,
+      Sleeky.Authorization.Dsl.One,
+      Sleeky.Authorization.Dsl.All,
+      Sleeky.Authorization.Dsl.NotNil
     ]
 end

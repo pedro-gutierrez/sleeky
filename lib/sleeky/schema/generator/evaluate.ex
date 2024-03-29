@@ -12,7 +12,7 @@ defmodule Sleeky.Schema.Generator.Evaluate do
         app |> Application.fetch_env!(env) |> Keyword.fetch!(key)
       end
 
-      def evaluate(_, {:literal, v}), do: v
+      def evaluate(_, {:value, v}), do: v
       def evaluate(%{__struct__: _} = context, [:**]), do: context
 
       def evaluate(%{__struct__: entity} = context, [field]) when is_atom(field) do

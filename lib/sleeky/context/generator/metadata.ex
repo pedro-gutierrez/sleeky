@@ -7,6 +7,7 @@ defmodule Sleeky.Context.Generator.Metadata do
     quote do
       def name, do: unquote(context.name)
       def models, do: unquote(context.models)
+      def repo, do: unquote(context.repo)
     end
   end
 end

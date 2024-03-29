@@ -3,7 +3,7 @@ defmodule Sleeky.Authorization.Dsl.Authorization do
   use Diesel.Tag
 
   tag do
-    child :roles, min: 1, max: 1
+    attribute :roles, required: true
     child :scope, min: 1
   end
 end

@@ -3,6 +3,7 @@ defmodule Blogs.Publishing do
   use Sleeky.Context
 
   context do
+    authorization Blogs.Authorization
     model Blogs.Publishing.Author
     model Blogs.Publishing.Blog
     model Blogs.Publishing.Comment
