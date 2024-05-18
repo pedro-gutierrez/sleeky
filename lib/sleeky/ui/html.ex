@@ -32,8 +32,8 @@ defmodule Sleeky.Ui.Html do
 
   defp do_tags(elements) when is_list(elements), do: Enum.map(elements, &do_tags/1)
 
-  defp do_tags(literal) when is_binary(literal) or is_number(literal) or is_number(literal) do
-    literal
+  defp do_tags(value) when is_binary(value) or is_number(value) or is_number(value) do
+    value
   end
 
   defp do_tags(atom) when is_atom(atom), do: to_string(atom)

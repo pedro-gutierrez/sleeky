@@ -21,7 +21,9 @@ defmodule Sleeky.Context.Generator.Paths do
     [
       paths(paths),
       default_paths(),
-      shortest_path(paths),
+      attributes_shortest_path(models),
+      parents_shortest_path(models),
+      ancestors_shortest_path(paths),
       default_shortest_path()
     ]
   end
@@ -40,7 +42,25 @@ defmodule Sleeky.Context.Generator.Paths do
     end
   end
 
-  defp shortest_path(paths) do
+  defp attributes_shortest_path(models) do
+    for model <- models, attribute <- model.attributes() do
+      quote do
+        def shortest_path(unquote(model.name()), unquote(attribute.name)),
+          do: [unquote(attribute.name)]
+      end
+    end
+  end
+
+  defp parents_shortest_path(models) do
+    for model <- models, rel <- model.parents() do
+      quote do
+        def shortest_path(unquote(model.name()), unquote(rel.column_name)),
+          do: [unquote(rel.column_name)]
+      end
+    end
+  end
+
+  defp ancestors_shortest_path(paths) do
     for {model, ancestors} <- paths, {ancestor, ancestor_paths} <- ancestors do
       shortest_path = List.first(ancestor_paths)
 
@@ -57,9 +77,11 @@ defmodule Sleeky.Context.Generator.Paths do
   end
 
   defp hierarchy(model) do
-    for p <- model.parents(), into: %{} do
-      {p.name, hierarchy(p.target.module)}
-    end
+    model.parents()
+    |> Enum.flat_map(fn p ->
+      [{p.name, hierarchy(p.target.module)}, {p.column_name, %{}}]
+    end)
+    |> Enum.into(%{})
   end
 
   defp ancestors(hierarchy) do

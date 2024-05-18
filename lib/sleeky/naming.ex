@@ -21,6 +21,23 @@ defmodule Sleeky.Naming do
     |> String.to_atom()
   end
 
+  @doc false
+  def table_name(model) do
+    plural(model)
+  end
+
+  @doc false
+  def column_name(model, alias \\ nil) do
+    name =
+      if alias do
+        alias
+      else
+        name(model)
+      end
+
+    String.to_atom("#{name}_id")
+  end
+
   defp last_module(name) do
     name
     |> Module.split()
@@ -31,5 +48,15 @@ defmodule Sleeky.Naming do
   def module(context, name) do
     name = name |> to_string() |> Macro.camelize()
     Module.concat(context, name)
+  end
+
+  @doc false
+  def context(model) do
+    model
+    |> Module.split()
+    |> Enum.reverse()
+    |> tl()
+    |> Enum.reverse()
+    |> Module.concat()
   end
 end

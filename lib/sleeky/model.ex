@@ -6,7 +6,13 @@ defmodule Sleeky.Model do
       Sleeky.Model.Parser
     ],
     generators: [
-      Sleeky.Model.Generator.Metadata
+      Sleeky.Model.Generator.Metadata,
+      Sleeky.Model.Generator.EctoSchema,
+      Sleeky.Model.Generator.FieldSpec,
+      Sleeky.Model.Generator.FieldNames,
+      Sleeky.Model.Generator.Changesets,
+      Sleeky.Model.Generator.Actions,
+      Sleeky.Model.Generator.Query
     ]
 
   defstruct [
@@ -19,7 +25,8 @@ defmodule Sleeky.Model do
     virtual?: false,
     attributes: [],
     relations: [],
-    keys: []
+    keys: [],
+    actions: []
   ]
 
   defmodule Key do
@@ -33,6 +40,8 @@ defmodule Sleeky.Model do
   end
 
   defmodule Attribute do
+    @moduledoc false
+
     defstruct [
       :name,
       :kind,
@@ -41,11 +50,15 @@ defmodule Sleeky.Model do
       :enum,
       :column_name,
       required?: true,
-      primary_key?: false
+      primary_key?: false,
+      virtual?: false,
+      aliases: []
     ]
   end
 
   defmodule Relation do
+    @moduledoc false
+
     defstruct [
       :name,
       :model,
@@ -54,7 +67,29 @@ defmodule Sleeky.Model do
       :column_name,
       :storage,
       :inverse,
-      required?: true
+      required?: true,
+      virtual?: false,
+      aliases: []
+    ]
+  end
+
+  defmodule Action do
+    @moduledoc false
+
+    defstruct [
+      :name,
+      :kind,
+      policies: %{}
+    ]
+  end
+
+  defmodule Policy do
+    @moduledoc false
+
+    defstruct [
+      :role,
+      :scope,
+      :policy
     ]
   end
 end

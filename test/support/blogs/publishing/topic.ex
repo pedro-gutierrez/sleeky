@@ -3,7 +3,6 @@ defmodule Blogs.Publishing.Topic do
   use Sleeky.Model
 
   model do
-    attribute name: :id, kind: :integer, primary_key: true
     attribute :name, kind: :string
 
     key fields: [:name], unique: true

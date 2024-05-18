@@ -1,7 +1,13 @@
 defmodule Sleeky do
   @moduledoc false
 
-  @dsls [Sleeky.Context.Dsl, Sleeky.Model.Dsl, Sleeky.Ui.Dsl, Sleeky.Ui.View.Dsl]
+  @dsls [
+    Sleeky.Authorization.Dsl,
+    Sleeky.Context.Dsl,
+    Sleeky.Model.Dsl,
+    Sleeky.Ui.Dsl,
+    Sleeky.Ui.View.Dsl
+  ]
 
   @doc false
   def locals_without_parens,

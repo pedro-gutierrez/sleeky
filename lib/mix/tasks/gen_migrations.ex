@@ -16,9 +16,12 @@ defmodule Mix.Tasks.Sleeky.Gen.Migrations do
 
   @impl true
   def run(_) do
-    contexts = :sleeky |> Application.fetch_env!(Sleeky) |> Keyword.fetch!(:contexts)
+    config = Application.fetch_env!(:sleeky, Sleeky)
+    repo = Keyword.fetch!(config, :repo)
+    migrations_dir = Mix.EctoSQL.source_repo_priv(repo)
+    contexts = Keyword.fetch!(config, :contexts)
 
-    dir = Path.join([File.cwd!(), "priv/repo/migrations"])
+    dir = Path.join([migrations_dir, "migrations"])
 
     dir
     |> Migrations.existing()

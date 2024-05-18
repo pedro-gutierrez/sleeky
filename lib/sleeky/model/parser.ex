@@ -5,158 +5,213 @@ defmodule Sleeky.Model.Parser do
   alias Sleeky.Model.Attribute
   alias Sleeky.Model.Key
   alias Sleeky.Model.Relation
+  alias Sleeky.Model.Action
+  alias Sleeky.Model.Policy
   import Sleeky.Naming
 
   @impl true
-  def parse(caller_mod, definition), do: parse(definition, caller_mod, %Model{})
-
-  def parse({:model, attrs, children}, mod, acc) do
-    children
-    |> parse(mod, acc)
-    |> with_model(mod, attrs)
+  def parse(caller, {:model, opts, definition}) do
+    caller
+    |> model(opts)
+    |> with_attributes(definition)
+    |> with_parents(definition)
+    |> with_children(definition)
+    |> with_keys(definition)
+    |> with_actions(definition)
+    |> with_primary_key()
   end
 
-  def parse({:attribute, attrs, _}, _mod, acc) do
-    attr_name = Keyword.fetch!(attrs, :name)
-    kind = Keyword.fetch!(attrs, :kind)
+  defp model(caller, opts) do
+    %Model{
+      context: context(caller),
+      name: name(caller),
+      plural: plural(caller),
+      module: caller,
+      table_name: table_name(caller),
+      virtual?: Keyword.get(opts, :virtual, false)
+    }
+  end
 
-    storage =
-      case kind do
-        :id -> :binary_id
-        :timestamp -> :utc_datetime
-        kind -> kind
+  defp with_attributes(model, definition) do
+    attrs =
+      for {:attribute, opts, _} <- definition do
+        attr_name = Keyword.fetch!(opts, :name)
+        kind = Keyword.fetch!(opts, :kind)
+        storage = storage(kind)
+        required = Keyword.get(opts, :required, true)
+
+        ensure_valid_field_name!(model, attr_name)
+
+        %Attribute{
+          name: attr_name,
+          column_name: attr_name,
+          kind: kind,
+          storage: storage,
+          aliases: [attr_name],
+          required?: required
+        }
       end
 
-    attr = %Attribute{
-      name: attr_name,
-      column_name: attr_name,
-      kind: kind,
-      storage: storage,
-      primary_key?: Keyword.get(attrs, :primary_key, false)
-    }
-
-    %{acc | attributes: Enum.reverse([attr | acc.attributes])}
+    %{model | attributes: attrs}
   end
 
-  def parse({:has_many, [], [name]}, _mod, acc) do
-    rel = %Relation{
-      name: name,
-      kind: :has_many
-    }
+  @reserved_field_names [:id]
 
-    %{acc | relations: Enum.reverse([rel | acc.relations])}
+  defp ensure_valid_field_name!(model, name) do
+    if name in @reserved_field_names do
+      raise "field #{inspect(name)} in model #{inspect(model.module)} is using a reserved name
+        (#{inspect(@reserved_field_names)})"
+    end
   end
 
-  def parse({:belongs_to, [], [module]}, model, acc) do
-    ensure_same_context!(model, module, :belongs_to)
+  defp with_parents(model, definition) do
+    model_module = model.module
 
-    name = name(module)
-    column_name = String.to_atom("#{name}_id")
+    rels =
+      for {:belongs_to, [], [parent_module]} <- definition do
+        ensure_same_context!(model_module, parent_module, :belongs_to)
 
-    inverse = %Relation{
-      name: plural(model),
-      kind: :child,
-      target: %Model{
-        name: name(model),
-        table_name: table_name(model),
-        module: model,
-        context: context(model)
-      }
-    }
+        name = name(parent_module)
+        column_name = column_name(parent_module)
+        storage = storage(:id)
 
-    rel = %Relation{
-      name: name,
-      kind: :parent,
-      model: model,
-      inverse: inverse,
-      column_name: column_name,
-      storage: module.primary_key().storage,
-      target: %Model{
-        name: name,
-        module: module,
-        context: context(module),
-        table_name: module.table_name()
-      }
-    }
-
-    %{acc | relations: Enum.reverse([rel | acc.relations])}
-  end
-
-  def parse({:key, opts, []}, model, acc) do
-    unique = Keyword.get(opts, :unique, false)
-    field_names = Keyword.fetch!(opts, :fields)
-
-    fields = acc.attributes ++ acc.relations
-
-    fields =
-      Enum.map(field_names, fn name ->
-        with nil <- Enum.find(fields, &(&1.name == name)) do
-          raise "Key is referencing unknown field #{inspect(name)} in model #{inspect(model)}"
-        end
-      end)
-
-    key = %Key{fields: fields, model: model, unique?: unique}
-    keys = Enum.reverse([key | acc.keys])
-
-    %{acc | keys: keys}
-  end
-
-  def parse(tags, mod, acc) when is_list(tags) do
-    Enum.reduce(tags, acc, fn tag, acc ->
-      parse(tag, mod, acc)
-    end)
-  end
-
-  def with_model(acc, model, attrs) do
-    {primary_key, acc} =
-      case Enum.find(acc.attributes, & &1.primary_key?) do
-        nil ->
-          primary_key = %Attribute{
-            name: :id,
-            kind: :id,
-            storage: :binary_id,
-            column_name: :id,
-            primary_key?: true
-          }
-
-          {primary_key, %{acc | attributes: [primary_key | acc.attributes]}}
-
-        primary_key ->
-          {primary_key, acc}
+        %Relation{
+          name: name,
+          kind: :parent,
+          model: model.module,
+          inverse: %Relation{
+            name: model.plural,
+            model: parent_module,
+            kind: :child,
+            target: summary_model(model)
+          },
+          column_name: column_name,
+          storage: storage,
+          target: summary_model(parent_module),
+          aliases: [name]
+        }
       end
 
-    plural = plural(model)
-
-    %{
-      acc
-      | context: context(model),
-        name: name(model),
-        plural: plural,
-        module: model,
-        table_name: table_name(model),
-        primary_key: primary_key,
-        virtual?: Keyword.get(attrs, :virtual, false)
-    }
+    %{model | relations: rels}
   end
 
-  def context(model) do
-    model
-    |> Module.split()
-    |> Enum.reverse()
-    |> tl()
-    |> Enum.reverse()
-    |> Module.concat()
+  defp with_children(model, definition) do
+    rels =
+      for {:has_many, [], [child_module]} <- definition do
+        ensure_same_context!(model.module, child_module, :has_many)
+
+        name = plural(child_module)
+
+        %Relation{
+          name: name,
+          aliases: [name],
+          kind: :child,
+          model: model.module,
+          inverse: %Relation{
+            name: name(model.module),
+            model: child_module,
+            kind: :parent,
+            target: summary_model(model),
+            column_name: column_name(model.module)
+          },
+          target: summary_model(child_module)
+        }
+      end
+
+    # if model.module == Blogs.Publishing.Author do
+    #  IO.inspect(rels)
+    # end
+
+    %{model | relations: model.relations ++ rels}
   end
 
-  defp table_name(model), do: plural(model)
+  defp with_keys(model, definition) do
+    keys =
+      for {:key, opts, _} <- definition do
+        unique = Keyword.get(opts, :unique, false)
+        field_names = Keyword.fetch!(opts, :fields)
+        fields = model.attributes ++ model.relations
+
+        fields =
+          Enum.map(field_names, fn name ->
+            with nil <- Enum.find(fields, &(&1.name == name)) do
+              known_field_names = Enum.map(fields, & &1.name)
+
+              raise "Key in model #{inspect(model.module)} is referencing unknown field
+                #{inspect(name)}. Known fields: #{inspect(known_field_names)}"
+            end
+          end)
+
+        %Key{fields: fields, model: model.module, unique?: unique}
+      end
+
+    %{model | keys: keys}
+  end
+
+  defp with_actions(model, definition) do
+    actions =
+      for {:action, opts, policies} <- definition do
+        name = Keyword.fetch!(opts, :name)
+
+        policies =
+          for {policy, opts, _} <- policies do
+            role = Keyword.fetch!(opts, :role)
+            scope = Keyword.get(opts, :scope)
+
+            %Policy{role: role, scope: scope, policy: policy}
+          end
+
+        policies =
+          Enum.reduce(policies, %{}, fn policy, acc ->
+            Map.put(acc, policy.role, policy)
+          end)
+
+        kind = Keyword.get(opts, :kind, name)
+
+        %Action{
+          name: name,
+          kind: kind,
+          policies: policies
+        }
+      end
+
+    %{model | actions: actions}
+  end
+
+  defp storage(:id), do: :binary_id
+  defp storage(:timestamp), do: :utc_datetime
+  defp storage(kind), do: kind
+
+  @primary_key %Attribute{
+    name: :id,
+    kind: :id,
+    storage: :binary_id,
+    column_name: :id,
+    primary_key?: true
+  }
+
+  defp with_primary_key(model) do
+    %{model | primary_key: @primary_key, attributes: [@primary_key | model.attributes]}
+  end
 
   defp ensure_same_context!(from, to, kind) do
     from_context = context(from)
     to_context = context(to)
 
     if from_context != to_context do
-      raise "Invalid relation of kind #{inspect(kind)} from #{inspect(from)} to
-#{inspect(to)}. Both models must be in the same context."
+      raise "invalid relation of kind #{inspect(kind)} from #{inspect(from)} (in context #{inspect(from_context)}) to #{inspect(to)} (in context #{inspect(to_context)}). Both models must be in the same context."
     end
+  end
+
+  defp summary_model(%Model{} = model), do: summary_model(model.module)
+
+  defp summary_model(module) do
+    %{
+      module: module,
+      name: name(module),
+      table_name: table_name(module),
+      plural: plural(module),
+      context: context(module)
+    }
   end
 end
