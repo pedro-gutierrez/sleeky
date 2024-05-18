@@ -1,46 +1,35 @@
 defmodule Sleeky.Evaluate do
   @moduledoc false
 
+  alias Sleeky.Model.{Attribute, Relation}
+
   def evaluate(nil, _), do: nil
-  def evaluate(value, []), do: value
+  def evaluate(context, {:path, []}), do: context
 
-  def evaluate(_, %{app: app, env: env, key: key}) do
-    app |> Application.fetch_env!(env) |> Keyword.fetch!(key)
-  end
-
-  def evaluate(_, {:value, v}), do: v
-  def evaluate(%{__struct__: _} = context, [:**]), do: context
-
-  def evaluate(%{__struct__: model} = context, {:path, [field]}) when is_atom(field) do
-    case model.field_spec(field) do
-      {:error, :unknown_field} ->
-        if model.name() == field do
-          context
-        else
-          Map.get(context, field)
-        end
-
-      {:ok, _kind, _column} ->
+  def evaluate(%{__struct__: model} = context, {:path, [field] = path}) do
+    case model.field(field) do
+      {:ok, %Attribute{}} ->
         Map.fetch!(context, field)
 
-      {:ok, :child, _, _} ->
+      {:ok, %Relation{kind: :child}} ->
         context
         |> relation(field)
         |> Enum.reject(&is_nil/1)
 
-      {:ok, :parent, _, _, _} ->
+      {:ok, %Relation{kind: :parent}} ->
         relation(context, field)
+
+      {:error, :field_not_found} ->
+        raise ArgumentError,
+              "no such field #{inspect(field)} in #{inspect(model)}, when evaluating path
+          #{inspect(path)} on #{inspect(context)}"
     end
   end
 
   def evaluate(%{__struct__: model} = context, {:path, [:**, ancestor | rest]}) do
     case model.context().shortest_path(model.name(), ancestor) do
       [] ->
-        if model.name() == ancestor do
-          evaluate(context, {:path, rest})
-        else
-          nil
-        end
+        nil
 
       path ->
         evaluate(context, {:path, path ++ rest})
@@ -60,23 +49,27 @@ defmodule Sleeky.Evaluate do
     end)
   end
 
-  def evaluate(context, {:path, [field | _] = paths}) when is_map(context) and is_list(field) do
-    paths
-    |> Enum.map(&evaluate(context, {:path, &1}))
-    |> List.flatten()
-    |> Enum.reject(&is_nil/1)
-    |> Enum.uniq()
-  end
+  # def evaluate(context, {:path, [field | _] = paths}) when is_map(context) and is_list(field) do
+  #  paths
+  #  |> Enum.map(&evaluate(context, {:path, &1}))
+  #  |> List.flatten()
+  #  |> Enum.reject(&is_nil/1)
+  #  |> Enum.uniq()
+  # end
 
-  def evaluate(%{__struct__: model} = context, {:path, [field | rest]}) do
-    case model.field_spec(field) do
-      {:error, :unknown_field} ->
-        nil
+  def evaluate(%{__struct__: model} = context, {:path, [field | rest] = path}) do
+    case model.field(field) do
+      {:ok, %Attribute{}} ->
+        raise ArgumentError,
+              "field #{inspect(field)} is not a relation of #{inspect(model)}, when evaluating
+          path #{inspect(path)} on #{inspect(context)}"
 
-      {:ok, _kind, _column} ->
-        nil
+      {:ok, %Relation{kind: :parent}} ->
+        context
+        |> relation(field)
+        |> evaluate({:path, rest})
 
-      {:ok, :child, _, _} ->
+      {:ok, %Relation{kind: :child}} ->
         context
         |> relation(field)
         |> Enum.map(&evaluate(&1, {:path, rest}))
@@ -84,18 +77,24 @@ defmodule Sleeky.Evaluate do
         |> Enum.reject(&is_nil/1)
         |> Enum.uniq()
 
-      {:ok, :parent, _, _, _} ->
-        context
-        |> relation(field)
-        |> evaluate({:path, rest})
+      {:error, :field_not_found} ->
+        raise ArgumentError,
+              "no such field #{inspect(field)} in #{inspect(model)}, when evaluating path
+          #{inspect(path)} on #{inspect(context)}"
     end
   end
 
-  def evaluate(context, {:path, [field | rest]}) when is_map(context) and is_atom(field) do
+  def evaluate(context, {:path, [field | rest]}) do
     context
     |> Map.get(field)
     |> evaluate({:path, rest})
   end
+
+  def evaluate(_, %{app: app, env: env, key: key}) do
+    app |> Application.fetch_env!(env) |> Keyword.fetch!(key)
+  end
+
+  def evaluate(_, {:value, v}), do: v
 
   defp relation(%{__struct__: model, id: id} = context, field) do
     with rel when rel != nil <- Map.get(context, field) do
