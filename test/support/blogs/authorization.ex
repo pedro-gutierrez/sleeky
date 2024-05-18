@@ -5,8 +5,8 @@ defmodule Blogs.Authorization do
   authorization roles: "current_user.roles" do
     scope :author do
       eq do
-        path "**.author_id"
-        path "current_user.id"
+        path "**.author"
+        path "current_user"
       end
     end
 

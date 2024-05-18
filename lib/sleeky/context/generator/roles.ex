@@ -13,11 +13,11 @@ defmodule Sleeky.Context.Generator.Roles do
   end
 
   defp roles_fun(auth, _) do
-    roles_path = {:path, auth.roles()}
-
     quote do
       def roles(params) do
-        Sleeky.Evaluate.evaluate(params, unquote(roles_path)) || []
+        Enum.reduce(unquote(auth.roles()), params, fn key, acc ->
+          if acc, do: Map.get(acc, key)
+        end)
       end
     end
   end
