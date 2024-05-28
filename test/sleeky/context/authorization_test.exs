@@ -4,71 +4,51 @@ defmodule Sleeky.Context.AuthorizationTest do
   alias Blogs.Accounts
   alias Blogs.Publishing
 
-  setup [:user, :comment]
+  setup [:user, :comments, :current_user]
 
   describe "allow/3" do
     test "denies if the scope does not match", context do
-      other_user = Map.put(context.user, :id, Ecto.UUID.generate())
+      params =
+        context
+          |> other_user()
+          |> Map.put(:user, context.user)
 
-      params = %{
-        user: context.user,
-        current_user: other_user
-      }
-
-      assert {:error, :forbidden} == Accounts.allow(:user, :edit, params)
+      assert {:error, :forbidden} == Accounts.allow(:user, :update, params)
     end
 
-    test "matches on a specific model", context do
-      context = %{
-        user: context.user,
-        current_user: context.user
-      }
+    test "matches on a specific model", %{user: user, params: params} do
+      params = Map.put(params, :user, user)
 
-      assert :ok == Accounts.allow(:user, :edit, context)
+      assert :ok == Accounts.allow(:user, :update, params)
     end
 
-    test "matches on a generic model", context do
-      context = %{
-        blog: context.blog,
-        current_user: context.user
-      }
+    test "matches on a generic model", %{post: blog, params: params} do
+      params = Map.put(params, :blog, blog)
 
-      assert :ok == Publishing.allow(:blog, :edit, context)
+      assert :ok == Publishing.allow(:blog, :update, params)
     end
 
-    test "resolves ancestors lazily", context do
-      context = %{
-        post: context.post,
-        current_user: context.user
-      }
+    test "resolves ancestors lazily", %{post: post, params: params} do
+      params = Map.put(params, :post, post)
 
-      assert :ok == Publishing.allow(:post, :edit, context)
+      assert :ok == Publishing.allow(:post, :update, params)
     end
 
-    test "resolves complex scopes", context do
-      context = %{
-        post: context.post,
-        current_user: context.user
-      }
+    test "resolves complex scopes", %{post: post, params: params} do
+      params = Map.put(params, :post, post)
 
-      assert :ok == Publishing.allow(:comment, :create, context)
+      assert :ok == Publishing.allow(:comment, :create, params)
     end
 
-    test "resolves very complex scopes", context do
-      context = %{
-        post: context.post,
-        current_user: context.user
-      }
+    test "resolves very complex scopes", %{post: post, params: params} do
+      params = Map.put(params, :post, post)
 
-      assert :ok == Publishing.allow(:comment, :edit, context)
+      assert :ok == Publishing.allow(:comment, :update, params)
     end
   end
 
   describe "scope/4" do
-    test "does basic filtering", context do
-      params = %{
-        current_user: context.user
-      }
+    test "does basic filtering", %{params: params} do
 
       q =
         Accounts.User.query()
@@ -79,10 +59,18 @@ defmodule Sleeky.Context.AuthorizationTest do
       assert params == [true]
     end
 
-    test "applies multiple filters", context do
-      params = %{
-        current_user: context.user
-      }
+    test "filters on model ids", %{user: user, params: params} do
+      q =
+        Publishing.Blog.query()
+        |> Publishing.scope(:blog, :list, params)
+
+      {sql, params} = Ecto.Adapters.SQL.to_sql(:all, Blogs.Repo, q)
+
+      assert sql =~ "WHERE (b0.\"author_id\" = $1)"
+      assert params == [Ecto.UUID.dump!(user.id)]
+    end
+
+    test "applies multiple filters", %{params: params} do
 
       q =
         Publishing.Post.query()

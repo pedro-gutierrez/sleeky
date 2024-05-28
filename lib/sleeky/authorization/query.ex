@@ -63,7 +63,7 @@ defmodule Sleeky.Authorization.Query do
         %{builder | filters: builder.filters ++ [filter]}
 
       {:ok, %Relation{kind: :parent} = rel} ->
-        filter = {{binding, rel.column_name}, op, value}
+        filter = {{binding, rel.column_name}, op, value.id}
 
         %{builder | filters: builder.filters ++ [filter]}
 

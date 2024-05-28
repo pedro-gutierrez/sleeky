@@ -38,6 +38,14 @@ defmodule Sleeky.Naming do
     String.to_atom("#{name}_id")
   end
 
+  @doc false
+  def foreign_key_name(rel) do
+    table_name = rel.table_name
+    column_name = rel.column_name
+
+    String.to_atom("#{table_name}_#{column_name}_fkey")
+  end
+
   defp last_module(name) do
     name
     |> Module.split()
@@ -57,6 +65,15 @@ defmodule Sleeky.Naming do
     |> Enum.reverse()
     |> tl()
     |> Enum.reverse()
+    |> Module.concat()
+  end
+
+  @doc false
+  def repo(context) do
+    context
+    |> Module.split()
+    |> Enum.drop(-1)
+    |> Kernel.++([Repo])
     |> Module.concat()
   end
 end

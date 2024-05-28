@@ -2,7 +2,7 @@ defmodule Blogs.Publishing.Post do
   @moduledoc false
   use Sleeky.Model
 
-  alias Blogs.Publishing.Blog
+  alias Blogs.Publishing.{Blog, Comment}
 
   model do
     attribute :title, kind: :string
@@ -11,8 +11,9 @@ defmodule Blogs.Publishing.Post do
     attribute :published, kind: :boolean, required: true, default: false
     attribute :deleted, kind: :boolean, required: true, default: false
     belongs_to Blog
+    has_many Comment
 
-    action :edit do
+    action :update do
       allow role: :user, scope: :author
     end
 

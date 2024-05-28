@@ -17,7 +17,7 @@ defmodule Sleeky.Context.Generator.Allow do
 
       quote do
         def allow(unquote(model), unquote(action.name), params) do
-          roles = roles(params)
+          roles = roles(params) || []
           policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
 
           if Sleeky.Authorization.Action.allow?(

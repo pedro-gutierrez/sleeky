@@ -12,7 +12,19 @@ defmodule Blogs.Publishing.Blog do
     has_many Post
     key fields: [:author, :name], unique: true
 
-    action :edit do
+    action :read do
+      allow role: :user
+    end
+
+    action :list do
+      allow role: :user, scope: :author
+    end
+
+    action :update do
+      allow role: :user, scope: :author
+    end
+
+    action :delete do
       allow role: :user, scope: :author
     end
   end

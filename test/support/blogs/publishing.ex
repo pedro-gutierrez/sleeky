@@ -4,6 +4,7 @@ defmodule Blogs.Publishing do
 
   context do
     authorization Blogs.Authorization
+
     model Blogs.Publishing.Author
     model Blogs.Publishing.Blog
     model Blogs.Publishing.Comment

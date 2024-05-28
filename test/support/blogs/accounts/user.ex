@@ -5,7 +5,7 @@ defmodule Blogs.Accounts.User do
     attribute :email, kind: :string
     attribute :public, kind: :boolean, default: false
 
-    action :edit do
+    action :update do
       allow role: :user, scope: :self
     end
 

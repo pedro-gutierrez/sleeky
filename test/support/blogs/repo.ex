@@ -1,6 +1,4 @@
 defmodule Blogs.Repo do
   @moduledoc false
-  use Ecto.Repo,
-    otp_app: :sleeky,
-    adapter: Ecto.Adapters.Postgres
+  use Sleeky.Repo, otp_app: :sleeky
 end

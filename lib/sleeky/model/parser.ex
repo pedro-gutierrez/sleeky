@@ -1,6 +1,8 @@
 defmodule Sleeky.Model.Parser do
   @moduledoc false
+
   @behaviour Diesel.Parser
+
   alias Sleeky.Model
   alias Sleeky.Model.Attribute
   alias Sleeky.Model.Key
@@ -22,8 +24,11 @@ defmodule Sleeky.Model.Parser do
   end
 
   defp model(caller, opts) do
+    context = context(caller)
+
     %Model{
-      context: context(caller),
+      context: context,
+      repo: repo(context),
       name: name(caller),
       plural: plural(caller),
       module: caller,
@@ -72,10 +77,11 @@ defmodule Sleeky.Model.Parser do
         ensure_same_context!(model_module, parent_module, :belongs_to)
 
         name = name(parent_module)
+        table_name = table_name(parent_module)
         column_name = column_name(parent_module)
         storage = storage(:id)
 
-        %Relation{
+        rel = %Relation{
           name: name,
           kind: :parent,
           model: model.module,
@@ -85,11 +91,14 @@ defmodule Sleeky.Model.Parser do
             kind: :child,
             target: summary_model(model)
           },
+          table_name: table_name,
           column_name: column_name,
           storage: storage,
           target: summary_model(parent_module),
           aliases: [name]
         }
+
+        %{rel | foreign_key_name: foreign_key_name(rel)}
       end
 
     %{model | relations: rels}
@@ -102,18 +111,23 @@ defmodule Sleeky.Model.Parser do
 
         name = plural(child_module)
 
+        inverse = %Relation{
+          name: name(model.module),
+          model: child_module,
+          kind: :parent,
+          target: summary_model(model),
+          table_name: table_name(child_module),
+          column_name: column_name(model.module)
+        }
+
+        inverse = %{inverse | foreign_key_name: foreign_key_name(inverse)}
+
         %Relation{
           name: name,
           aliases: [name],
           kind: :child,
           model: model.module,
-          inverse: %Relation{
-            name: name(model.module),
-            model: child_module,
-            kind: :parent,
-            target: summary_model(model),
-            column_name: column_name(model.module)
-          },
+          inverse: inverse,
           target: summary_model(child_module)
         }
       end

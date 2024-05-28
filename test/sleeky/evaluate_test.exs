@@ -3,7 +3,7 @@ defmodule Sleeky.EvaluateTest do
 
   alias Sleeky.Evaluate
 
-  setup [:user, :comment]
+  setup [:user, :comments]
 
   describe "evaluate/2" do
     test "resolves parents lazily", context do

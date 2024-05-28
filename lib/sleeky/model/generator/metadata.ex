@@ -12,6 +12,8 @@ defmodule Sleeky.Model.Generator.Metadata do
     keys = model.keys
 
     quote do
+      @repo unquote(model.repo)
+
       @attributes unquote(Macro.escape(attributes))
       @parents unquote(Macro.escape(parents))
       @fields unquote(Macro.escape(fields))

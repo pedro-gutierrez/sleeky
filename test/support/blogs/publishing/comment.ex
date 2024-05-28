@@ -13,8 +13,12 @@ defmodule Blogs.Publishing.Comment do
       allow role: :user, scope: :is_published_or_author
     end
 
-    action :edit do
+    action :update do
       allow role: :user, scope: :is_published_or_author_and_is_not_locked
+    end
+
+    action :list do
+      allow role: :user
     end
   end
 end

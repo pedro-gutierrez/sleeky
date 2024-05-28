@@ -10,13 +10,18 @@ defmodule Sleeky.Model do
       Sleeky.Model.Generator.EctoSchema,
       Sleeky.Model.Generator.FieldNames,
       Sleeky.Model.Generator.Changesets,
-      Sleeky.Model.Generator.Actions,
+      Sleeky.Model.Generator.CreateFunction,
+      Sleeky.Model.Generator.FetchFunction,
+      Sleeky.Model.Generator.EditFunction,
+      Sleeky.Model.Generator.DeleteFunction,
+      Sleeky.Model.Generator.ListFunction,
       Sleeky.Model.Generator.Query
     ]
 
   defstruct [
     :module,
     :context,
+    :repo,
     :name,
     :plural,
     :primary_key,
@@ -63,7 +68,9 @@ defmodule Sleeky.Model do
       :model,
       :kind,
       :target,
+      :table_name,
       :column_name,
+      :foreign_key_name,
       :storage,
       :inverse,
       required?: true,
