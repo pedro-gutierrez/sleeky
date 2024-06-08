@@ -13,6 +13,8 @@ defmodule Sleeky.Model.Generator.FieldNames do
 
     fields_on_insert = Enum.map(attrs, & &1.name) ++ Enum.map(parents, & &1.column_name)
 
+    fields_on_update = fields_on_insert
+
     required_fields =
       (attrs
        |> Enum.filter(& &1.required?)
@@ -23,6 +25,7 @@ defmodule Sleeky.Model.Generator.FieldNames do
 
     quote do
       @fields_on_insert unquote(fields_on_insert)
+      @fields_on_update unquote(fields_on_update)
       @required_fields unquote(required_fields)
     end
   end

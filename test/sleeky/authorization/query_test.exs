@@ -147,7 +147,7 @@ defmodule Sleeky.Authorization.QueryTest do
           op: :eq,
           args: [
             {:path, [:blog]},
-            {:value, 1}
+            {:value, %{id: 1}}
           ]
         }
       }

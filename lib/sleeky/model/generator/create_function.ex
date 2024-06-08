@@ -1,16 +1,16 @@
-defmodule Sleeky.Model.Generator.Actions do
+defmodule Sleeky.Model.Generator.CreateFunction do
   @moduledoc false
   @behaviour Diesel.Generator
 
   @impl true
   def generate(_, model) do
     [
-      create_action_with_map_fun(model),
-      create_action_with_list_fun(model)
+      with_map_args(model),
+      with_keyword_args(model)
     ]
   end
 
-  defp create_action_with_map_fun(model) do
+  defp with_map_args(model) do
     quote do
       def create(attrs) when is_map(attrs) do
         %__MODULE__{}
@@ -20,7 +20,7 @@ defmodule Sleeky.Model.Generator.Actions do
     end
   end
 
-  defp create_action_with_list_fun(_model) do
+  defp with_keyword_args(_model) do
     quote do
       def create(attrs) when is_list(attrs) do
         attrs

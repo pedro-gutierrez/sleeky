@@ -38,7 +38,7 @@ defmodule Sleeky.Migrations.Step.CreateTable do
       |> Map.values()
       |> Enum.map(&{:add, [line: 1], Column.encode(&1)})
 
-    columns = columns ++ [{:timestamps, [line: 1], []}]
+    columns = columns ++ [{:timestamps, [line: 1], [[type: :utc_datetime_usec]]}]
 
     {:create, [line: 1],
      [

@@ -37,7 +37,7 @@ defmodule Sleeky.MixProject do
     [
       {:bandit, "~> 0.7"},
       {:calendar, "~> 1.0"},
-      {:diesel, path: "/Users/pedrogutierrez/Projects/diesel"},
+      {:diesel, "~> 0.5"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:estree, "~> 2.7"},
@@ -47,6 +47,7 @@ defmodule Sleeky.MixProject do
       {:inflex, "~> 2.0"},
       {:jason, "~> 1.2"},
       {:libgraph, "~> 0.16"},
+      {:paginator, "~> 1.2.0"},
       {:postgrex, ">= 0.0.0"},
       {:plug, "~> 1.14"},
       {:slugify, "~> 1.3"},

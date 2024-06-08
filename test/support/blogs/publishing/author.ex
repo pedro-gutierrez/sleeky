@@ -7,5 +7,9 @@ defmodule Blogs.Publishing.Author do
   model do
     attribute :name, kind: :string
     has_many Blog
+
+    action :create do
+      allow role: :guest
+    end
   end
 end

@@ -9,20 +9,22 @@ defmodule Sleeky.Migration.V1 do
     create(table(:users, prefix: :accounts, primary_key: false)) do
       add(:email, :string, null: false)
       add(:id, :binary_id, primary_key: true, null: false)
-      timestamps()
+      add(:public, :boolean, null: false)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create(table(:authors, prefix: :publishing, primary_key: false)) do
       add(:id, :binary_id, primary_key: true, null: false)
       add(:name, :string, null: false)
-      timestamps()
+      timestamps(type: :utc_datetime_usec)
     end
 
     create(table(:blogs, prefix: :publishing, primary_key: false)) do
       add(:author_id, :binary_id, null: false)
       add(:id, :binary_id, primary_key: true, null: false)
       add(:name, :string, null: false)
-      timestamps()
+      add(:published, :boolean, null: false)
+      timestamps(type: :utc_datetime_usec)
     end
 
     create(table(:comments, prefix: :publishing, primary_key: false)) do
@@ -30,21 +32,24 @@ defmodule Sleeky.Migration.V1 do
       add(:body, :string, null: false)
       add(:id, :binary_id, primary_key: true, null: false)
       add(:post_id, :binary_id, null: false)
-      timestamps()
+      timestamps(type: :utc_datetime_usec)
     end
 
     create(table(:posts, prefix: :publishing, primary_key: false)) do
       add(:blog_id, :binary_id, null: false)
+      add(:deleted, :boolean, null: false)
       add(:id, :binary_id, primary_key: true, null: false)
-      add(:published_at, :utc_datetime, null: false)
+      add(:locked, :boolean, null: false)
+      add(:published, :boolean, null: false)
+      add(:published_at, :utc_datetime, null: true)
       add(:title, :string, null: false)
-      timestamps()
+      timestamps(type: :utc_datetime_usec)
     end
 
     create(table(:topics, prefix: :publishing, primary_key: false)) do
       add(:id, :binary_id, primary_key: true, null: false)
       add(:name, :string, null: false)
-      timestamps()
+      timestamps(type: :utc_datetime_usec)
     end
 
     alter(table(:blogs, prefix: :publishing)) do

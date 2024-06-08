@@ -135,7 +135,7 @@ locals_without_parens = [
   video: :*,
   view: :*,
   view: :*,
-  wbr: :*,
+  wbr: :*
 ]
 
 [

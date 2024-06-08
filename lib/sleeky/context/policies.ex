@@ -14,7 +14,7 @@ defmodule Sleeky.Context.Policies do
     |> case do
       [] -> nil
       [policy] -> policy
-      policies -> combine(policies, :any)
+      policies -> combine(policies, :one)
     end
   end
 
