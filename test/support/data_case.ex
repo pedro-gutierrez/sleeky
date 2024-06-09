@@ -2,10 +2,13 @@ defmodule Sleeky.DataCase do
   @moduledoc false
 
   defmacro __using__(opts) do
-    repo = :sleeky |> Application.fetch_env!(Sleeky) |> Keyword.fetch!(:repo)
+    config = Application.fetch_env!(:sleeky, Sleeky)
+    repo = Keyword.fetch!(config, :repo)
+    endpoint = Keyword.fetch!(config, :endpoint)
 
     quote do
       @repo unquote(repo)
+      @endpoint unquote(endpoint)
 
       use ExUnit.Case, unquote(opts)
       import Ecto
@@ -19,6 +22,7 @@ defmodule Sleeky.DataCase do
       setup tags do
         Application.ensure_all_started(:sleeky)
         start_supervised!(@repo)
+        start_supervised!(@endpoint)
 
         pid = Sandbox.start_owner!(@repo, shared: not tags[:async])
         on_exit(fn -> Sandbox.stop_owner(pid) end)
