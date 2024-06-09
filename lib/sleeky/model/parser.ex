@@ -132,10 +132,6 @@ defmodule Sleeky.Model.Parser do
         }
       end
 
-    # if model.module == Blogs.Publishing.Author do
-    #  IO.inspect(rels)
-    # end
-
     %{model | relations: model.relations ++ rels}
   end
 
@@ -201,7 +197,8 @@ defmodule Sleeky.Model.Parser do
     kind: :id,
     storage: :binary_id,
     column_name: :id,
-    primary_key?: true
+    primary_key?: true,
+    mutable?: false
   }
 
   defp with_primary_key(model) do

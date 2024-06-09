@@ -29,6 +29,9 @@ defmodule Sleeky.Endpoint do
       use Supervisor
 
       @doc false
+      def router, do: unquote(router)
+
+      @doc false
       def start_link(opts), do: Supervisor.start_link(__MODULE__, opts)
 
       if Mix.env() == :dev do

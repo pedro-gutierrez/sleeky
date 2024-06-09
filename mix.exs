@@ -51,7 +51,8 @@ defmodule Sleeky.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:plug, "~> 1.14"},
       {:slugify, "~> 1.3"},
-      {:solid, "~> 0.15"}
+      {:solid, "~> 0.15"},
+      {:validate, "~> 1.3"}
     ]
   end
 

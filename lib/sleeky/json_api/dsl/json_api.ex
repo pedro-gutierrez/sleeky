@@ -1,0 +1,8 @@
+defmodule Sleeky.JsonApi.Dsl.JsonApi do
+  @moduledoc false
+  use Diesel.Tag
+
+  tag do
+    child :context, min: 1
+  end
+end

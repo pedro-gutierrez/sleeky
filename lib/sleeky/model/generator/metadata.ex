@@ -7,6 +7,7 @@ defmodule Sleeky.Model.Generator.Metadata do
     attributes = model.attributes
     relations = model.relations
     parents = Enum.filter(relations, &(&1.kind == :parent))
+    children = Enum.filter(relations, &(&1.kind == :child))
     fields = Enum.reduce(attributes ++ relations, %{}, &Map.put(&2, &1.name, &1))
     actions = model.actions
     keys = model.keys
@@ -16,6 +17,7 @@ defmodule Sleeky.Model.Generator.Metadata do
 
       @attributes unquote(Macro.escape(attributes))
       @parents unquote(Macro.escape(parents))
+      @children unquote(Macro.escape(children))
       @fields unquote(Macro.escape(fields))
       @keys unquote(Macro.escape(keys))
       @actions unquote(Macro.escape(actions))
@@ -29,6 +31,7 @@ defmodule Sleeky.Model.Generator.Metadata do
       def primary_key, do: unquote(Macro.escape(model.primary_key))
 
       def parents, do: @parents
+      def children, do: @children
       def attributes, do: @attributes
       def keys, do: @keys
       def fields, do: @fields

@@ -4,14 +4,14 @@ defmodule Sleeky.Context.AuthorizationTest do
   alias Blogs.Accounts
   alias Blogs.Publishing
 
-  setup [:user, :comments, :current_user]
+  setup [:comments, :current_user]
 
   describe "allow/3" do
     test "denies if the scope does not match", context do
       params =
         context
-          |> other_user()
-          |> Map.put(:user, context.user)
+        |> other_user()
+        |> Map.put(:user, context.user)
 
       assert {:error, :forbidden} == Accounts.allow(:user, :update, params)
     end
@@ -49,7 +49,6 @@ defmodule Sleeky.Context.AuthorizationTest do
 
   describe "scope/4" do
     test "does basic filtering", %{params: params} do
-
       q =
         Accounts.User.query()
         |> Accounts.scope(:user, :list, params)
@@ -71,7 +70,6 @@ defmodule Sleeky.Context.AuthorizationTest do
     end
 
     test "applies multiple filters", %{params: params} do
-
       q =
         Publishing.Post.query()
         |> Publishing.scope(:post, :list, params)

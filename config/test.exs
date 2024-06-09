@@ -1,6 +1,9 @@
 import Config
 
-config :logger, level: :warning
+config :logger,
+  level: :warning
+
+config :logger, :console, metadata: [:reason]
 
 config :sleeky, :ecto_repos, [Blogs.Repo]
 
@@ -11,8 +14,11 @@ config :sleeky, Blogs.Repo,
 
 config :sleeky, Sleeky,
   repo: Blogs.Repo,
+  endpoint: Blogs.Endpoint,
   contexts: [
     Blogs.Publishing,
     Blogs.Notifications,
     Blogs.Accounts
   ]
+
+config :sleeky, Blogs.Endpoint, port: 80

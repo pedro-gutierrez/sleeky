@@ -5,7 +5,7 @@ defmodule Sleeky.Model.ListTest do
 
   import Ecto.Query
 
-  setup [:user, :comments]
+  setup [:comments]
 
   describe "list function" do
     test "returns all blogs by default", %{blog: blog} do

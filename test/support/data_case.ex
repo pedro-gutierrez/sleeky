@@ -2,12 +2,18 @@ defmodule Sleeky.DataCase do
   @moduledoc false
 
   defmacro __using__(opts) do
-    repo = :sleeky |> Application.fetch_env!(Sleeky) |> Keyword.fetch!(:repo)
+    config = Application.fetch_env!(:sleeky, Sleeky)
+    repo = Keyword.fetch!(config, :repo)
+    endpoint = Keyword.fetch!(config, :endpoint)
 
     quote do
       @repo unquote(repo)
+      @endpoint unquote(endpoint)
+      @router @endpoint.router()
 
       use ExUnit.Case, unquote(opts)
+      use Plug.Test
+
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
@@ -19,6 +25,7 @@ defmodule Sleeky.DataCase do
       setup tags do
         Application.ensure_all_started(:sleeky)
         start_supervised!(@repo)
+        start_supervised!(@endpoint)
 
         pid = Sandbox.start_owner!(@repo, shared: not tags[:async])
         on_exit(fn -> Sandbox.stop_owner(pid) end)
@@ -40,6 +47,49 @@ defmodule Sleeky.DataCase do
           end)
         end)
       end
+
+      defp get(path, opts \\ []), do: route(:get, path, headers: headers(opts))
+
+      defp post(path, data, opts \\ []) do
+        method = opts[:method] || :post
+        data = Jason.encode!(data)
+
+        route(method, path, headers: headers(opts), params: data)
+      end
+
+      @router_opts @router.init([])
+
+      defp route(method, path, opts) do
+        conn =
+          method
+          |> conn(path, opts[:params])
+          |> with_req_headers(opts[:headers] || %{})
+          |> @router.call(@router_opts)
+      end
+
+      defp json_response!(conn, status \\ 200) do
+        assert :sent == conn.state
+        assert status == conn.status
+        Jason.decode!(conn.resp_body)
+      end
+
+      defp with_req_headers(conn, headers) do
+        Enum.reduce(headers, conn, fn {key, value}, conn ->
+          put_req_header(conn, key, value)
+        end)
+      end
+
+      defp headers(opts) do
+        opts
+        |> Keyword.get(:headers, %{})
+        |> Map.put_new("content-type", "application/vnd.api+json")
+        |> maybe_auth_header(opts[:token])
+      end
+
+      defp maybe_auth_header(headers, nil), do: headers
+
+      defp maybe_auth_header(headers, token),
+        do: Map.put(headers, "authorization", "Bearer " <> token)
 
       @doc """
       Convert the given givne into its generated sql
