@@ -4,9 +4,7 @@ defmodule Sleeky do
   @dsls [
     Sleeky.Authorization.Dsl,
     Sleeky.Context.Dsl,
-    Sleeky.Model.Dsl,
-    Sleeky.Ui.Dsl,
-    Sleeky.Ui.View.Dsl
+    Sleeky.Model.Dsl
   ]
 
   @doc false
