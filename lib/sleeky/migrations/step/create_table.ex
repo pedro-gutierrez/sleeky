@@ -6,7 +6,7 @@ defmodule Sleeky.Migrations.Step.CreateTable do
   alias Sleeky.Migrations.Table
   alias Sleeky.Migrations.Column
 
-  import Sleeky.Inspector
+  import Sleeky.Naming
 
   defstruct [:table]
 

@@ -2,7 +2,7 @@ defmodule Sleeky.Model.Generator.Changesets do
   @moduledoc false
   @behaviour Diesel.Generator
 
-  import Sleeky.Ast
+  import Sleeky.Naming
 
   @impl true
   def generate(_, model) do

@@ -3,7 +3,7 @@ defmodule Sleeky.Context.Generator.UpdateActions do
 
   @behaviour Diesel.Generator
 
-  import Sleeky.Ast
+  import Sleeky.Naming
   import Sleeky.Context.Ast
 
   alias Sleeky.Model.Action

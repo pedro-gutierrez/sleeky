@@ -1,8 +1,10 @@
 defmodule Sleeky.Migrations.Table do
   @moduledoc false
+
   alias Sleeky.Migrations.Column
   alias Sleeky.Migrations.ColumnChanges
-  import Sleeky.Inspector
+
+  import Sleeky.Naming
 
   defstruct [
     :name,

@@ -3,7 +3,7 @@ defmodule Sleeky.Context.Generator.ListActions do
 
   @behaviour Diesel.Generator
 
-  import Sleeky.Ast
+  import Sleeky.Naming
 
   alias Sleeky.Model.Action
 
@@ -42,8 +42,11 @@ defmodule Sleeky.Context.Generator.ListActions do
               %unquote(rel.target.module){} = unquote(parent_var),
               unquote(context)
             ) do
-          unquote(query) = from(m in unquote(model).query(),
-            where: m.unquote(column_name) == ^unquote(parent_var).id)
+          unquote(query) =
+            from(m in unquote(model).query(),
+              where: m.unquote(column_name) == ^unquote(parent_var).id
+            )
+
           unquote(scope_and_list(model))
         end
       end
@@ -64,7 +67,8 @@ defmodule Sleeky.Context.Generator.ListActions do
           unquote(context)
         )
 
-      opts = unquote(context)
+      opts =
+        unquote(context)
         |> Map.take([:limit, :before, :after])
         |> Keyword.new()
         |> Keyword.put(:query, unquote(query))

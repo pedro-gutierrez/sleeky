@@ -3,7 +3,7 @@ defmodule Sleeky.Context.Ast do
   Context specific ast helpers
   """
 
-  import Sleeky.Ast
+  import Sleeky.Naming
 
   @doc """
   Returns a list of pattern matched variables for each one of the parents of the given model
