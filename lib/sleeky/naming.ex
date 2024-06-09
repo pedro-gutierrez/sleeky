@@ -76,4 +76,46 @@ defmodule Sleeky.Naming do
     |> Kernel.++([Repo])
     |> Module.concat()
   end
+
+  @doc false
+  def indexed(items, key \\ :name) do
+    Enum.reduce(items, %{}, fn item, index ->
+      index_key = Map.get(item, key)
+      Map.put(index, index_key, item)
+    end)
+  end
+
+  @doc """
+  Returns a variable of the given name
+
+  This is used when generating code, such as functions, inside macros
+  """
+  def var(name), do: Macro.var(name, nil)
+
+  @doc """
+  Flattens a list of expressions, discarding nil ones
+
+  Useful when used inside unquoting
+  """
+  def flattened(asts) do
+    asts
+    |> List.flatten()
+    |> Enum.reject(&is_nil/1)
+  end
+
+  @doc """
+  Print a quoted expression
+
+  For debugging purposes only
+  """
+  def print(ast, condition \\ true) do
+    if condition do
+      ast
+      |> Macro.to_string()
+      |> Code.format_string!()
+      |> IO.puts()
+    end
+
+    ast
+  end
 end

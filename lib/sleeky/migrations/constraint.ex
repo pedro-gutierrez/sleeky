@@ -1,6 +1,7 @@
 defmodule Sleeky.Migrations.Constraint do
   @moduledoc false
-  import Sleeky.Inspector
+
+  # import Sleeky.Inspector
   alias Sleeky.Model.Relation
 
   defstruct [
@@ -35,8 +36,7 @@ defmodule Sleeky.Migrations.Constraint do
 
   defp with_name(constraint) do
     if is_nil(constraint.name) do
-      name = join([constraint.table, constraint.column, "fkey"])
-      %{constraint | name: name}
+      %{constraint | name: "#{constraint.table}_#{constraint.column}_fkey"}
     else
       constraint
     end

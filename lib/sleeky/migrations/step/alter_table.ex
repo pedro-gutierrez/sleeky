@@ -4,7 +4,7 @@ defmodule Sleeky.Migrations.Step.AlterTable do
 
   alias Sleeky.Migrations.{Column, ColumnChanges, State, Table}
 
-  import Sleeky.Inspector
+  import Sleeky.Naming
 
   defstruct [:table, :prefix, add: %{}, remove: %{}, modify: %{}]
 

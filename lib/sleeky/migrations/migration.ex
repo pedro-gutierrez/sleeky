@@ -1,7 +1,7 @@
 defmodule Sleeky.Migrations.Migration do
   @moduledoc false
-  import Sleeky.Inspector
   import Sleeky.Migrations.Ecto
+  import Sleeky.Naming
 
   @mutations [
     Sleeky.Migrations.Step.CreateSchema,
@@ -61,7 +61,7 @@ defmodule Sleeky.Migrations.Migration do
       |> Enum.reduce([], fn step, code ->
         code ++ [step.__struct__.encode(step)]
       end)
-      |> flatten()
+      |> flattened()
 
     migration(migration.version, body)
   end
@@ -87,7 +87,7 @@ defmodule Sleeky.Migrations.Migration do
     Enum.reduce(@mutations, new(opts), fn mutation, m ->
       old
       |> mutation.diff(new)
-      |> flatten()
+      |> flattened()
       |> Enum.reject(&is_nil/1)
       |> Enum.reduce(m, &into/2)
     end)
