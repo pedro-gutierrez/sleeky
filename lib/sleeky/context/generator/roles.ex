@@ -4,7 +4,7 @@ defmodule Sleeky.Context.Generator.Roles do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, context), do: roles_fun(context.authorization, context)
+  def generate(context, _), do: roles_fun(context.authorization, context)
 
   defp roles_fun(nil, _) do
     quote do

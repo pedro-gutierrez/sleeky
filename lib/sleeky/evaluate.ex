@@ -36,8 +36,11 @@ defmodule Sleeky.Evaluate do
     end
   end
 
-  def evaluate(context, {:path, [:** | _] = path}) do
+  def evaluate(context, {:path, [:**, ancestor | _] = path}) do
     Enum.reduce_while(context, nil, fn
+      {^ancestor, value}, _default ->
+        {:halt, value}
+
       {_, %{__struct__: _} = sub_context}, default ->
         case evaluate(sub_context, {:path, path}) do
           nil -> {:cont, default}

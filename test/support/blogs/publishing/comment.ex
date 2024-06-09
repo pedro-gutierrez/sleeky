@@ -20,5 +20,9 @@ defmodule Blogs.Publishing.Comment do
     action :list do
       allow role: :user
     end
+
+    action :delete do
+      allow role: :user, scope: :author
+    end
   end
 end

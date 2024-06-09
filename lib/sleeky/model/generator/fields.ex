@@ -3,7 +3,7 @@ defmodule Sleeky.Model.Generator.FieldNames do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, model) do
+  def generate(model, _) do
     attrs =
       model.attributes
       |> Enum.reject(& &1.virtual?)

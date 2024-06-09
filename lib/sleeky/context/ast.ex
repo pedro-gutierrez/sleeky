@@ -32,6 +32,18 @@ defmodule Sleeky.Context.Ast do
   end
 
   @doc """
+  Populate a context map with the params given to an action
+  """
+  def context_with_params do
+    context = var(:context)
+    attrs = var(:attrs)
+
+    quote do
+      unquote(context) <- Map.merge(unquote(attrs), unquote(context))
+    end
+  end
+
+  @doc """
   Populate a context map with a given model
   """
   def context_with_model(model) do
@@ -55,7 +67,7 @@ defmodule Sleeky.Context.Ast do
       var = var(rel.name)
 
       quote do
-        unquote(attrs) <- Map.put(unquote(attrs), unquote(column), unquote(var).id)
+        unquote(attrs) <- Map.put(unquote(attrs), unquote(column), unquote(attrs).unquote(var).id)
       end
     end
   end
@@ -120,9 +132,10 @@ defmodule Sleeky.Context.Ast do
     model_name = model.name()
     model_var = var(model_name)
     id = var(:id)
+    context = var(:context)
 
     quote do
-      {:ok, unquote(model_var)} <- unquote(model).fetch(unquote(id))
+      {:ok, unquote(model_var)} <- unquote(model).fetch(unquote(id), unquote(context))
     end
   end
 end

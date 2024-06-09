@@ -12,6 +12,7 @@ defmodule Sleeky.Context do
       Sleeky.Context.Generator.Allow,
       Sleeky.Context.Generator.Scope,
       Sleeky.Context.Generator.Paths,
+      Sleeky.Context.Generator.Helpers,
       Sleeky.Context.Generator.CreateActions,
       Sleeky.Context.Generator.UpdateActions,
       Sleeky.Context.Generator.ReadActions,

@@ -4,7 +4,10 @@ defmodule Sleeky do
   @dsls [
     Sleeky.Authorization.Dsl,
     Sleeky.Context.Dsl,
-    Sleeky.Model.Dsl
+    Sleeky.Model.Dsl,
+    Sleeky.Context.Dsl,
+    Sleeky.JsonApi.Dsl,
+    Sleeky.Endpoint.Dsl
   ]
 
   @doc false

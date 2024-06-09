@@ -9,6 +9,20 @@ defmodule Sleeky.QueryBuilder do
   import Ecto.Query
 
   @doc """
+  Build a new builder from a simple map
+  """
+  def from_simple_map(model, map) do
+    filters =
+      for {field, value} <- map do
+        {{model, field}, infer_op(value), value}
+      end
+
+    %__MODULE__{
+      filters: filters
+    }
+  end
+
+  @doc """
   Applies the given builder to the given query
 
   First, it applies joins, then fitlers, finally sorting
@@ -70,6 +84,12 @@ defmodule Sleeky.QueryBuilder do
     dynamic([{^binding, x}], field(x, ^column) == ^value)
   end
 
+  defp filter({{binding, column}, :like, value}) do
+    value = "%#{value}%"
+
+    dynamic([{^binding, x}], ilike(field(x, ^column), ^value))
+  end
+
   defp filter({{binding, column}, :neq, value}) do
     dynamic([{^binding, x}], field(x, ^column) != ^value)
   end
@@ -119,4 +139,7 @@ defmodule Sleeky.QueryBuilder do
       filters: [{op, Enum.flat_map(builders, & &1.filters)}]
     }
   end
+
+  defp infer_op(str) when is_binary(str), do: :like
+  defp infer_op(_), do: :eq
 end

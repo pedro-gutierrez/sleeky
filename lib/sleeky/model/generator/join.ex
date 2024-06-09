@@ -3,7 +3,7 @@ defmodule Sleeky.Model.Generator.Join do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, model) do
+  def generate(model, _) do
     [
       header_join_function(),
       join_parents_functions(model),

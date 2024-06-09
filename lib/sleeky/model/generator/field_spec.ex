@@ -3,7 +3,7 @@ defmodule Sleeky.Model.Generator.FieldSpec do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_caller, model) do
+  def generate(model, _) do
     [
       attributes(model),
       parents(model),

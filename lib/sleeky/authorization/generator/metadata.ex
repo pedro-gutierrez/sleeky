@@ -3,7 +3,7 @@ defmodule Sleeky.Authorization.Generator.Metadata do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, auth) do
+  def generate(auth, _) do
     quote do
       def roles, do: unquote(auth.roles)
       def scopes, do: unquote(Macro.escape(auth.scopes))

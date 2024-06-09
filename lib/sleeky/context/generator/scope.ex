@@ -6,7 +6,7 @@ defmodule Sleeky.Context.Generator.Scope do
   alias Sleeky.Context.Scopes
 
   @impl true
-  def generate(_caller, context) do
+  def generate(context, _) do
     scope_funs(context) ++ [default_scope_fun()]
   end
 

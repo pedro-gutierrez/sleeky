@@ -20,5 +20,17 @@ defmodule Blogs.Publishing.Post do
     action :list do
       allow role: :user, scope: :is_published_and_is_not_locked
     end
+
+    action :delete do
+      allow role: :user, scope: :author
+    end
+
+    action :read do
+      allow role: :user, scope: :author
+    end
+
+    action :create do
+      allow role: :user, scope: :author
+    end
   end
 end

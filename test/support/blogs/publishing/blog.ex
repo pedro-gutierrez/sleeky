@@ -16,6 +16,10 @@ defmodule Blogs.Publishing.Blog do
       allow role: :user
     end
 
+    action :create do
+      allow role: :user, scope: :author
+    end
+
     action :list do
       allow role: :user, scope: :author
     end

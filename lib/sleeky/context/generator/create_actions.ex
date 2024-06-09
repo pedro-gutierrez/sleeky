@@ -1,39 +1,40 @@
 defmodule Sleeky.Context.Generator.CreateActions do
   @moduledoc false
-
   @behaviour Diesel.Generator
 
   import Sleeky.Naming
-  import Sleeky.Context.Ast
-
-  alias Sleeky.Model.Action
 
   @impl true
-  def generate(_caller, context) do
-    for model <- context.models, %Action{name: :create} = action <- model.actions() do
+  def generate(context, _) do
+    for model <- context.models, %{name: :create} = action <- model.actions() do
       model_name = model.name()
-      action_fun_name = String.to_atom("#{action.name}_#{model_name}")
-      attrs = var(:attrs)
-      context = var(:context)
-      parent_vars = function_parent_args(model)
+      action_fun_name = String.to_atom("create_#{model_name}")
 
-      pre_reqs = [
-        context_with_parents(model),
-        attrs_with_required_parents(model),
-        attrs_with_optional_parents(model),
-        attrs_with_computed_attributes(model),
-        context_with_args(),
-        allowed?(model, action)
-      ]
+      attr_names =
+        for attr when not attr.computed? <- model.attributes(),
+            do: attr.name
+
+      parent_fields =
+        for rel when not rel.computed? <- model.parents(),
+            into: %{},
+            do: {rel.name, rel.column_name}
+
+      child_fields =
+        for rel when not rel.computed? <- model.children(),
+            do: rel.name
 
       quote do
-        def unquote(action_fun_name)(
-              unquote_splicing(parent_vars),
-              unquote(attrs),
-              unquote(context)
-            ) do
-          with unquote_splicing(flattened(pre_reqs)) do
-            unquote(model).create(unquote(attrs))
+        def unquote(action_fun_name)(attrs, context) do
+          context = Map.merge(attrs, context)
+
+          fields =
+            attrs
+            |> Map.take(unquote(attr_names))
+            |> collect_ids(attrs, unquote(Macro.escape(parent_fields)))
+            |> collect_values(attrs, unquote(child_fields))
+
+          with :ok <- allow(unquote(model_name), unquote(action.name), context) do
+            unquote(model).create(fields)
           end
         end
       end
