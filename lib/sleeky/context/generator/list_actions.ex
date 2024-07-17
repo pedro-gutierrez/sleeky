@@ -8,7 +8,7 @@ defmodule Sleeky.Context.Generator.ListActions do
   alias Sleeky.Model.Action
 
   @impl true
-  def generate(_caller, context) do
+  def generate(context, _) do
     for model <- context.models, %Action{name: :list} <- model.actions() do
       [default_list_fun(model), list_by_parent_funs(model)]
     end
@@ -21,7 +21,9 @@ defmodule Sleeky.Context.Generator.ListActions do
 
     quote do
       def unquote(action_fun_name)(unquote(context)) do
-        unquote(query) = unquote(model).query()
+        unquote(query) =
+          unquote(model).query() |> maybe_filter(unquote(model.name()), unquote(context))
+
         unquote(scope_and_list(model))
       end
     end
@@ -46,6 +48,7 @@ defmodule Sleeky.Context.Generator.ListActions do
             from(m in unquote(model).query(),
               where: m.unquote(column_name) == ^unquote(parent_var).id
             )
+            |> maybe_filter(unquote(model.name()), unquote(context))
 
           unquote(scope_and_list(model))
         end
@@ -69,7 +72,7 @@ defmodule Sleeky.Context.Generator.ListActions do
 
       opts =
         unquote(context)
-        |> Map.take([:limit, :before, :after])
+        |> Map.take([:limit, :before, :after, :preload, :sort])
         |> Keyword.new()
         |> Keyword.put(:query, unquote(query))
 

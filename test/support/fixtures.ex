@@ -13,6 +13,12 @@ defmodule Sleeky.Fixtures do
     replace_current_user(context, user)
   end
 
+  def author(context) do
+    user = %{id: context.author.id, roles: [:user]}
+
+    replace_current_user(context, user)
+  end
+
   def other_user(context) do
     user = %{id: uuid(), roles: [:user]}
 
@@ -34,13 +40,10 @@ defmodule Sleeky.Fixtures do
     Map.put(context, :params, params)
   end
 
-  def user(context) do
-    {:ok, user} = Accounts.User.create(id: Ecto.UUID.generate(), email: "foo@bar", public: true)
-    Map.put(context, :user, user)
-  end
-
   def comments(context) do
-    {:ok, author} = Publishing.Author.create(id: context.user.id, name: "foo")
+    {:ok, user} = Accounts.User.create(id: Ecto.UUID.generate(), email: "foo@bar", public: true)
+
+    {:ok, author} = Publishing.Author.create(id: user.id, name: "foo")
 
     {:ok, blog} =
       Publishing.Blog.create(
@@ -89,11 +92,26 @@ defmodule Sleeky.Fixtures do
       )
 
     context
+    |> Map.put(:user, user)
     |> Map.put(:author, author)
     |> Map.put(:blog, blog)
     |> Map.put(:post, post)
     |> Map.put(:comment1, comment1)
     |> Map.put(:comment2, comment2)
     |> Map.put(:comment3, comment3)
+  end
+
+  def post_json_api_params(context) do
+    params = %{
+      "deleted" => false,
+      "locked" => false,
+      "published" => true,
+      "published_at" => "2024-06-29T12:00:00Z",
+      "title" => "foo",
+      "blog" => %{"id" => context.blog.id},
+      "id" => Ecto.UUID.generate()
+    }
+
+    Map.put(context, :post_json_api_params, params)
   end
 end

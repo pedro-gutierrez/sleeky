@@ -3,7 +3,7 @@ defmodule Sleeky.Context.Generator.Paths do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_context, context) do
+  def generate(context, _) do
     models = context.models
 
     hierarchies = for model <- models, into: %{}, do: {model.name(), hierarchy(model)}

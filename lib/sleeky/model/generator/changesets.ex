@@ -5,7 +5,7 @@ defmodule Sleeky.Model.Generator.Changesets do
   import Sleeky.Naming
 
   @impl true
-  def generate(_, model) do
+  def generate(model, _) do
     [
       insert_changeset(model),
       inlined_insert_changeset(model),
@@ -17,6 +17,7 @@ defmodule Sleeky.Model.Generator.Changesets do
   defp insert_changeset(model) do
     changes = var(:changes)
     cast_inlined_children = cast_inlined_children(model)
+    primary_key_constraint = String.to_atom("#{model.plural()}_pkey")
 
     quote do
       def insert_changeset(%__MODULE__{} = model, attrs, opts \\ []) do
@@ -24,7 +25,10 @@ defmodule Sleeky.Model.Generator.Changesets do
 
         unquote(changes) = cast(model, attrs, required_fields)
         unquote(cast_inlined_children)
+
         validate_required(unquote(changes), required_fields)
+
+        unique_constraint(unquote(changes), [:id], name: unquote(primary_key_constraint))
       end
     end
   end

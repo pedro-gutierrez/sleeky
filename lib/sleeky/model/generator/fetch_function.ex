@@ -3,10 +3,13 @@ defmodule Sleeky.Model.Generator.FetchFunction do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, model) do
+  def generate(model, _) do
     quote do
-      def fetch(id) do
-        case unquote(model.context).repo().get(__MODULE__, id) do
+      def fetch(id, opts \\ []) do
+        repo = unquote(model.context).repo()
+        preload = Keyword.get(opts, :preload, [])
+
+        case __MODULE__ |> repo.get(id) |> repo.preload(preload) do
           nil -> {:error, :not_found}
           model -> {:ok, model}
         end

@@ -3,7 +3,7 @@ defmodule Sleeky.Model.Generator.DeleteFunction do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, model) do
+  def generate(model, _) do
     quote do
       def delete(model) do
         with {:ok, _} <-

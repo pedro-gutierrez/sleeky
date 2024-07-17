@@ -9,7 +9,7 @@ defmodule Sleeky.Context.Generator.DeleteActions do
   alias Sleeky.Model.Action
 
   @impl true
-  def generate(_caller, context) do
+  def generate(context, _) do
     for model <- context.models, %Action{name: :delete} = action <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("delete_#{model_name}")

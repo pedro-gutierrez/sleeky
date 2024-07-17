@@ -8,11 +8,13 @@ defmodule Sleeky.Context.Parser do
   import Diesel, only: [children: 2, child: 2, child: 1]
 
   @impl true
-  def parse(context, definition) do
-    name = name(context)
+  def parse(definition, opts) do
+    caller_module = Keyword.fetch!(opts, :caller_module)
+
+    name = name(caller_module)
+    repo = repo(caller_module)
     models = definition |> children(:model) |> child()
     authorization = definition |> child(:authorization) |> child()
-    repo = repo(context)
 
     %Context{name: name, authorization: authorization, repo: repo, models: models}
   end

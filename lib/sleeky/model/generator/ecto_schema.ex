@@ -5,7 +5,7 @@ defmodule Sleeky.Model.Generator.EctoSchema do
   alias Sleeky.Naming
 
   @impl true
-  def generate(_caller, model) do
+  def generate(model, _) do
     quote do
       use Ecto.Schema
       import Ecto.Changeset

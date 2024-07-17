@@ -3,12 +3,20 @@ defmodule Sleeky.Model.Generator.ListFunction do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, _model) do
+  def generate(_, _) do
     quote do
       def list(opts \\ []) do
         query = Keyword.get(opts, :query, __MODULE__)
         preload = Keyword.get(opts, :preload, [])
-        query = from(q in query, order_by: [asc: q.inserted_at], preload: ^preload)
+        query = from(q in query, preload: ^preload)
+
+        query =
+          opts
+          |> Keyword.get(:sort, inserted_at: :asc)
+          |> Enum.reduce(query, fn
+            {field, :asc}, q -> q |> order_by([q], asc: field(q, ^field))
+            {field, :desc}, q -> q |> order_by([q], desc: field(q, ^field))
+          end)
 
         opts =
           opts

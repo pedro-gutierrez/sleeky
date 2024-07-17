@@ -12,9 +12,10 @@ defmodule Sleeky.Model.Parser do
   import Sleeky.Naming
 
   @impl true
-  def parse(caller, {:model, opts, definition}) do
-    caller
-    |> model(opts)
+  def parse({:model, attrs, definition}, opts) do
+    opts
+    |> Keyword.fetch!(:caller_module)
+    |> model(attrs)
     |> with_attributes(definition)
     |> with_parents(definition)
     |> with_children(definition)
@@ -23,7 +24,7 @@ defmodule Sleeky.Model.Parser do
     |> with_primary_key()
   end
 
-  defp model(caller, opts) do
+  defp model(caller, attrs) do
     context = context(caller)
 
     %Model{
@@ -33,7 +34,7 @@ defmodule Sleeky.Model.Parser do
       plural: plural(caller),
       module: caller,
       table_name: table_name(caller),
-      virtual?: Keyword.get(opts, :virtual, false)
+      virtual?: Keyword.get(attrs, :virtual, false)
     }
   end
 
@@ -132,10 +133,6 @@ defmodule Sleeky.Model.Parser do
         }
       end
 
-    # if model.module == Blogs.Publishing.Author do
-    #  IO.inspect(rels)
-    # end
-
     %{model | relations: model.relations ++ rels}
   end
 
@@ -201,7 +198,8 @@ defmodule Sleeky.Model.Parser do
     kind: :id,
     storage: :binary_id,
     column_name: :id,
-    primary_key?: true
+    primary_key?: true,
+    mutable?: false
   }
 
   defp with_primary_key(model) do

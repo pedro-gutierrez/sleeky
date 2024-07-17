@@ -3,7 +3,7 @@ defmodule Sleeky.Model.Generator.CreateFunction do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_, model) do
+  def generate(model, _) do
     [
       with_map_args(model),
       with_keyword_args(model)

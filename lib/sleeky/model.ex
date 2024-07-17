@@ -56,6 +56,9 @@ defmodule Sleeky.Model do
       required?: true,
       primary_key?: false,
       virtual?: false,
+      computed?: false,
+      mutable?: true,
+      timestamp?: false,
       aliases: []
     ]
   end
@@ -75,6 +78,8 @@ defmodule Sleeky.Model do
       :inverse,
       required?: true,
       virtual?: false,
+      computed?: false,
+      mutable?: true,
       aliases: []
     ]
   end

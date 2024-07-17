@@ -7,7 +7,7 @@ defmodule Sleeky.Authorization.Parser do
   alias Sleeky.Authorization.{Expression, Scope}
 
   @impl true
-  def parse(_context, {:authorization, opts, children}) do
+  def parse({:authorization, opts, children}, _) do
     roles = opts |> Keyword.fetch!(:roles) |> path()
 
     scopes =

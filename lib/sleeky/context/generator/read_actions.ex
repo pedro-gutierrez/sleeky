@@ -4,29 +4,23 @@ defmodule Sleeky.Context.Generator.ReadActions do
   @behaviour Diesel.Generator
 
   import Sleeky.Naming
-  import Sleeky.Context.Ast
 
   alias Sleeky.Model.Action
 
   @impl true
-  def generate(_caller, context) do
+  def generate(context, _) do
     for model <- context.models, %Action{name: :read} = action <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("read_#{model_name}")
-      context = var(:context)
-      model_var = var(model_name)
-      id_var = var(:id)
-
-      steps = [
-        fetch_model(model),
-        context_with_model(model),
-        allowed?(model, action)
-      ]
 
       quote do
-        def unquote(action_fun_name)(unquote(id_var), unquote(context)) do
-          with unquote_splicing(flattened(steps)) do
-            {:ok, unquote(model_var)}
+        def unquote(action_fun_name)(id, context) do
+          opts = context |> Map.take([:preload]) |> Keyword.new()
+
+          with {:ok, model} <- unquote(model).fetch(id, opts),
+               context <- Map.put(context, unquote(model_name), model),
+               :ok <- allow(unquote(model_name), unquote(action.name), context) do
+            {:ok, model}
           end
         end
       end

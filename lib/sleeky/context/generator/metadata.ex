@@ -3,7 +3,7 @@ defmodule Sleeky.Context.Generator.Metadata do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(_context, context) do
+  def generate(context, _) do
     quote do
       import Ecto.Query
 

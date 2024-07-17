@@ -8,7 +8,7 @@ defmodule Sleeky.Context.Generator.Allow do
   alias Sleeky.Context.Scopes
 
   @impl true
-  def generate(_mod, context) do
+  def generate(context, _) do
     scopes = Scopes.all(context)
 
     for model <- context.models, action <- model.actions() do
