@@ -91,14 +91,14 @@ defmodule Mix.Tasks.Sleeky.New do
     create_file("lib/#{mod_filename}/application.ex", lib_app_template(assigns))
     create_file("lib/#{mod_filename}/migrate.ex", lib_migrate_template(assigns))
     create_file("lib/#{mod_filename}/repo.ex", lib_repo_template(assigns))
-    create_file("lib/#{mod_filename}/auth.ex", lib_auth_template(assigns))
+    create_file("lib/#{mod_filename}/authorization.ex", lib_authorization_template(assigns))
+    create_file("lib/#{mod_filename}/authentication.ex", lib_authentication_template(assigns))
     create_file("lib/#{mod_filename}/endpoint.ex", lib_endpoint_template(assigns))
-    create_file("lib/#{mod_filename}/router.ex", lib_router_template(assigns))
-    create_file("lib/#{mod_filename}/rest.ex", lib_rest_template(assigns))
-    create_file("lib/#{mod_filename}/schema.ex", lib_schema_template(assigns))
-    create_file("lib/#{mod_filename}/schema/user.ex", lib_schema_user_template(assigns))
-    create_file("lib/#{mod_filename}/ui.ex", lib_ui_template(assigns))
-    create_file("lib/#{mod_filename}/ui/index.ex", lib_ui_index_template(assigns))
+    create_file("lib/#{mod_filename}/json_api.ex", lib_json_api_template(assigns))
+    create_file("lib/#{mod_filename}/accounts.ex", lib_accounts_template(assigns))
+    create_file("lib/#{mod_filename}/accounts/user.ex", lib_accounts_user_template(assigns))
+    # create_file("lib/#{mod_filename}/ui.ex", lib_ui_template(assigns))
+    # create_file("lib/#{mod_filename}/ui/index.ex", lib_ui_index_template(assigns))
 
     create_directory("test/support")
     create_file("test/test_helper.exs", test_helper_template(assigns))
@@ -124,7 +124,7 @@ defmodule Mix.Tasks.Sleeky.New do
     Then initialise your database:
 
         createuser #{app} -d
-        mix sleeky.migrations
+        mix sleeky.gen.migrations
         mix ecto.create
         mix ecto.migrate
 
@@ -271,7 +271,7 @@ defmodule Mix.Tasks.Sleeky.New do
   """)
 
   embed_template(:dockerfile, """
-  FROM hexpm/elixir:1.14.5-erlang-25.3.2.4-alpine-3.18.2 AS builder
+  FROM hexpm/elixir:1.17.2-erlang-26.2.5.2-alpine-3.18.7 AS builder
   RUN apk add --no-cache --update bash git openssl
   ENV MIX_ENV=prod
   COPY config ./config
@@ -283,7 +283,7 @@ defmodule Mix.Tasks.Sleeky.New do
       && mix deps.get \\
       && mix release
 
-  FROM alpine:3.18.2
+  FROM alpine:3.18.7
   RUN apk add --no-cache openssl openssl ncurses-libs libstdc++
   WORKDIR /app
   COPY --from=builder _build/prod/rel/<%= @mod_filename %>/ .
@@ -377,7 +377,7 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:lib_repo, """
   defmodule <%= @mod %>.Repo do
     @moduledoc false
-    use Ecto.Repo, otp_app: :<%= @app %>, adapter: Ecto.Adapters.Postgres
+    use Sleeky.Repo, otp_app: :<%= @app %>
   end
   """)
 
@@ -400,28 +400,44 @@ defmodule Mix.Tasks.Sleeky.New do
   end
   """)
 
-  embed_template(:lib_auth, """
-  defmodule <%= @mod %>.Auth do
-    @moduledoc "Takes care of authentication and authorization concerns"
-    use Plug.Builder
-    use Sleeky.Auth
+  embed_template(:lib_authorization, """
+  defmodule <%= @mod %>.Authorization do
+    @moduledoc "Defines authorization rules"
+    use Sleeky.Authorization
 
-    plug :put_user
-
-    @doc false
-    def put_user(conn, _opts) do
-      # sample user
-      assign(conn, :current_user, %{id: "123", roles: [:admin]})
+    authorization roles: "subject.roles" do
+      scope :self do
+        eq do
+          path "user.id"
+          path "subject.id"
+        end
+      end
     end
+  end
+  """)
 
-    roles [:current_user, :roles]
+  embed_template(:lib_authentication, """
+  defmodule <%= @mod %>.Authentication do
+    @moduledoc false
 
-    scope :owner do
-      "**.user" == "current_user"
-    end
+    @behaviour Plug
+    import Plug.Conn
 
-    scope :self do
-      "id" == "current_user.id"
+    @impl true
+    def init(opts), do: opts
+
+    @impl true
+    def call(conn, _) do
+      case get_req_header(conn, "authorization") do
+        ["admin-" <> id] ->
+          assign(conn, :subject, %{roles: [:admin], id: id})
+
+        ["user-" <> id] ->
+          assign(conn, :subject, %{roles: [:user], id: id})
+
+        _ ->
+          assign(conn, :subject, %{roles: [:guest]})
+      end
     end
   end
   """)
@@ -429,65 +445,69 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:lib_endpoint, """
   defmodule <%= @mod %>.Endpoint do
     @moduledoc false
-    use Sleeky.Endpoint, otp_app: :<%= @app %>, router: <%= @mod %>.Router
+    use Sleeky.Endpoint, otp_app: :<%= @app %>
+
+    endpoint do
+      mount <%= @mod %>.JsonApi, at: "/api"
+    end
   end
   """)
 
-  embed_template(:lib_router, """
-  defmodule <%= @mod %>.Router do
+  embed_template(:lib_json_api, """
+  defmodule <%= @mod %>.JsonApi do
     @moduledoc false
-    use Sleeky.Router,
-      otp_app: :<%= @app %>,
-      plugs: [<%= @mod %>.Auth]
+    use Sleeky.JsonApi
+
+    json_api do
+      plugs do
+        <%= @mod %>.Authentication
+      end
+
+      context <%= @mod %>.Accounts
+    end
   end
   """)
 
-  embed_template(:lib_rest, """
-  defmodule <%= @mod %>.Rest do
-    @moduledoc false
-    use Sleeky.Rest
 
-    schema <%= @mod %>.Schema
+  embed_template(:lib_accounts, """
+  defmodule <%= @mod %>.Accounts do
+    @moduledoc false
+    use Sleeky.Context
+
+    context do
+      authorization <%= @mod %>.Authorization
+      model <%= @mod %>.Accounts.User
+    end
   end
   """)
 
-  embed_template(:lib_schema, """
-  defmodule <%= @mod %>.Schema do
+  embed_template(:lib_accounts_user, """
+  defmodule <%= @mod %>.Accounts.User do
     @moduledoc false
-    use Sleeky.Schema
+    use Sleeky.Model
 
-    entity(<%= @mod %>.Schema.User)
-  end
-  """)
+    model do
+      attribute :email, kind: :string
 
-  embed_template(:lib_schema_user, """
-  defmodule <%= @mod %>.Schema.User do
-    @moduledoc false
-    use Sleeky.Entity
+      action :list do
+        allow role: :guest
+      end
 
-    attribute :email, :string do
-    end
+      action :read do
+        allow role: :guest
+      end
 
-    unique :email
+      action :create do
+        allow role: :admin
+      end
 
-    action :list do
-      allow :admin
-    end
+      action :update do
+        allow role: :admin
+      end
 
-    action :read do
-      allow :admin
-    end
-
-    action :create do
-      allow :admin
-    end
-
-    action :update do
-      allow :admin
-    end
-
-    action :delete do
-      allow :admin
+      action :delete do
+        allow role: :admin
+      end
     end
   end
   """)
@@ -531,7 +551,13 @@ defmodule Mix.Tasks.Sleeky.New do
   import Config
 
   config :<%= @app %>, ecto_repos: [<%= @mod %>.Repo]
-  config :sleeky, schema: <%= @mod %>.Schema
+
+  config :sleeky, Sleeky,
+    repo: <%= @mod %>.Repo,
+    endpoint: <%= @mod %>.Endpoint,
+    contexts: [
+      <%= @mod %>.Accounts
+    ]
 
   config :logger, :console,
     format: "$time [$level] $message: $metadata\n",
@@ -587,34 +613,40 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:test_case, """
   defmodule <%= @mod %>.Case do
     @moduledoc "A base template for all test cases"
-    use ExUnit.CaseTemplate
 
-    using do
+    defmacro __using__(opts) do
+      config = Application.fetch_env!(:sleeky, Sleeky)
+      repo = Keyword.fetch!(config, :repo)
+      endpoint = Keyword.fetch!(config, :endpoint)
+
       quote do
+        @repo unquote(repo)
+        @endpoint unquote(endpoint)
+        @router @endpoint.router()
+
+        use ExUnit.Case, unquote(opts)
         use Plug.Test
 
         import Ecto
+        import Ecto.Changeset
         import Ecto.Query
-        import <%= @mod %>.Case
+
+        import Plug.Conn
 
         alias Ecto.Adapters.SQL.Sandbox
+        alias Ecto.Adapters.Postgres.Connection, as: SQL
+
         alias <%= @mod %>.Repo
 
-        @options <%= @mod %>.Router.init([])
-
         setup tags do
-          :ok = Sandbox.checkout(Repo)
-
-          unless tags[:async] do
-            Sandbox.mode(Repo, {:shared, self()})
-          end
-
+          pid = Sandbox.start_owner!(@repo, shared: not tags[:async])
+          on_exit(fn -> Sandbox.stop_owner(pid) end)
           :ok
         end
 
         defp get(path, opts \\\\ []), do: request(:get, path, opts)
         defp post(path, opts \\\\ []), do: request(:post, path, opts)
-        defp put(path, opts \\\\ []), do: request(:put, path, opts)
+        defp patch(path, opts \\\\ []), do: request(:patch, path, opts)
         defp delete(path, opts \\\\ []), do: request(:delete, path, opts)
 
         defp post_json(path, data, opts \\\\ []) do
@@ -631,7 +663,7 @@ defmodule Mix.Tasks.Sleeky.New do
             method
             |> conn(path, opts[:params])
             |> with_req_headers(opts[:headers] || %{})
-            |> <%= @mod %>.Router.call(@options)
+            |> @router.call([])
         end
 
         defp with_req_headers(conn, headers) do
@@ -640,9 +672,19 @@ defmodule Mix.Tasks.Sleeky.New do
           end)
         end
 
-        defp json_response(conn, status \\\\ 200) do
+        defp json_response!(conn, status) do
           assert :sent == conn.state
-          assert status == conn.status
+          if status != conn.status do
+            flunk(\"\"\"
+            expected status code \#{status}, got
+
+              * status: \#{conn.status}
+              * body: \#{inspect(conn.resp_body)}
+
+            when doing \#{conn.method} /\#{inspect(Enum.join(conn.path_info, \"/\"))}
+            \"\"\")
+          end
+
           Jason.decode!(conn.resp_body)
         end
       end
@@ -654,23 +696,28 @@ defmodule Mix.Tasks.Sleeky.New do
   defmodule <%= @mod %>.UserCreateTest do
     use <%= @mod %>.Case
 
-    describe "POST /api/users" do
+    describe "POST /api/accounts/users" do
       test "creates a new user" do
+        params = %{
+          "email" => "alice@example.com",
+          "id" => Ecto.UUID.generate()
+        }
+
+        headers = %{
+          "authorization" => "admin-1"
+        }
+
         assert %{"id" => _, "email" => _} =
-                 post_json("/api/users", %{email: "alice@example.com"})
-                 |> json_response(201)
+                 post_json("/api/accounts/users", params, headers: headers)
+                 |> json_response!(201)
       end
+    end
 
-      test "does not create the same user twice" do
-        post_json("/api/users", %{email: "alice@example.com"})
-        |> json_response(201)
+    describe "GET /api/accounts/users" do
+      test "returns an empty list if no users are found" do
+        resp = get("/api/accounts/users") |> json_response!(200)
 
-        post_json("/api/users", %{email: "alice@example.com"})
-        |> json_response(409)
-
-        assert [%{"id" => _}] =
-                 get("/api/users")
-                 |> json_response()
+        assert resp |> Map.get("items") |> Enum.empty?()
       end
     end
   end
@@ -682,8 +729,8 @@ defmodule Mix.Tasks.Sleeky.New do
   env:
     MIX_ENV: test
     DEPS_CACHE_VERSION: v1
-    ELIXIR_VERSION: 1.14
-    ERLANG_VERSION: 25.0
+    ELIXIR_VERSION: 1.17
+    ERLANG_VERSION: 26.2
   jobs:
     build-and-test:
       runs-on: ubuntu-latest
