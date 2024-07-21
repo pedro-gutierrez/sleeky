@@ -95,6 +95,8 @@ defmodule Mix.Tasks.Sleeky.New do
     create_file("lib/#{mod_filename}/authentication.ex", lib_authentication_template(assigns))
     create_file("lib/#{mod_filename}/endpoint.ex", lib_endpoint_template(assigns))
     create_file("lib/#{mod_filename}/json_api.ex", lib_json_api_template(assigns))
+    create_file("lib/#{mod_filename}/ui.ex", lib_ui_template(assigns))
+    create_file("lib/#{mod_filename}/ui/index.ex", lib_ui_index_template(assigns))
     create_file("lib/#{mod_filename}/accounts.ex", lib_accounts_template(assigns))
     create_file("lib/#{mod_filename}/accounts/user.ex", lib_accounts_user_template(assigns))
     # create_file("lib/#{mod_filename}/ui.ex", lib_ui_template(assigns))
@@ -449,6 +451,7 @@ defmodule Mix.Tasks.Sleeky.New do
 
     endpoint do
       mount <%= @mod %>.JsonApi, at: "/api"
+      mount <%= @mod %>.Ui, at: "/"
     end
   end
   """)
@@ -468,6 +471,36 @@ defmodule Mix.Tasks.Sleeky.New do
   end
   """)
 
+  embed_template(:lib_ui, """
+  defmodule <%= @mod %>.Ui do
+    @moduledoc false
+    use Sleeky.Ui
+
+    ui do
+      page <%= @mod %>.Ui.Index
+    end
+  end
+  """)
+
+  embed_template(:lib_ui_index, """
+  defmodule <%= @mod %>.Ui.Index do
+    @moduledoc false
+    use Sleeky.View
+
+    view do
+      html do
+        head do
+          title "Wecome to <%= @mod %>"
+          script src: "https://cdn.jsdelivr.net/npm/unpoly@3.8.0/unpoly.min.js"
+          link rel: "stylesheet", href: "https://cdn.jsdelivr.net/npm/unpoly@3.8.0/unpoly.min.css"
+        end
+        body do
+          h1 "It works!"
+        end
+      end
+    end
+  end
+  """)
 
   embed_template(:lib_accounts, """
   defmodule <%= @mod %>.Accounts do
