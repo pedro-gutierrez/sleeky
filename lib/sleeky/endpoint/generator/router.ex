@@ -25,12 +25,13 @@ defmodule Sleeky.Endpoint.Generator.Router do
 
         plug(Plug.Static, at: "/assets", from: {unquote(otp_app), "priv/assets"})
         plug(:match)
-        unquote_splicing(mounts)
         plug(:dispatch)
 
         get "/healthz" do
           send_resp(unquote(conn), 200, "")
         end
+
+        unquote_splicing(mounts)
       end
     end
   end

@@ -1,4 +1,4 @@
-defmodule Sleeky.Html.Render do
+defmodule Sleeky.View.Render do
   @moduledoc false
 
   @self_closing_tags [
@@ -21,7 +21,11 @@ defmodule Sleeky.Html.Render do
 
   def render([]), do: ""
 
-  def render(html), do: do_tags(html)
+  def render({:html, _, _} = view) do
+    "<!DOCTYPE html>" <> do_tags(view)
+  end
+
+  def render(view), do: do_tags(view)
 
   defp do_tags({:each, [name: assign, as: alias], [template]}) do
     template = do_tags(template)

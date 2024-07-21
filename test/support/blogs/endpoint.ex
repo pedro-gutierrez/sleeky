@@ -4,5 +4,6 @@ defmodule Blogs.Endpoint do
 
   endpoint do
     mount Blogs.JsonApi, at: "/api"
+    mount Blogs.Ui, at: "/"
   end
 end

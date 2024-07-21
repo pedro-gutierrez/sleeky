@@ -1,4 +1,4 @@
-defmodule Sleeky.Html.Generator.Source do
+defmodule Sleeky.View.Generator.Source do
   @moduledoc false
   @behaviour Diesel.Generator
 

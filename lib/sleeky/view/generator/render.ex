@@ -1,8 +1,8 @@
-defmodule Sleeky.Html.Generator.Render do
+defmodule Sleeky.View.Generator.Render do
   @moduledoc false
   @behaviour Diesel.Generator
 
-  alias Sleeky.Html
+  alias Sleeky.View
 
   @impl true
   def generate(html, _opts) do
@@ -10,8 +10,8 @@ defmodule Sleeky.Html.Generator.Render do
 
     template =
       html
-      |> Html.Resolve.resolve(slots)
-      |> Html.Render.render()
+      |> View.Resolve.resolve(slots)
+      |> View.Render.render()
 
     quote do
       @template Solid.parse!(unquote(template))
