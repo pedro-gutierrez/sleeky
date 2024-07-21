@@ -35,7 +35,7 @@ defmodule Sleeky.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:bandit, "~> 0.7"},
+      {:bandit, "~> 1.5"},
       {:calendar, "~> 1.0"},
       {:diesel, "~> 0.7"},
       {:ecto, "~> 3.9"},
