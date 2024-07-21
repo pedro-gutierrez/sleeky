@@ -90,7 +90,15 @@ defmodule Sleeky.DataCase do
       defp json_response!(conn, status \\ 200) do
         assert :sent == conn.state
         assert status == conn.status
+        assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
         Jason.decode!(conn.resp_body)
+      end
+
+      defp html_response!(conn, status \\ 200) do
+        assert :sent == conn.state
+        assert status == conn.status
+        assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
+        conn.resp_body
       end
 
       defp with_req_headers(conn, headers) do
@@ -103,7 +111,7 @@ defmodule Sleeky.DataCase do
         opts
         |> Keyword.get(:headers, %{})
         |> Map.new()
-        |> Map.put_new("content-type", "application/vnd.api+json")
+        |> Map.put_new("content-type", "application/json")
         |> maybe_auth_header(opts[:token])
       end
 

@@ -1,8 +1,8 @@
-defmodule Sleeky.Html.Dsl do
+defmodule Sleeky.View.Dsl do
   @moduledoc false
   use Diesel.Dsl,
     otp_app: :sleeky,
-    root: :html,
+    root: :view,
     tags: [
       # standard html
       :a,

@@ -7,7 +7,9 @@ defmodule Sleeky do
     Sleeky.Model.Dsl,
     Sleeky.Context.Dsl,
     Sleeky.JsonApi.Dsl,
-    Sleeky.Endpoint.Dsl
+    Sleeky.Endpoint.Dsl,
+    Sleeky.View.Dsl,
+    Sleeky.Ui.Dsl
   ]
 
   @doc false

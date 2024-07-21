@@ -1,4 +1,4 @@
-defmodule Sleeky.Html.Resolve do
+defmodule Sleeky.View.Resolve do
   @moduledoc false
 
   alias Sleeky.Template

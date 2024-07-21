@@ -1,4 +1,4 @@
-defmodule Sleeky.EndpointTest do
+defmodule Sleeky.Endpoint.ApiTest do
   use Sleeky.DataCase
 
   alias Blogs.Publishing.Comment
@@ -6,12 +6,6 @@ defmodule Sleeky.EndpointTest do
   setup [:comments]
 
   describe "an endpoint" do
-    test "has a health check" do
-      "/healthz"
-      |> get()
-      |> ok!()
-    end
-
     test "routes json api read requests", context do
       id = context.blog.id
 
