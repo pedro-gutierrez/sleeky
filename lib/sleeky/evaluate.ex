@@ -27,7 +27,7 @@ defmodule Sleeky.Evaluate do
   end
 
   def evaluate(%{__struct__: model} = context, {:path, [:**, ancestor | rest]}) do
-    case model.context().shortest_path(model.name(), ancestor) do
+    case model.context().get_shortest_path(model.name(), ancestor) do
       [] ->
         nil
 

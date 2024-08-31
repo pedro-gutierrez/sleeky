@@ -88,17 +88,28 @@ defmodule Sleeky.DataCase do
       end
 
       defp json_response!(conn, status \\ 200) do
-        assert :sent == conn.state
-        assert status == conn.status
+        assert_status_code(conn, status)
         assert get_resp_header(conn, "content-type") == ["application/json; charset=utf-8"]
         Jason.decode!(conn.resp_body)
       end
 
       defp html_response!(conn, status \\ 200) do
-        assert :sent == conn.state
-        assert status == conn.status
+        assert_status_code(conn, status)
         assert get_resp_header(conn, "content-type") == ["text/html; charset=utf-8"]
         conn.resp_body
+      end
+
+      defp assert_status_code(conn, status) do
+        assert :sent == conn.state
+
+        if status != conn.status do
+          flunk("""
+          Expected status code #{status} but got #{conn.status} with response body:
+
+            #{inspect(conn.resp_body)}
+
+          """)
+        end
       end
 
       defp with_req_headers(conn, headers) do

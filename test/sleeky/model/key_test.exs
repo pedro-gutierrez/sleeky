@@ -1,7 +1,7 @@
 defmodule Sleeky.Model.KeyTest do
   use ExUnit.Case
 
-  alias Blogs.Publishing.{Blog, Topic}
+  alias Blogs.Publishing.{Blog, Theme}
   alias Blogs.Accounts.User
   alias Sleeky.Model.{Attribute, Relation}
 
@@ -14,7 +14,7 @@ defmodule Sleeky.Model.KeyTest do
     end
 
     test "can have unique keys" do
-      assert [key] = Topic.keys()
+      assert [key] = Theme.keys()
       assert key.unique?
     end
 

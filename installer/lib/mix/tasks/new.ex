@@ -640,7 +640,6 @@ defmodule Mix.Tasks.Sleeky.New do
 
   embed_template(:test_helper, """
   ExUnit.start()
-  Ecto.Adapters.SQL.Sandbox.mode(<%= @mod %>.Repo, :manual)
   """)
 
   embed_template(:test_case, """
@@ -649,12 +648,10 @@ defmodule Mix.Tasks.Sleeky.New do
 
     defmacro __using__(opts) do
       config = Application.fetch_env!(:sleeky, Sleeky)
-      repo = Keyword.fetch!(config, :repo)
-      endpoint = Keyword.fetch!(config, :endpoint)
 
       quote do
-        @repo unquote(repo)
-        @endpoint unquote(endpoint)
+        @repo <%= @app %>.Repo
+        @endpoint <%= @app %>.Endpoint
         @router @endpoint.router()
 
         use ExUnit.Case, unquote(opts)
@@ -672,6 +669,7 @@ defmodule Mix.Tasks.Sleeky.New do
         alias <%= @mod %>.Repo
 
         setup tags do
+          Application.ensure_all_started(<%= app %>)
           pid = Sandbox.start_owner!(@repo, shared: not tags[:async])
           on_exit(fn -> Sandbox.stop_owner(pid) end)
           :ok

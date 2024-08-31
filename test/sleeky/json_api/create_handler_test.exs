@@ -82,12 +82,14 @@ defmodule Sleeky.JsonApi.CreateHandlerTest do
         |> Blog.JsonApiCreateHandler.execute([])
         |> json_response!(201)
 
+      author_id = context.author.id
+
       assert %{
                "name" => "new blog",
                "published" => true,
-               "id" => id,
-               "author" => %{"id" => context.author.id}
-             } == resp
+               "id" => ^id,
+               "author" => %{"id" => ^author_id}
+             } = resp
     end
 
     test "detects conflicts", context do

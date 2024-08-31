@@ -33,20 +33,52 @@ defmodule Sleeky.Context.Policies do
 
   defp policy_with_scope!(_model, _action, _role, %{scope: nil} = policy, _), do: policy
 
-  defp policy_with_scope!(model, action, role, policy, scopes) do
-    scope = Map.get(scopes, policy.scope)
+  defp policy_with_scope!(model, action, role, policy, all_scopes) do
+    case scope(all_scopes, policy.scope) do
+      {:ok, scope} ->
+        %{policy | scope: scope}
 
-    unless scope do
-      raise """
-        Unknown scope: #{inspect(policy.scope)}
-        in action: #{inspect(action.name)}
-        for role: #{inspect(role)}
-        of model: #{inspect(model)}
+      {:error, reason} ->
+        raise """
+        Error resolving scope:
 
-        Available scopes: #{scopes |> Map.keys() |> inspect()}
-      """
+            #{inspect(reason)}
+
+        in:
+
+          * action: #{inspect(action.name)}
+          * model: #{inspect(model)}
+          * role: #{inspect(role)}
+
+        Available scopes:
+
+          #{all_scopes |> Map.keys() |> inspect()}
+        """
     end
+  end
 
-    %{policy | scope: scope}
+  defp scope(all_scopes, name) when is_atom(name) do
+    case Map.get(all_scopes, name) do
+      nil -> {:error, "unknown scope #{inspect(name)}"}
+      scope -> {:ok, scope}
+    end
+  end
+
+  defp scope(all_scopes, {op, scopes}) do
+    with scopes when is_list(scopes) <-
+           Enum.reduce_while(scopes, [], fn scope, acc ->
+             case scope(all_scopes, scope) do
+               {:ok, scope} -> {:cont, [scope | acc]}
+               {:error, _} = error -> {:halt, error}
+             end
+           end) do
+      {:ok,
+       %Sleeky.Authorization.Scope{
+         expression: %Sleeky.Authorization.Expression{
+           op: op,
+           args: Enum.reverse(scopes)
+         }
+       }}
+    end
   end
 end

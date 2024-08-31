@@ -13,14 +13,14 @@ defmodule Sleeky.JsonApi.Generator.CreateDecoders do
 
       rules =
         for attr when attr.name not in [:id] <- model.attributes(), into: rules do
-          {to_string(attr.name), [] |> required(attr) |> attribute_type(attr)}
+          {to_string(attr.name), [] |> maybe_required(attr) |> attribute_type(attr)}
         end
 
       rules =
         for rel <- model.parents(), into: rules do
           decoder = Module.concat(rel.target.module, JsonApiRelationDecoder)
 
-          {to_string(rel.name), [] |> required(rel) |> relation_type(decoder)}
+          {to_string(rel.name), [] |> maybe_required(rel) |> relation_type(decoder)}
         end
 
       mappings = default_mappings(model)

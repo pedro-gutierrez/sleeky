@@ -18,12 +18,15 @@ defmodule Sleeky.Endpoint.ApiTest do
         |> get(headers: headers)
         |> json_response!(200)
 
+      author_id = context.author.id
+      blog_id = context.blog.id
+
       assert %{
                "name" => "elixir blog",
                "published" => true,
-               "id" => context.blog.id,
-               "author" => %{"id" => context.author.id}
-             } == resp
+               "id" => ^blog_id,
+               "author" => %{"id" => ^author_id}
+             } = resp
     end
 
     test "routes json api list requests", context do
@@ -36,6 +39,9 @@ defmodule Sleeky.Endpoint.ApiTest do
         |> get(headers: headers)
         |> json_response!(200)
 
+      author_id = context.author.id
+      blog_id = context.blog.id
+
       assert %{
                "limit" => 50,
                "total_count" => 1,
@@ -43,11 +49,11 @@ defmodule Sleeky.Endpoint.ApiTest do
                  %{
                    "name" => "elixir blog",
                    "published" => true,
-                   "id" => context.blog.id,
-                   "author" => %{"id" => context.author.id}
+                   "id" => ^blog_id,
+                   "author" => %{"id" => ^author_id}
                  }
                ]
-             } == resp
+             } = resp
     end
 
     test "routes json api list children requests", context do
@@ -60,6 +66,9 @@ defmodule Sleeky.Endpoint.ApiTest do
         |> get(headers: headers)
         |> json_response!(200)
 
+      author_id = context.author.id
+      blog_id = context.blog.id
+
       assert %{
                "limit" => 50,
                "total_count" => 1,
@@ -67,11 +76,11 @@ defmodule Sleeky.Endpoint.ApiTest do
                  %{
                    "name" => "elixir blog",
                    "published" => true,
-                   "id" => context.blog.id,
-                   "author" => %{"id" => context.author.id}
+                   "id" => ^blog_id,
+                   "author" => %{"id" => ^author_id}
                  }
                ]
-             } == resp
+             } = resp
     end
 
     test "routes json api list children requests with queries", context do
@@ -110,12 +119,15 @@ defmodule Sleeky.Endpoint.ApiTest do
         |> post(params, headers: headers)
         |> json_response!(201)
 
+      author_id = context.author.id
+
       assert %{
                "name" => "some other blog",
                "published" => true,
-               "id" => id,
-               "author" => %{"id" => context.author.id}
-             } == resp
+               "id" => ^id,
+               "author" => %{"id" => ^author_id},
+               "theme" => nil
+             } = resp
     end
 
     test "routes json api update requests", context do
@@ -132,12 +144,16 @@ defmodule Sleeky.Endpoint.ApiTest do
         |> patch(params, headers: headers)
         |> json_response!(200)
 
+      author_id = context.author.id
+      blog_id = context.blog.id
+
       assert %{
                "name" => "updated blog name",
                "published" => true,
-               "id" => context.blog.id,
-               "author" => %{"id" => context.author.id}
-             } == resp
+               "id" => ^blog_id,
+               "author" => %{"id" => ^author_id},
+               "theme" => nil
+             } = resp
     end
 
     test "routes json api delete requests", context do

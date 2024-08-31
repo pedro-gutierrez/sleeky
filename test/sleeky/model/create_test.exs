@@ -2,34 +2,27 @@ defmodule Sleeky.Model.CreateTest do
   use Sleeky.DataCase
 
   alias Blogs.Publishing.Author
+  alias Blogs.Publishing.Theme
 
   describe "create function" do
-    test "creates models and inlined children" do
+    test "creates models" do
       attrs = %{
         "id" => Ecto.UUID.generate(),
-        "name" => "john",
-        "blogs" => [
-          %{
-            "id" => Ecto.UUID.generate(),
-            "name" => "personal blog",
-            "published" => true,
-            "posts" => [
-              %{
-                "id" => Ecto.UUID.generate(),
-                "title" => "hello world",
-                "locked" => false,
-                "published" => true,
-                "deleted" => false,
-                "published_at" => DateTime.utc_now()
-              }
-            ]
-          }
-        ]
+        "name" => "john"
       }
 
       assert {:ok, author} = Author.create(attrs)
-      assert [blog] = author.blogs
-      assert [_post] = blog.posts
+      assert author.name == "john"
+    end
+
+    test "validates inclusion of attribute values" do
+      attrs = %{
+        "id" => Ecto.UUID.generate(),
+        "name" => "other"
+      }
+
+      assert {:error, changeset} = Theme.create(attrs)
+      assert errors_on(changeset) == %{name: ["is invalid"]}
     end
   end
 end

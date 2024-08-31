@@ -24,6 +24,7 @@ defmodule Sleeky.Migration.V1 do
       add(:id, :binary_id, primary_key: true, null: false)
       add(:name, :string, null: false)
       add(:published, :boolean, null: false)
+      add(:theme_id, :binary_id, null: true)
       timestamps(type: :utc_datetime_usec)
     end
 
@@ -36,6 +37,7 @@ defmodule Sleeky.Migration.V1 do
     end
 
     create(table(:posts, prefix: :publishing, primary_key: false)) do
+      add(:author_id, :binary_id, null: false)
       add(:blog_id, :binary_id, null: false)
       add(:deleted, :boolean, null: false)
       add(:id, :binary_id, primary_key: true, null: false)
@@ -46,26 +48,34 @@ defmodule Sleeky.Migration.V1 do
       timestamps(type: :utc_datetime_usec)
     end
 
-    create(table(:topics, prefix: :publishing, primary_key: false)) do
+    create(table(:themes, prefix: :publishing, primary_key: false)) do
       add(:id, :binary_id, primary_key: true, null: false)
       add(:name, :string, null: false)
       timestamps(type: :utc_datetime_usec)
     end
 
     alter(table(:blogs, prefix: :publishing)) do
-      modify(:author_id, references(:authors, type: :binary_id, null: false, on_delete: :nothing))
+      modify(:author_id, references(:authors, type: :binary_id, on_delete: :nothing))
+    end
+
+    alter(table(:blogs, prefix: :publishing)) do
+      modify(:theme_id, references(:themes, type: :binary_id, on_delete: :nothing))
     end
 
     alter(table(:comments, prefix: :publishing)) do
-      modify(:author_id, references(:authors, type: :binary_id, null: false, on_delete: :nothing))
+      modify(:author_id, references(:authors, type: :binary_id, on_delete: :nothing))
     end
 
     alter(table(:comments, prefix: :publishing)) do
-      modify(:post_id, references(:posts, type: :binary_id, null: false, on_delete: :nothing))
+      modify(:post_id, references(:posts, type: :binary_id, on_delete: :nothing))
     end
 
     alter(table(:posts, prefix: :publishing)) do
-      modify(:blog_id, references(:blogs, type: :binary_id, null: false, on_delete: :nothing))
+      modify(:author_id, references(:authors, type: :binary_id, on_delete: :nothing))
+    end
+
+    alter(table(:posts, prefix: :publishing)) do
+      modify(:blog_id, references(:blogs, type: :binary_id, on_delete: :nothing))
     end
 
     create(
@@ -75,7 +85,7 @@ defmodule Sleeky.Migration.V1 do
       )
     )
 
-    create(unique_index(:topics, [:name], name: :topics_name_idx, prefix: :publishing))
+    create(unique_index(:themes, [:name], name: :themes_name_idx, prefix: :publishing))
   end
 
   def down do

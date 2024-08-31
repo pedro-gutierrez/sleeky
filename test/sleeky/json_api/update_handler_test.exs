@@ -36,12 +36,17 @@ defmodule Sleeky.JsonApi.UpdateHandlerTest do
         |> Blog.JsonApiUpdateHandler.execute([])
         |> json_response!(200)
 
+      published = context.blog.published
+      id = context.blog.id
+      author_id = context.author.id
+
       assert %{
                "name" => "blog name updated",
-               "published" => context.blog.published,
-               "id" => context.blog.id,
-               "author" => %{"id" => context.author.id}
-             } == resp
+               "published" => ^published,
+               "id" => ^id,
+               "author" => %{"id" => ^author_id},
+               "theme" => nil
+             } = resp
     end
   end
 end

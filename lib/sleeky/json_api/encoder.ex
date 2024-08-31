@@ -38,7 +38,8 @@ defmodule Sleeky.JsonApi.Encoder do
 
         %{__struct__: Ecto.Association.NotLoaded} ->
           id = Map.get(model, rel.column_name)
-          Map.put(acc, rel.name, %{id: id})
+          value = if not is_nil(id), do: %{id: id}
+          Map.put(acc, rel.name, value)
 
         %{id: _} = value ->
           Map.put(acc, rel.name, encode(value))

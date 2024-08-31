@@ -10,7 +10,7 @@ defmodule Sleeky.QueryBuilderTest do
   @query from(p in Post, as: :post)
 
   @select "SELECT p0.\"id\", p0.\"title\", p0.\"published_at\", p0.\"locked\", " <>
-            "p0.\"published\", p0.\"deleted\", p0.\"blog_id\", p0.\"inserted_at\", " <>
+            "p0.\"published\", p0.\"deleted\", p0.\"blog_id\", p0.\"author_id\", p0.\"inserted_at\", " <>
             "p0.\"updated_at\" FROM \"publishing\".\"posts\" AS p0"
 
   test "supports no filters" do
@@ -70,6 +70,32 @@ defmodule Sleeky.QueryBuilderTest do
     assert sql == @select <> " WHERE ((p0.\"locked\" = $1) OR (p0.\"deleted\" = $2))"
   end
 
+  test "combines complex nested and and or expressions" do
+    a = {{:post, :locked}, :eq, true}
+    b = {{:post, :deleted}, :eq, true}
+
+    sql =
+      @query
+      |> QueryBuilder.filter(
+        {:and,
+         [
+           {:or, [a, b]},
+           {:or,
+            [
+              {:and, [a, b]},
+              {:and, [a, b]}
+            ]}
+         ]}
+      )
+      |> to_sql()
+
+    assert sql ==
+             @select <>
+               " WHERE (((p0.\"locked\" = $1) OR (p0.\"deleted\" = $2)) " <>
+               "AND (((p0.\"locked\" = $3) AND (p0.\"deleted\" = $4)) " <>
+               "OR ((p0.\"locked\" = $5) AND (p0.\"deleted\" = $6))))"
+  end
+
   test "supports joins" do
     sql =
       @query
@@ -83,5 +109,20 @@ defmodule Sleeky.QueryBuilderTest do
              @select <>
                " INNER JOIN \"publishing\".\"blogs\" AS b1 ON p0.\"blog_id\" = b1.\"id\"" <>
                " INNER JOIN \"publishing\".\"authors\" AS a2 ON b1.\"author_id\" = a2.\"id\""
+  end
+
+  test "supports left joins" do
+    sql =
+      @query
+      |> QueryBuilder.join([
+        {:left_join, {Blog, :blog, :id}, {:post, :blog_id}},
+        {:left_join, {Author, :author, :id}, {:blog, :author_id}}
+      ])
+      |> to_sql()
+
+    assert sql ==
+             @select <>
+               " LEFT OUTER JOIN \"publishing\".\"blogs\" AS b1 ON p0.\"blog_id\" = b1.\"id\"" <>
+               " LEFT OUTER JOIN \"publishing\".\"authors\" AS a2 ON b1.\"author_id\" = a2.\"id\""
   end
 end

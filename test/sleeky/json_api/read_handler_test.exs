@@ -48,12 +48,16 @@ defmodule Sleeky.JsonApi.ReadHandlerTest do
         |> Blog.JsonApiReadHandler.execute([])
         |> json_response!(200)
 
+      blog_id = context.blog.id
+      author_id = context.author.id
+
       assert %{
-               "author" => %{"id" => context.author.id},
-               "id" => context.blog.id,
+               "author" => %{"id" => ^author_id},
+               "id" => ^blog_id,
                "name" => "elixir blog",
-               "published" => true
-             } == resp
+               "published" => true,
+               "theme" => nil
+             } = resp
     end
 
     test "returns included parents", context do
@@ -71,12 +75,16 @@ defmodule Sleeky.JsonApi.ReadHandlerTest do
         |> Blog.JsonApiReadHandler.execute([])
         |> json_response!(200)
 
+      blog_id = context.blog.id
+      author_id = context.author.id
+
       assert %{
-               "author" => %{"id" => context.author.id, "name" => "foo"},
-               "id" => context.blog.id,
+               "author" => %{"id" => ^author_id, "name" => "foo"},
+               "id" => ^blog_id,
                "name" => "elixir blog",
-               "published" => true
-             } == resp
+               "published" => true,
+               "theme" => nil
+             } = resp
     end
   end
 end

@@ -21,6 +21,8 @@ defmodule Sleeky.Decoder do
     quote do
       @rules unquote(rules)
 
+      def rules, do: @rules
+
       def decode(input) do
         case Validate.validate(input, @rules) do
           {:ok, unquote(data_var)} ->
@@ -51,8 +53,17 @@ defmodule Sleeky.Decoder do
     end
   end
 
-  def required(opts, attr), do: Keyword.merge(opts, required: attr.required?)
-  def optional(opts), do: Keyword.merge(opts, required: false, nullable: true)
+  def maybe_required(opts, field) do
+    if field.required? do
+      Keyword.put(opts, :required, field.required?)
+    else
+      optional(opts)
+    end
+  end
+
+  def optional(opts) do
+    Keyword.merge(opts, required: false, nullable: true)
+  end
 
   def attribute_type(opts, %{kind: :timestamp}) do
     Keyword.merge(opts, type: :string, cast: {:datetime, "{ISO:Extended}"})

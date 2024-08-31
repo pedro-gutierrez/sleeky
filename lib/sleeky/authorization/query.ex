@@ -40,56 +40,86 @@ defmodule Sleeky.Authorization.Query do
     builder = %QueryBuilder{}
     value = Evaluate.evaluate(params, right)
 
-    binding = model.name()
+    binding = [model.name]
 
-    filter(model, binding, left, op, value, builder)
+    do_filter(model, binding, left, op, value, builder)
   end
 
-  defp filter(model, binding, [:**, field | rest], op, value, builder) do
-    case model.context().shortest_path(model.name(), field) do
+  defp do_filter(model, binding, [:**, field | rest], op, value, builder) do
+    case model.context().get_shortest_path(model.name(), field) do
       [] ->
         raise ArgumentError, "no path to #{inspect(field)} in model #{inspect(model)}"
 
       path ->
-        filter(model, binding, path ++ rest, op, value, builder)
+        do_filter(model, binding, path ++ rest, op, value, builder)
     end
   end
 
-  defp filter(model, binding, [field], op, value, builder) do
+  defp do_filter(model, binding, [field], op, value, builder) do
     case model.field(field) do
       {:ok, %Attribute{} = attr} ->
-        filter = {{binding, attr.column_name}, op, value}
+        binding_alias = binding_alias(binding)
+        filter = {{binding_alias, attr.column_name}, op, value}
 
         %{builder | filters: builder.filters ++ [filter]}
 
       {:ok, %Relation{kind: :parent} = rel} ->
-        filter = {{binding, rel.column_name}, op, value.id}
+        binding_alias = binding_alias(binding)
+        filter = {{binding_alias, rel.column_name}, op, value.id}
 
         %{builder | filters: builder.filters ++ [filter]}
 
       {:ok, %Relation{kind: :child} = rel} ->
-        join = {:join, {rel.target.module, rel.name, rel.inverse.column_name}, {binding, :id}}
-        filter = {{rel.name, :id}, op, value}
+        parent_binding = binding
+        parent_alias = binding_alias(parent_binding)
+        child_binding = binding ++ [rel.name]
+        child_alias = binding_alias(child_binding)
+
+        join =
+          {:left_join, {rel.target.module, child_alias, rel.inverse.column_name},
+           {parent_alias, :id}}
+
+        filter = {{child_alias, :id}, op, value}
 
         %{builder | joins: builder.joins ++ [join], filters: builder.filters ++ [filter]}
     end
   end
 
-  defp filter(model, binding, [field | rest], op, value, builder) do
+  defp do_filter(model, binding, [field | rest], op, value, builder) do
     case model.field(field) do
       {:ok, %Relation{kind: :parent} = rel} ->
+        parent_binding = binding ++ [rel.name]
+        parent_binding_alias = binding_alias(parent_binding)
+        binding_alias = binding_alias(binding)
         parent_model = rel.target.module
-        join = {:join, {parent_model, rel.name, :id}, {binding, rel.column_name}}
+        join_type = if rel.required?, do: :join, else: :left_join
+
+        join =
+          {join_type, {parent_model, parent_binding_alias, :id}, {binding_alias, rel.column_name}}
+
         builder = %{builder | joins: builder.joins ++ [join]}
 
-        filter(parent_model, rel.name, rest, op, value, builder)
+        do_filter(parent_model, parent_binding, rest, op, value, builder)
 
       {:ok, %Relation{kind: :child} = rel} ->
+        parent_binding = binding
+        parent_alias = binding_alias(parent_binding)
+        child_binding = binding ++ [rel.name]
+        child_alias = binding_alias(child_binding)
         child_model = rel.target.module
-        join = {:join, {child_model, rel.name, rel.inverse.column_name}, {binding, :id}}
+
+        join =
+          {:left_join, {child_model, child_alias, rel.inverse.column_name}, {parent_alias, :id}}
+
         builder = %{builder | joins: builder.joins ++ [join]}
 
-        filter(child_model, rel.name, rest, op, value, builder)
+        do_filter(child_model, child_binding, rest, op, value, builder)
     end
+  end
+
+  defp binding_alias(binding) do
+    binding
+    |> Enum.map_join("_", &to_string/1)
+    |> String.to_atom()
   end
 end

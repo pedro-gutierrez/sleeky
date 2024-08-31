@@ -9,7 +9,7 @@ defmodule Blogs.Publishing.Author do
     has_many Blog
 
     action :create do
-      allow role: :guest
+      role :guest
     end
   end
 end

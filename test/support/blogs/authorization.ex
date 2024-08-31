@@ -11,9 +11,8 @@ defmodule Blogs.Authorization do
     end
 
     scope :is_public, debug: true do
-      eq do
+      is_true do
         path "**.public"
-        true
       end
     end
 

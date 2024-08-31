@@ -17,7 +17,7 @@ defmodule Sleeky.Migrations.CreateConstraintTest do
             end
 
             alter(table(:blogs, prefix: :publishing)) do
-              modify(:author_id, references(:authors, type: :binary_id, null: false, on_delete: :nothing))
+              modify(:author_id, references(:authors, type: :binary_id, on_delete: :nothing))
             end
           end
         end
@@ -26,7 +26,7 @@ defmodule Sleeky.Migrations.CreateConstraintTest do
       |> generate_migrations()
       |> refute_migrations([
         "alter(table(:blogs, prefix: :publishing)) do",
-        "modify(:author_id, references(:authors, type: :binary_id, null: false, on_delete: :nothing))"
+        "modify(:author_id, references(:authors, type: :binary_id, on_delete: :nothing))"
       ])
     end
   end

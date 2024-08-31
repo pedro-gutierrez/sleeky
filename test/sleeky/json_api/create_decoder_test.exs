@@ -43,7 +43,6 @@ defmodule Sleeky.JsonApi.CreateDecoderTest do
 
       assert errors == %{
                "locked" => ["expected boolean received binary"],
-               "published_at" => ["expected string received nil"],
                "id" => ["is required"]
              }
     end

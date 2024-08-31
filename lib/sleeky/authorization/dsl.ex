@@ -10,6 +10,7 @@ defmodule Sleeky.Authorization.Dsl do
       Sleeky.Authorization.Dsl.Scope,
       Sleeky.Authorization.Dsl.One,
       Sleeky.Authorization.Dsl.All,
-      Sleeky.Authorization.Dsl.NotNil
+      Sleeky.Authorization.Dsl.NotNil,
+      Sleeky.Authorization.Dsl.IsTrue
     ]
 end

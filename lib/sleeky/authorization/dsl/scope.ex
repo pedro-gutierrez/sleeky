@@ -9,5 +9,6 @@ defmodule Sleeky.Authorization.Dsl.Scope do
     child :one, min: 0, max: 1
     child :all, min: 0, max: 1
     child :not_nil, min: 0, max: 1
+    child :is_true, min: 0, max: 1
   end
 end

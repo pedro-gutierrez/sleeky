@@ -10,19 +10,34 @@ defmodule Blogs.Publishing.Comment do
     belongs_to Author
 
     action :create do
-      allow role: :user, scope: :is_published_or_author
+      role :user do
+        scope do
+          one [:is_published, :author]
+        end
+      end
     end
 
     action :update do
-      allow role: :user, scope: :is_published_or_author_and_is_not_locked
+      role :user do
+        scope do
+          one do
+            :is_published
+
+            all do
+              :author
+              :is_not_locked
+            end
+          end
+        end
+      end
     end
 
     action :list do
-      allow role: :user
+      role :user
     end
 
     action :delete do
-      allow role: :user, scope: :author
+      role :user, scope: :author
     end
   end
 end
