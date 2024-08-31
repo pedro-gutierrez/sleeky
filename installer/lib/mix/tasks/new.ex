@@ -478,6 +478,8 @@ defmodule Mix.Tasks.Sleeky.New do
 
     ui do
       page <%= @mod %>.Ui.Index
+
+      context <%= @mod %>.Accounts
     end
   end
   """)
@@ -545,47 +547,12 @@ defmodule Mix.Tasks.Sleeky.New do
   end
   """)
 
-  embed_template(:lib_ui, """
-  defmodule <%= @mod %>.Ui do
-    @moduledoc false
-    use Sleeky.Ui
-
-    view <%= @mod %>.Ui.Index
-  end
-  """)
-
-  embed_template(:lib_ui_index, """
-  defmodule <%= @mod %>.Ui.Index do
-    @moduledoc false
-    use Sleeky.Ui.View
-
-    render do
-      html do
-        head do
-          meta charset: "utf-8"
-          title "Welcome to Sleeky"
-        end
-
-        body do
-          h1 do
-            "Welcome to Sleeky!"
-          end
-
-          p do
-            "Sleek tested, Mother approved."
-          end
-        end
-      end
-    end
-  end
-  """)
-
   embed_template(:config, """
   import Config
 
   config :<%= @app %>, ecto_repos: [<%= @mod %>.Repo]
 
-  config :sleeky, Sleeky,
+  config :<%= @app %>, Sleeky,
     repo: <%= @mod %>.Repo,
     endpoint: <%= @mod %>.Endpoint,
     contexts: [

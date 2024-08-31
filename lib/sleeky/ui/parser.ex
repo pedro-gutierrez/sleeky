@@ -13,7 +13,9 @@ defmodule Sleeky.Ui.Parser do
         {path(caller, module), module}
       end
 
-    %Ui{pages: pages}
+    contexts = for {:context, _, [module]} <- children, do: module
+
+    %Ui{pages: pages, contexts: contexts}
   end
 
   defp path(caller, module) do

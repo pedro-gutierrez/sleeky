@@ -4,5 +4,6 @@ defmodule Sleeky.Ui.Dsl.Ui do
 
   tag do
     child :page, min: 0
+    child :context, min: 1
   end
 end

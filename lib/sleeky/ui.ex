@@ -3,10 +3,11 @@ defmodule Sleeky.Ui do
   use Diesel,
     otp_app: :sleeky,
     generators: [
-      Sleeky.Ui.Generator.Router
+      Sleeky.Ui.Generator.Router,
+      Sleeky.Ui.Generator.NewViews
     ]
 
-  defstruct [:pages]
+  defstruct [:pages, :contexts]
 
   defmodule Page do
     @moduledoc false

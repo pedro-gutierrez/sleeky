@@ -3,6 +3,7 @@ defmodule Sleeky.Ui.Dsl do
   use Diesel.Dsl,
     otp_app: :sleeky,
     tags: [
+      Sleeky.Ui.Dsl.Context,
       Sleeky.Ui.Dsl.Page
     ]
 end
