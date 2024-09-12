@@ -9,6 +9,6 @@ defmodule Blogs.Publishing do
     model Blogs.Publishing.Blog
     model Blogs.Publishing.Comment
     model Blogs.Publishing.Post
-    model Blogs.Publishing.Topic
+    model Blogs.Publishing.Theme
   end
 end

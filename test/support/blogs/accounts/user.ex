@@ -6,11 +6,11 @@ defmodule Blogs.Accounts.User do
     attribute :public, kind: :boolean, default: false
 
     action :update do
-      allow role: :user, scope: :self
+      role :user, scope: :self
     end
 
     action :list do
-      allow role: :user, scope: :is_public
+      role :user, scope: :is_public
     end
   end
 end

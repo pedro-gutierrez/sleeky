@@ -3,12 +3,16 @@ defmodule Sleeky.Model.Dsl do
     otp_app: :sleeky,
     root: Sleeky.Model.Dsl.Model,
     tags: [
-      :attribute,
+      Sleeky.Model.Dsl.Attribute,
+      Sleeky.Model.Dsl.Unique,
       :belongs_to,
       :has_many,
       :action,
       :key,
       :primary_key,
-      Sleeky.Model.Dsl.Allow
+      Sleeky.Model.Dsl.Role,
+      Sleeky.Model.Dsl.Scope,
+      Sleeky.Model.Dsl.One,
+      Sleeky.Model.Dsl.All
     ]
 end

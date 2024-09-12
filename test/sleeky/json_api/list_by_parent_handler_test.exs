@@ -18,18 +18,21 @@ defmodule Sleeky.JsonApi.ListByParentHandlerTest do
         |> Blog.JsonApiListByAuthorHandler.execute([])
         |> json_response!(200)
 
+      author_id = context.author.id
+      blog_id = context.blog.id
+
       assert %{
                "limit" => 50,
                "total_count" => 1,
                "items" => [
                  %{
-                   "author" => %{"id" => context.author.id},
-                   "id" => context.blog.id,
+                   "author" => %{"id" => ^author_id},
+                   "id" => ^blog_id,
                    "name" => "elixir blog",
                    "published" => true
                  }
                ]
-             } == resp
+             } = resp
     end
 
     test "returns a 404 if the parent is not found", context do

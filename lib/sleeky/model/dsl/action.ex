@@ -5,5 +5,6 @@ defmodule Sleeky.Model.Dsl.Action do
   tag do
     attribute :name, kind: :atom, required: true
     child :allow, min: 0
+    child :role, min: 0
   end
 end

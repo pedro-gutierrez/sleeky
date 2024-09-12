@@ -2,7 +2,7 @@ defmodule Sleeky.Authorization.QueryTest do
   use ExUnit.Case
 
   alias Sleeky.Authorization.{Expression, Query, Scope}
-  alias Blogs.Publishing.{Blog, Post}
+  alias Blogs.Publishing.{Blog, Post, Comment}
 
   import Ecto.Query
 
@@ -113,11 +113,33 @@ defmodule Sleeky.Authorization.QueryTest do
 
       builder = Query.build(Post, blog_published)
 
-      assert builder.filters == [{{:blog, :published}, :eq, true}]
+      assert builder.joins == [
+               {:join, {Blogs.Publishing.Blog, :post_blog, :id}, {:post, :blog_id}}
+             ]
+
+      assert builder.filters == [{{:post_blog, :published}, :eq, true}]
+    end
+
+    test "supports joining on optional parent" do
+      blog_published = %Scope{
+        expression: %Expression{
+          op: :eq,
+          args: [
+            {:path, [:blog, :theme, :name]},
+            {:value, "Science"}
+          ]
+        }
+      }
+
+      builder = Query.build(Post, blog_published)
 
       assert builder.joins == [
-               {:join, {Blogs.Publishing.Blog, :blog, :id}, {:post, :blog_id}}
+               {:join, {Blogs.Publishing.Blog, :post_blog, :id}, {:post, :blog_id}},
+               {:left_join, {Blogs.Publishing.Theme, :post_blog_theme, :id},
+                {:post_blog, :theme_id}}
              ]
+
+      assert builder.filters == [{{:post_blog_theme, :name}, :eq, "Science"}]
     end
 
     test "supports joining on ancestor" do
@@ -133,12 +155,63 @@ defmodule Sleeky.Authorization.QueryTest do
 
       builder = Query.build(Post, blog_published)
 
-      assert builder.filters == [{{:author, :name}, :eq, "John"}]
+      assert builder.joins == [
+               {:join, {Blogs.Publishing.Blog, :post_blog, :id}, {:post, :blog_id}},
+               {:join, {Blogs.Publishing.Author, :post_blog_author, :id},
+                {:post_blog, :author_id}}
+             ]
+
+      assert builder.filters == [{{:post_blog_author, :name}, :eq, "John"}]
+    end
+
+    test "supports joining on parent and ancestor" do
+      post_author = %Scope{
+        expression: %Expression{
+          op: :eq,
+          args: [
+            {:path, [:post, :author, :name]},
+            {:value, "John"}
+          ]
+        }
+      }
+
+      blog_author = %Scope{
+        expression: %Expression{
+          op: :eq,
+          args: [
+            {:path, [:post, :blog, :author, :name]},
+            {:value, "John"}
+          ]
+        }
+      }
+
+      combined = %Scope{
+        expression: %Expression{
+          op: :one,
+          args: [post_author, blog_author]
+        }
+      }
+
+      builder = Query.build(Comment, combined)
 
       assert builder.joins == [
-               {:join, {Blogs.Publishing.Blog, :blog, :id}, {:post, :blog_id}},
-               {:join, {Blogs.Publishing.Author, :author, :id}, {:blog, :author_id}}
+               {:join, {Blogs.Publishing.Post, :comment_post, :id}, {:comment, :post_id}},
+               {:join, {Blogs.Publishing.Author, :comment_post_author, :id},
+                {:comment_post, :author_id}},
+               {:join, {Blogs.Publishing.Post, :comment_post, :id}, {:comment, :post_id}},
+               {:join, {Blogs.Publishing.Blog, :comment_post_blog, :id},
+                {:comment_post, :blog_id}},
+               {:join, {Blogs.Publishing.Author, :comment_post_blog_author, :id},
+                {:comment_post_blog, :author_id}}
              ]
+
+      assert builder.filters ==
+               [
+                 or: [
+                   {{:comment_post_author, :name}, :eq, "John"},
+                   {{:comment_post_blog_author, :name}, :eq, "John"}
+                 ]
+               ]
     end
 
     test "supports fitering on parent" do
@@ -170,11 +243,11 @@ defmodule Sleeky.Authorization.QueryTest do
 
       builder = Query.build(Blog, published_posts)
 
-      assert builder.filters == [{{:posts, :id}, :eq, 1}]
-
       assert builder.joins == [
-               {:join, {Blogs.Publishing.Post, :posts, :blog_id}, {:blog, :id}}
+               {:left_join, {Blogs.Publishing.Post, :blog_posts, :blog_id}, {:blog, :id}}
              ]
+
+      assert builder.filters == [{{:blog_posts, :id}, :eq, 1}]
     end
 
     test "supports filtering on child attribute" do
@@ -190,11 +263,11 @@ defmodule Sleeky.Authorization.QueryTest do
 
       builder = Query.build(Blog, published_posts)
 
-      assert builder.filters == [{{:posts, :published}, :eq, true}]
-
       assert builder.joins == [
-               {:join, {Blogs.Publishing.Post, :posts, :blog_id}, {:blog, :id}}
+               {:left_join, {Blogs.Publishing.Post, :blog_posts, :blog_id}, {:blog, :id}}
              ]
+
+      assert builder.filters == [{{:blog_posts, :published}, :eq, true}]
     end
   end
 end

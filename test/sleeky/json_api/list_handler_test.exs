@@ -18,18 +18,22 @@ defmodule Sleeky.JsonApi.ListHandlerTest do
         |> Blog.JsonApiListHandler.execute([])
         |> json_response!(200)
 
+      author_id = context.author.id
+      blog_id = context.blog.id
+
       assert %{
                "limit" => 50,
                "total_count" => 1,
                "items" => [
                  %{
-                   "author" => %{"id" => context.author.id},
-                   "id" => context.blog.id,
+                   "author" => %{"id" => ^author_id},
+                   "id" => ^blog_id,
                    "name" => "elixir blog",
-                   "published" => true
+                   "published" => true,
+                   "theme" => nil
                  }
                ]
-             } == resp
+             } = resp
     end
 
     test "returns included parents", context do
@@ -44,18 +48,21 @@ defmodule Sleeky.JsonApi.ListHandlerTest do
         |> Blog.JsonApiListHandler.execute([])
         |> json_response!(200)
 
+      author_id = context.author.id
+      blog_id = context.blog.id
+
       assert %{
                "limit" => 50,
                "total_count" => 1,
                "items" => [
                  %{
-                   "author" => %{"id" => context.author.id, "name" => "foo"},
-                   "id" => context.blog.id,
+                   "author" => %{"id" => ^author_id, "name" => "foo"},
+                   "id" => ^blog_id,
                    "name" => "elixir blog",
                    "published" => true
                  }
                ]
-             } == resp
+             } = resp
     end
 
     test "supports query filters", context do

@@ -59,6 +59,7 @@ defmodule Sleeky.Model do
       computed?: false,
       mutable?: true,
       timestamp?: false,
+      in: [],
       aliases: []
     ]
   end

@@ -56,6 +56,7 @@ defmodule Sleeky.Fixtures do
     {:ok, post} =
       Publishing.Post.create(
         id: uuid(),
+        author_id: author.id,
         blog_id: blog.id,
         published: true,
         deleted: false,
@@ -109,7 +110,8 @@ defmodule Sleeky.Fixtures do
       "published_at" => "2024-06-29T12:00:00Z",
       "title" => "foo",
       "blog" => %{"id" => context.blog.id},
-      "id" => Ecto.UUID.generate()
+      "id" => Ecto.UUID.generate(),
+      "author" => %{"id" => context.author.id}
     }
 
     Map.put(context, :post_json_api_params, params)

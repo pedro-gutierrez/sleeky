@@ -2,7 +2,7 @@ defmodule Blogs.Publishing.Post do
   @moduledoc false
   use Sleeky.Model
 
-  alias Blogs.Publishing.{Blog, Comment}
+  alias Blogs.Publishing.{Author, Blog, Comment}
 
   model do
     attribute :title, kind: :string
@@ -11,26 +11,31 @@ defmodule Blogs.Publishing.Post do
     attribute :published, kind: :boolean, required: true, default: false
     attribute :deleted, kind: :boolean, required: true, default: false
     belongs_to Blog
+    belongs_to Author
     has_many Comment
 
     action :update do
-      allow role: :user, scope: :author
+      role :user, scope: :author
     end
 
     action :list do
-      allow role: :user, scope: :is_published_and_is_not_locked
+      role :user do
+        scope do
+          all [:is_published, :is_not_locked]
+        end
+      end
     end
 
     action :delete do
-      allow role: :user, scope: :author
+      role :user, scope: :author
     end
 
     action :read do
-      allow role: :user, scope: :author
+      role :user, scope: :author
     end
 
     action :create do
-      allow role: :user, scope: :author
+      role :user, scope: :author
     end
   end
 end

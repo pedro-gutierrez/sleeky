@@ -11,7 +11,6 @@ defmodule Sleeky.Migrations.Constraint do
     :column,
     :target,
     type: :uuid,
-    null: false,
     on_delete: :nothing
   ]
 
@@ -23,8 +22,7 @@ defmodule Sleeky.Migrations.Constraint do
       prefix: rel.model.context.name(),
       column: rel.column_name,
       target: target_model.table_name(),
-      type: target_model.primary_key().storage,
-      null: !rel.required?
+      type: target_model.primary_key().storage
     )
   end
 

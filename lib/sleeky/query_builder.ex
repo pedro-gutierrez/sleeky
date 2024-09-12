@@ -76,7 +76,7 @@ defmodule Sleeky.QueryBuilder do
     dynamic(not (^filter))
   end
 
-  defp filter({{binding, column}, _, nil}) do
+  defp filter({{binding, column}, :eq, nil}) do
     dynamic([{^binding, x}], is_nil(field(x, ^column)))
   end
 
@@ -88,6 +88,10 @@ defmodule Sleeky.QueryBuilder do
     value = "%#{value}%"
 
     dynamic([{^binding, x}], ilike(field(x, ^column), ^value))
+  end
+
+  defp filter({{binding, column}, :neq, nil}) do
+    dynamic([{^binding, x}], not is_nil(field(x, ^column)))
   end
 
   defp filter({{binding, column}, :neq, value}) do
@@ -122,8 +126,15 @@ defmodule Sleeky.QueryBuilder do
 
   def join(query, joins) when is_list(joins) do
     Enum.reduce(joins, query, fn
-      {:join, {remote_model, remote_alias, remote_column}, {local_alias, local_column}}, query ->
-        join(query, :inner, [{^local_alias, x}], r in ^remote_model,
+      {join_type, {remote_model, remote_alias, remote_column}, {local_alias, local_column}},
+      query ->
+        join_type =
+          case join_type do
+            :join -> :inner
+            :left_join -> :left
+          end
+
+        join(query, join_type, [{^local_alias, x}], r in ^remote_model,
           as: ^remote_alias,
           on: field(x, ^local_column) == field(r, ^remote_column)
         )

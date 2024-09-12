@@ -10,7 +10,7 @@ defmodule Sleeky.Migrations.CreateIndexTest do
                "create(\n      unique_index(:blogs, [:author_id, :name],\n        name: :blogs_author_id_name_idx,\n        prefix: :publishing\n"
 
       assert migration =~
-               "create(unique_index(:topics, [:name], name: :topics_name_idx, prefix: :publishing))"
+               "create(unique_index(:themes, [:name], name: :themes_name_idx, prefix: :publishing))"
     end
   end
 end

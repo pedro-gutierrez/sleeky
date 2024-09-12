@@ -75,7 +75,7 @@ defmodule Sleeky.Context.AuthorizationTest do
         |> Publishing.scope(:post, :list, params)
 
       {sql, params} = Ecto.Adapters.SQL.to_sql(:all, Blogs.Repo, q)
-      assert sql =~ "WHERE ((p0.\"published_at\" IS NULL) AND (p0.\"locked\" = $1))"
+      assert sql =~ "WHERE (NOT (p0.\"published_at\" IS NULL) AND (p0.\"locked\" = $1))"
       assert params == [false]
     end
   end

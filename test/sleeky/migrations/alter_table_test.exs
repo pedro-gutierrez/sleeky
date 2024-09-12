@@ -10,7 +10,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
           use Ecto.Migration
 
           def up do
-            create table(:topics, prefix: :publishing, primary_key: false) do
+            create table(:themes, prefix: :publishing, primary_key: false) do
             end
           end
         end
@@ -18,7 +18,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
       ]
       |> generate_migrations()
       |> assert_migrations([
-        "alter(table(:topics, prefix: :publishing)) do",
+        "alter(table(:themes, prefix: :publishing)) do",
         "add(:id, :binary_id, primary_key: true, null: false)",
         "add(:name, :string, null: false)"
       ])
@@ -31,7 +31,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
           use Ecto.Migration
 
           def up do
-            create table(:topics, prefix: :publishing, primary_key: false) do
+            create table(:themes, prefix: :publishing, primary_key: false) do
               add(:id, :binary_id, primary_key: true, null: false)
               add(:name, :string, null: false)
               add(:closed, :boolean, null: true)
@@ -42,7 +42,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
       ]
       |> generate_migrations()
       |> assert_migrations([
-        "alter(table(:topics, prefix: :publishing)) do",
+        "alter(table(:themes, prefix: :publishing)) do",
         "remove(:closed)"
       ])
     end
@@ -54,9 +54,9 @@ defmodule Sleeky.Migrations.AlterTableTest do
           use Ecto.Migration
 
           def up do
-            create(table(:topics, prefix: :publishing, primary_key: false)) do
+            create(table(:themes, prefix: :publishing, primary_key: false)) do
             end
-            alter(table(:topics, prefix: :publishing)) do
+            alter(table(:themes, prefix: :publishing)) do
               add(:id, :binary_id, primary_key: true, null: false)
               add(:name, :string, null: false)
             end
@@ -66,7 +66,7 @@ defmodule Sleeky.Migrations.AlterTableTest do
       ]
       |> generate_migrations()
       |> refute_migrations([
-        "alter(table(:topics, prefix: :publishing)) do"
+        "alter(table(:themes, prefix: :publishing)) do"
       ])
     end
   end

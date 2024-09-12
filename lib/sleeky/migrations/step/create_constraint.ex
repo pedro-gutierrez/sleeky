@@ -43,7 +43,6 @@ defmodule Sleeky.Migrations.Step.CreateConstraint do
                  step.constraint.target,
                  [
                    type: step.constraint.type,
-                   null: step.constraint.null,
                    on_delete: step.constraint.on_delete
                  ]
                ]}

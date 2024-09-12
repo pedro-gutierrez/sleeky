@@ -45,6 +45,7 @@ defmodule Sleeky.Model.Parser do
         kind = Keyword.fetch!(opts, :kind)
         storage = storage(kind)
         required = Keyword.get(opts, :required, true)
+        allowed_values = Keyword.get(opts, :in, [])
 
         ensure_valid_field_name!(model, attr_name)
 
@@ -54,7 +55,8 @@ defmodule Sleeky.Model.Parser do
           kind: kind,
           storage: storage,
           aliases: [attr_name],
-          required?: required
+          required?: required,
+          in: allowed_values
         }
       end
 
@@ -71,11 +73,11 @@ defmodule Sleeky.Model.Parser do
   end
 
   defp with_parents(model, definition) do
-    model_module = model.module
-
     rels =
-      for {:belongs_to, [], [parent_module]} <- definition do
-        ensure_same_context!(model_module, parent_module, :belongs_to)
+      for opts <- children_tags(definition, :belongs_to) do
+        parent_module = Keyword.fetch!(opts, :name)
+        ensure_same_context!(model.module, parent_module, :belongs_to)
+        required = Keyword.get(opts, :required, true)
 
         name = name(parent_module)
         table_name = table_name(parent_module)
@@ -86,6 +88,7 @@ defmodule Sleeky.Model.Parser do
           name: name,
           kind: :parent,
           model: model.module,
+          required?: required,
           inverse: %Relation{
             name: model.plural,
             model: parent_module,
@@ -99,7 +102,9 @@ defmodule Sleeky.Model.Parser do
           aliases: [name]
         }
 
-        %{rel | foreign_key_name: foreign_key_name(rel)}
+        foreign_key_name = String.to_atom("#{model.table_name}_#{column_name}_fkey")
+
+        %{rel | foreign_key_name: foreign_key_name}
       end
 
     %{model | relations: rels}
@@ -121,7 +126,9 @@ defmodule Sleeky.Model.Parser do
           column_name: column_name(model.module)
         }
 
-        inverse = %{inverse | foreign_key_name: foreign_key_name(inverse)}
+        foreign_key_name = String.to_atom("#{inverse.table_name}_#{inverse.column_name}_fkey")
+
+        inverse = %{inverse | foreign_key_name: foreign_key_name}
 
         %Relation{
           name: name,
@@ -136,27 +143,36 @@ defmodule Sleeky.Model.Parser do
     %{model | relations: model.relations ++ rels}
   end
 
+  defp fields!(model, field_names) do
+    fields = model.attributes ++ model.relations
+
+    Enum.map(field_names, fn name ->
+      with nil <- Enum.find(fields, &(&1.name == name)) do
+        known_field_names = Enum.map(fields, & &1.name)
+
+        raise "Key in model #{inspect(model.module)} is referencing unknown field
+          #{inspect(name)}. Known fields: #{inspect(known_field_names)}"
+      end
+    end)
+  end
+
   defp with_keys(model, definition) do
     keys =
       for {:key, opts, _} <- definition do
         unique = Keyword.get(opts, :unique, false)
         field_names = Keyword.fetch!(opts, :fields)
-        fields = model.attributes ++ model.relations
-
-        fields =
-          Enum.map(field_names, fn name ->
-            with nil <- Enum.find(fields, &(&1.name == name)) do
-              known_field_names = Enum.map(fields, & &1.name)
-
-              raise "Key in model #{inspect(model.module)} is referencing unknown field
-                #{inspect(name)}. Known fields: #{inspect(known_field_names)}"
-            end
-          end)
+        fields = fields!(model, field_names)
 
         %Key{fields: fields, model: model.module, unique?: unique}
       end
 
-    %{model | keys: keys}
+    unique_keys =
+      for {:unique, _, field_names} <- definition do
+        fields = fields!(model, field_names)
+        %Key{fields: fields, model: model.module, unique?: true}
+      end
+
+    %{model | keys: Enum.uniq(keys ++ unique_keys)}
   end
 
   defp with_actions(model, definition) do
@@ -165,15 +181,9 @@ defmodule Sleeky.Model.Parser do
         name = Keyword.fetch!(opts, :name)
 
         policies =
-          for {policy, opts, _} <- policies do
-            role = Keyword.fetch!(opts, :role)
-            scope = Keyword.get(opts, :scope)
-
-            %Policy{role: role, scope: scope, policy: policy}
-          end
-
-        policies =
-          Enum.reduce(policies, %{}, fn policy, acc ->
+          policies
+          |> Enum.map(&action_policy/1)
+          |> Enum.reduce(%{}, fn policy, acc ->
             Map.put(acc, policy.role, policy)
           end)
 
@@ -188,6 +198,24 @@ defmodule Sleeky.Model.Parser do
 
     %{model | actions: actions}
   end
+
+  defp action_policy({:role, [], [name]}) do
+    %Policy{role: name, policy: :allow}
+  end
+
+  defp action_policy({:role, [name: role, scope: scope], []}) do
+    %Policy{role: role, scope: scope(scope), policy: :allow}
+  end
+
+  defp action_policy({:role, [name: role], [scope]}) do
+    %Policy{role: role, scope: scope(scope), policy: :allow}
+  end
+
+  defp scope(name) when is_atom(name), do: name
+  defp scope(scopes) when is_list(scopes), do: Enum.map(scopes, &scope/1)
+  defp scope({:scope, [], [scope]}), do: scope(scope)
+  defp scope({:one, [], scopes}), do: {:one, scope(scopes)}
+  defp scope({:all, [], scopes}), do: {:all, scope(scopes)}
 
   defp storage(:id), do: :binary_id
   defp storage(:timestamp), do: :utc_datetime
@@ -225,5 +253,20 @@ defmodule Sleeky.Model.Parser do
       plural: plural(module),
       context: context(module)
     }
+  end
+
+  defp children_tags(definition, tag_name) do
+    definition
+    |> Enum.map(fn
+      {^tag_name, [], [parent_module]} ->
+        [name: parent_module, required: true]
+
+      {^tag_name, opts, _} ->
+        opts
+
+      _ ->
+        nil
+    end)
+    |> Enum.reject(&is_nil/1)
   end
 end
