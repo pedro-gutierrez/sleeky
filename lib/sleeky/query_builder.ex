@@ -125,7 +125,9 @@ defmodule Sleeky.QueryBuilder do
   def join(query, nil), do: query
 
   def join(query, joins) when is_list(joins) do
-    Enum.reduce(joins, query, fn
+    joins
+    |> Enum.uniq()
+    |> Enum.reduce(query, fn
       {join_type, {remote_model, remote_alias, remote_column}, {local_alias, local_column}},
       query ->
         join_type =
@@ -146,7 +148,7 @@ defmodule Sleeky.QueryBuilder do
   """
   def combine(builders, op) do
     %__MODULE__{
-      joins: Enum.flat_map(builders, & &1.joins),
+      joins: builders |> Enum.flat_map(& &1.joins) |> Enum.uniq(),
       filters: [{op, Enum.flat_map(builders, & &1.filters)}]
     }
   end

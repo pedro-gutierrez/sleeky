@@ -198,7 +198,6 @@ defmodule Sleeky.Authorization.QueryTest do
                {:join, {Blogs.Publishing.Post, :comment_post, :id}, {:comment, :post_id}},
                {:join, {Blogs.Publishing.Author, :comment_post_author, :id},
                 {:comment_post, :author_id}},
-               {:join, {Blogs.Publishing.Post, :comment_post, :id}, {:comment, :post_id}},
                {:join, {Blogs.Publishing.Blog, :comment_post_blog, :id},
                 {:comment_post, :blog_id}},
                {:join, {Blogs.Publishing.Author, :comment_post_blog_author, :id},

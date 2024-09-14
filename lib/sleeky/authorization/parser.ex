@@ -84,8 +84,20 @@ defmodule Sleeky.Authorization.Parser do
     %Expression{op: :neq, args: [arg, {:value, nil}]}
   end
 
+  defp translate_expression(:same, args) do
+    %Expression{op: :eq, args: args}
+  end
+
+  defp translate_expression(:member, args) do
+    %Expression{op: :in, args: args}
+  end
+
   defp translate_expression(:is_true, [arg]) do
     %Expression{op: :eq, args: [arg, {:value, true}]}
+  end
+
+  defp translate_expression(:is_false, [arg]) do
+    %Expression{op: :eq, args: [arg, {:value, false}]}
   end
 
   defp translate_expression(op, args), do: %Expression{op: op, args: args}
