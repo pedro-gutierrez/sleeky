@@ -4,7 +4,7 @@ defmodule Blogs.Authorization do
 
   authorization roles: "current_user.roles" do
     scope :author do
-      eq do
+      same do
         path "**.author"
         path "current_user"
       end
@@ -17,7 +17,7 @@ defmodule Blogs.Authorization do
     end
 
     scope :self do
-      eq do
+      same do
         path "user.id"
         path "current_user.id"
       end
@@ -30,9 +30,8 @@ defmodule Blogs.Authorization do
     end
 
     scope :is_not_locked do
-      eq do
+      is_false do
         path "**.locked"
-        false
       end
     end
 

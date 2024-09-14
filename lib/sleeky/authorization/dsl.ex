@@ -5,12 +5,15 @@ defmodule Sleeky.Authorization.Dsl do
     root: Sleeky.Authorization.Dsl.Authorization,
     tags: [
       Sleeky.Authorization.Dsl.Eq,
+      Sleeky.Authorization.Dsl.Same,
+      Sleeky.Authorization.Dsl.Member,
       Sleeky.Authorization.Dsl.Path,
       Sleeky.Authorization.Dsl.Roles,
       Sleeky.Authorization.Dsl.Scope,
       Sleeky.Authorization.Dsl.One,
       Sleeky.Authorization.Dsl.All,
       Sleeky.Authorization.Dsl.NotNil,
-      Sleeky.Authorization.Dsl.IsTrue
+      Sleeky.Authorization.Dsl.IsTrue,
+      Sleeky.Authorization.Dsl.IsFalse
     ]
 end
