@@ -37,7 +37,7 @@ defmodule Sleeky.MixProject do
     [
       {:bandit, "~> 1.5"},
       {:calendar, "~> 1.0"},
-      {:diesel, path: "/Users/pedrogutierrez/Projects/diesel"},
+      {:diesel, "~> 0.7"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:estree, "~> 2.7"},
