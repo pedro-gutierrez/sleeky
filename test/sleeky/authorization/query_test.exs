@@ -100,6 +100,52 @@ defmodule Sleeky.Authorization.QueryTest do
       end
     end
 
+    test "supports deeply nested scopes" do
+      published = scope(:eq, [{:path, [:published]}, {:value, true}])
+      locked = scope(:eq, [{:path, [:locked]}, {:value, true}])
+
+      combined =
+        scope(
+          :all,
+          [
+            published,
+            scope(:one, [published, scope(:all, [published, locked])]),
+            scope(:one, [
+              locked,
+              scope(:all, [scope(:all, [published, locked, published, locked]), locked])
+            ])
+          ]
+        )
+
+      builder = Query.build(Post, combined)
+
+      assert builder.filters == [
+               and: [
+                 {{:post, :published}, :eq, true},
+                 {:or,
+                  [
+                    {{:post, :published}, :eq, true},
+                    {:and, [{{:post, :published}, :eq, true}, {{:post, :locked}, :eq, true}]}
+                  ]},
+                 {:or,
+                  [
+                    {{:post, :locked}, :eq, true},
+                    {:and,
+                     [
+                       {:and,
+                        [
+                          {{:post, :published}, :eq, true},
+                          {{:post, :locked}, :eq, true},
+                          {{:post, :published}, :eq, true},
+                          {{:post, :locked}, :eq, true}
+                        ]},
+                       {{:post, :locked}, :eq, true}
+                     ]}
+                  ]}
+               ]
+             ]
+    end
+
     test "supports joining on parent" do
       blog_published = %Scope{
         expression: %Expression{
@@ -268,5 +314,14 @@ defmodule Sleeky.Authorization.QueryTest do
 
       assert builder.filters == [{{:blog_posts, :published}, :eq, true}]
     end
+  end
+
+  defp scope(op, args) do
+    %Scope{
+      expression: %Expression{
+        op: op,
+        args: args
+      }
+    }
   end
 end

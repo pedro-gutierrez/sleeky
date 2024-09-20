@@ -109,10 +109,10 @@ defmodule Sleeky.JsonApi.Generator.Router do
     end
   end
 
-  defp collection_path(context, model), do: "/#{context.name}/#{model.plural()}"
+  defp collection_path(context, model), do: "/#{context.name()}/#{model.plural()}"
 
   defp relation_path(context, model, rel),
-    do: "/#{context.name}/#{model.plural()}/:id/#{rel.name}"
+    do: "/#{context.name()}/#{model.plural()}/:id/#{rel.name}"
 
   defp item_path(context, model), do: collection_path(context, model) <> "/:id"
 end
