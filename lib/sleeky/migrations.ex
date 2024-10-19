@@ -38,7 +38,7 @@ defmodule Sleeky.Migrations do
 
     contexts
     |> Enum.flat_map(& &1.models())
-    |> Enum.reject(& &1.virtual?)
+    |> Enum.reject(& &1.virtual?())
     |> Enum.reduce(state, &state_with_model/2)
   end
 
@@ -59,7 +59,7 @@ defmodule Sleeky.Migrations do
   end
 
   defp state_with_constraints(state, model) do
-    model.parents
+    model.parents()
     |> Enum.map(&Constraint.from_relation/1)
     |> Enum.reduce(state, fn constraint, state ->
       State.add!(state, constraint.prefix, :constraints, constraint)

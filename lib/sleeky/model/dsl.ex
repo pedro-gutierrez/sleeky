@@ -13,6 +13,7 @@ defmodule Sleeky.Model.Dsl do
       Sleeky.Model.Dsl.Role,
       Sleeky.Model.Dsl.Scope,
       Sleeky.Model.Dsl.One,
-      Sleeky.Model.Dsl.All
+      Sleeky.Model.Dsl.All,
+      Sleeky.Model.Dsl.Task
     ]
 end

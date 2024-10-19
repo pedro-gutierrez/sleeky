@@ -177,22 +177,29 @@ defmodule Sleeky.Model.Parser do
 
   defp with_actions(model, definition) do
     actions =
-      for {:action, opts, policies} <- definition do
+      for {:action, opts, children} <- definition do
         name = Keyword.fetch!(opts, :name)
 
         policies =
-          policies
+          children
           |> Enum.map(&action_policy/1)
+          |> Enum.reject(&is_nil/1)
           |> Enum.reduce(%{}, fn policy, acc ->
             Map.put(acc, policy.role, policy)
           end)
+
+        tasks =
+          children
+          |> Enum.map(&action_task/1)
+          |> Enum.reject(&is_nil/1)
 
         kind = Keyword.get(opts, :kind, name)
 
         %Action{
           name: name,
           kind: kind,
-          policies: policies
+          policies: policies,
+          tasks: tasks
         }
       end
 
@@ -210,6 +217,11 @@ defmodule Sleeky.Model.Parser do
   defp action_policy({:role, [name: role], [scope]}) do
     %Policy{role: role, scope: scope(scope), policy: :allow}
   end
+
+  defp action_policy(_), do: nil
+
+  defp action_task({:task, [], [module]}), do: module
+  defp action_task(_), do: nil
 
   defp scope(name) when is_atom(name), do: name
   defp scope(scopes) when is_list(scopes), do: Enum.map(scopes, &scope/1)

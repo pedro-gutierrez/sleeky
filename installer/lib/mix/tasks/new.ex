@@ -523,23 +523,23 @@ defmodule Mix.Tasks.Sleeky.New do
       attribute :email, kind: :string
 
       action :list do
-        allow role: :guest
+        role :guest
       end
 
       action :read do
-        allow role: :guest
+        role :guest
       end
 
       action :create do
-        allow role: :admin
+        role :admin
       end
 
       action :update do
-        allow role: :admin
+        role :admin
       end
 
       action :delete do
-        allow role: :admin
+        role :admin
       end
     end
   end

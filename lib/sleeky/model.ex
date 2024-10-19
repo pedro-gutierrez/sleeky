@@ -91,7 +91,8 @@ defmodule Sleeky.Model do
     defstruct [
       :name,
       :kind,
-      policies: %{}
+      policies: %{},
+      tasks: []
     ]
   end
 

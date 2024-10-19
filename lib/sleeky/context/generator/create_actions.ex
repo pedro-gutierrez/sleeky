@@ -10,11 +10,12 @@ defmodule Sleeky.Context.Generator.CreateActions do
   end
 
   defp create_funs(context) do
-    for model <- context.models, %{name: :create} <- model.actions() do
+    for model <- context.models, %{name: :create} = action <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("create_#{model_name}")
       do_action_fun_name = String.to_atom("do_create_#{model_name}")
       children_action_fun_name = String.to_atom("create_#{model_name}_children")
+      tasks = action.tasks
 
       quote do
         def unquote(action_fun_name)(attrs, context) do
@@ -23,7 +24,8 @@ defmodule Sleeky.Context.Generator.CreateActions do
 
           repo.transaction(fn ->
             with {:ok, model} <- unquote(do_action_fun_name)(attrs, context),
-                 :ok <- unquote(children_action_fun_name)(model, attrs, context) do
+                 :ok <- unquote(children_action_fun_name)(model, attrs, context),
+                 :ok <- Sleeky.Job.schedule_all(model, :create, unquote(tasks)) do
               model
             else
               {:error, reason} ->
