@@ -4,5 +4,7 @@ defmodule Blogs.Ui do
 
   ui do
     page Blogs.Ui.Index
+
+    context Blogs.Accounts
   end
 end
