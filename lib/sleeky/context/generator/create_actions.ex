@@ -18,7 +18,7 @@ defmodule Sleeky.Context.Generator.CreateActions do
       tasks = action.tasks
 
       quote do
-        def unquote(action_fun_name)(attrs, context) do
+        def unquote(action_fun_name)(attrs, context \\ %{}) do
           context = Map.merge(attrs, context)
           repo = repo()
 

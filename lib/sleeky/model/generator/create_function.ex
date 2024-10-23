@@ -6,7 +6,8 @@ defmodule Sleeky.Model.Generator.CreateFunction do
   def generate(model, _) do
     [
       with_map_args(model),
-      with_keyword_args(model)
+      with_keyword_args(model),
+      batch_fun(model)
     ]
   end
 
@@ -26,6 +27,16 @@ defmodule Sleeky.Model.Generator.CreateFunction do
         attrs
         |> Map.new()
         |> create()
+      end
+    end
+  end
+
+  defp batch_fun(model) do
+    quote do
+      def create_many(items, opts \\ []) when is_list(items) do
+        unquote(model.context).repo().insert_all(__MODULE__, items, opts)
+
+        :ok
       end
     end
   end
