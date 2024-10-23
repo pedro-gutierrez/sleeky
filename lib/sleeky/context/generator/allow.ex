@@ -18,16 +18,21 @@ defmodule Sleeky.Context.Generator.Allow do
       quote do
         def allow(unquote(model), unquote(action.name), params) do
           roles = roles(params) || []
-          policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
 
-          if Sleeky.Authorization.Action.allow?(
-               unquote(model),
-               unquote(action.name),
-               policy,
-               params
-             ),
-             do: :ok,
-             else: {:error, :forbidden}
+          if roles == [] do
+            :ok
+          else
+            policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
+
+            if Sleeky.Authorization.Action.allow?(
+                 unquote(model),
+                 unquote(action.name),
+                 policy,
+                 params
+               ),
+               do: :ok,
+               else: {:error, :forbidden}
+          end
         end
       end
     end
