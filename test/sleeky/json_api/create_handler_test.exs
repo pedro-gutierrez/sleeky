@@ -23,7 +23,7 @@ defmodule Sleeky.JsonApi.CreateHandlerTest do
              } == errors
     end
 
-    test "checks authorization" do
+    test "denies access if no role matches" do
       params = %{
         "id" => Ecto.UUID.generate(),
         "name" => "john"
@@ -32,12 +32,26 @@ defmodule Sleeky.JsonApi.CreateHandlerTest do
       errors =
         :post
         |> conn("/", params)
+        |> assign(:current_user, %{roles: [:other]})
         |> Author.JsonApiCreateHandler.execute([])
         |> json_response!(403)
 
       assert %{
                "reason" => "forbidden"
              } == errors
+    end
+
+    test "allows access if no roles are defined" do
+      params = %{
+        "id" => Ecto.UUID.generate(),
+        "name" => "john"
+      }
+
+      :post
+      |> conn("/", params)
+      |> assign(:current_user, %{roles: []})
+      |> Author.JsonApiCreateHandler.execute([])
+      |> json_response!(201)
     end
 
     test "creates top level models" do

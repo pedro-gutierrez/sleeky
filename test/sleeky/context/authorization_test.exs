@@ -11,6 +11,7 @@ defmodule Sleeky.Context.AuthorizationTest do
       params =
         context
         |> other_user()
+        |> Map.fetch!(:params)
         |> Map.put(:user, context.user)
 
       assert {:error, :forbidden} == Accounts.allow(:user, :update, params)
