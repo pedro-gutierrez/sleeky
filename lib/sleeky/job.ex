@@ -30,7 +30,9 @@ defmodule Sleeky.Job do
   end
 
   defp do_perform(job, model, id, task) do
-    case id |> model.fetch!() |> task.execute() do
+    opts = [preload: model.parent_field_names()]
+
+    case id |> model.fetch!(opts) |> task.execute() do
       {:error, reason} -> handle_error(job, model, id, task, reason)
       _ -> :ok
     end

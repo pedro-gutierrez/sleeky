@@ -6,18 +6,17 @@ defmodule Sleeky.Model.Generator.FetchFunction do
   @impl true
   def generate(model, _),
     do: [
-      fetch_function(model),
+      fetch_function(),
       fetch_bang_function(),
       fetch_by_unique_key_functions(model)
     ]
 
-  defp fetch_function(model) do
+  defp fetch_function do
     quote do
       def fetch(id, opts \\ []) do
-        repo = unquote(model.context).repo()
         preload = Keyword.get(opts, :preload, [])
 
-        case __MODULE__ |> repo.get(id) |> repo.preload(preload) do
+        case __MODULE__ |> @repo.get(id) |> @repo.preload(preload) do
           nil -> {:error, :not_found}
           model -> {:ok, model}
         end
