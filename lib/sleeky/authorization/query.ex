@@ -40,7 +40,7 @@ defmodule Sleeky.Authorization.Query do
     builder = %QueryBuilder{}
     value = Evaluate.evaluate(params, right)
 
-    binding = [model.name]
+    binding = [model.name()]
 
     do_filter(model, binding, left, op, value, builder)
   end
