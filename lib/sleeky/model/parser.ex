@@ -162,14 +162,16 @@ defmodule Sleeky.Model.Parser do
         unique = Keyword.get(opts, :unique, false)
         field_names = Keyword.fetch!(opts, :fields)
         fields = fields!(model, field_names)
+        name = field_names |> Enum.join("_") |> String.to_atom()
 
-        %Key{fields: fields, model: model.module, unique?: unique}
+        %Key{fields: fields, model: model.module, unique?: unique, name: name}
       end
 
     unique_keys =
       for {:unique, _, field_names} <- definition do
         fields = fields!(model, field_names)
-        %Key{fields: fields, model: model.module, unique?: true}
+        name = field_names |> Enum.join("_") |> String.to_atom()
+        %Key{fields: fields, model: model.module, unique?: true, name: name}
       end
 
     %{model | keys: Enum.uniq(keys ++ unique_keys)}

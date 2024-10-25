@@ -39,6 +39,7 @@ defmodule Sleeky.Model do
     defstruct [
       :fields,
       :model,
+      :name,
       unique?: false
     ]
   end
