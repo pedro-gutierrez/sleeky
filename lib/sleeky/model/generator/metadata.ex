@@ -18,6 +18,7 @@ defmodule Sleeky.Model.Generator.Metadata do
 
     quote do
       @repo unquote(model.repo)
+      def repo, do: @repo
 
       @attributes unquote(Macro.escape(attributes))
       @parents unquote(Macro.escape(parents))

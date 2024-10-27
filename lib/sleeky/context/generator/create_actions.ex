@@ -17,23 +17,37 @@ defmodule Sleeky.Context.Generator.CreateActions do
       children_action_fun_name = String.to_atom("create_#{model_name}_children")
       tasks = action.tasks
 
-      quote do
-        def unquote(action_fun_name)(attrs, context \\ %{}) do
-          context = Map.merge(attrs, context)
-          repo = repo()
+      fun_with_map_args =
+        quote do
+          def unquote(action_fun_name)(attrs, context \\ %{})
 
-          repo.transaction(fn ->
-            with {:ok, model} <- unquote(do_action_fun_name)(attrs, context),
-                 :ok <- unquote(children_action_fun_name)(model, attrs, context),
-                 :ok <- Sleeky.Job.schedule_all(model, :create, unquote(tasks)) do
-              model
-            else
-              {:error, reason} ->
-                repo.rollback(reason)
-            end
-          end)
+          def unquote(action_fun_name)(attrs, context) when is_map(attrs) do
+            context = Map.merge(attrs, context)
+            repo = repo()
+
+            repo.transaction(fn ->
+              with {:ok, model} <- unquote(do_action_fun_name)(attrs, context),
+                   :ok <- unquote(children_action_fun_name)(model, attrs, context),
+                   :ok <- Sleeky.Job.schedule_all(model, :create, unquote(tasks)) do
+                model
+              else
+                {:error, reason} ->
+                  repo.rollback(reason)
+              end
+            end)
+          end
         end
-      end
+
+      fun_with_kw_args =
+        quote do
+          def unquote(action_fun_name)(attrs, context) when is_list(attrs) do
+            attrs
+            |> Map.new()
+            |> unquote(action_fun_name)()
+          end
+        end
+
+      [fun_with_map_args, fun_with_kw_args]
     end
   end
 
@@ -51,12 +65,20 @@ defmodule Sleeky.Context.Generator.CreateActions do
             into: %{},
             do: {rel.name, rel.column_name}
 
+      default_values =
+        for attr when not is_nil(attr.default) <- model.attributes(), into: %{} do
+          {attr.name, attr.default}
+        end
+
       quote do
         defp unquote(action_fun_name)(attrs, context) do
           fields =
             attrs
             |> Map.take(unquote(attr_names))
             |> collect_ids(attrs, unquote(Macro.escape(parent_fields)))
+            |> Sleeky.Context.Helpers.set_default_values(unquote(Macro.escape(default_values)))
+            |> string_keys()
+            |> Map.put_new_lazy("id", &Ecto.UUID.generate/0)
 
           with :ok <- allow(unquote(model_name), unquote(action.name), context) do
             unquote(model).create(fields)
