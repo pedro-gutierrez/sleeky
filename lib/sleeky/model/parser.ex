@@ -46,6 +46,7 @@ defmodule Sleeky.Model.Parser do
         storage = storage(kind)
         required = Keyword.get(opts, :required, true)
         allowed_values = Keyword.get(opts, :in, [])
+        default = Keyword.get(opts, :default)
 
         ensure_valid_field_name!(model, attr_name)
 
@@ -56,7 +57,8 @@ defmodule Sleeky.Model.Parser do
           storage: storage,
           aliases: [attr_name],
           required?: required,
-          in: allowed_values
+          in: allowed_values,
+          default: default
         }
       end
 

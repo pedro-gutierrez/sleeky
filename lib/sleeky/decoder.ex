@@ -54,7 +54,7 @@ defmodule Sleeky.Decoder do
   end
 
   def maybe_required(opts, field) do
-    if field.required? do
+    if field.required? && !field.default do
       Keyword.put(opts, :required, field.required?)
     else
       optional(opts)

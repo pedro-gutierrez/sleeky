@@ -18,6 +18,11 @@ defmodule Sleeky.Context.ListActionTest do
       assert [] == page.entries
     end
 
+    test "skips auth when no roles are provided", %{blog: blog} do
+      assert page = Publishing.list_blogs()
+      assert [blog] == page.entries
+    end
+
     test "lists items by their parent", %{params: params, post: post} do
       assert page = Publishing.list_comments_by_post(post, params)
       assert [_c1, _c2, _c3] = page.entries

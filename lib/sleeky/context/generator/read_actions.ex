@@ -16,7 +16,7 @@ defmodule Sleeky.Context.Generator.ReadActions do
       action_fun_name = String.to_atom("read_#{model_name}")
 
       quote do
-        def unquote(action_fun_name)(id, context) do
+        def unquote(action_fun_name)(id, context \\ %{}) do
           opts = context |> Map.take([:preload]) |> Keyword.new()
 
           with {:ok, model} <- unquote(model).fetch(id, opts),
@@ -39,7 +39,7 @@ defmodule Sleeky.Context.Generator.ReadActions do
       args = key.fields |> Enum.map(& &1.name) |> Enum.map(&var(&1))
 
       quote do
-        def unquote(action_fun_name)(unquote_splicing(args), context) do
+        def unquote(action_fun_name)(unquote_splicing(args), context \\ %{}) do
           opts = context |> Map.take([:preload]) |> Keyword.new()
 
           with {:ok, model} <-

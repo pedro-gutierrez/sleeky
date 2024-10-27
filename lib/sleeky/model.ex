@@ -78,6 +78,7 @@ defmodule Sleeky.Model do
       :foreign_key_name,
       :storage,
       :inverse,
+      :default,
       required?: true,
       virtual?: false,
       computed?: false,

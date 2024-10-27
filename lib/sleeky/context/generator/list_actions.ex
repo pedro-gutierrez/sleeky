@@ -20,7 +20,7 @@ defmodule Sleeky.Context.Generator.ListActions do
     query = var(:query)
 
     quote do
-      def unquote(action_fun_name)(unquote(context)) do
+      def unquote(action_fun_name)(unquote(context) \\ %{}) do
         unquote(query) =
           unquote(model).query() |> maybe_filter(unquote(model.name()), unquote(context))
 
@@ -42,7 +42,7 @@ defmodule Sleeky.Context.Generator.ListActions do
       quote do
         def unquote(action_fun_name)(
               %unquote(rel.target.module){} = unquote(parent_var),
-              unquote(context)
+              unquote(context) \\ %{}
             ) do
           unquote(query) =
             from(m in unquote(model).query(),

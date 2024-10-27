@@ -73,7 +73,8 @@ defmodule Sleeky.JsonApi.CreateHandlerTest do
 
       assert %{
                "name" => "john",
-               "id" => id
+               "id" => id,
+               "profile" => "publisher"
              } == resp
     end
 
