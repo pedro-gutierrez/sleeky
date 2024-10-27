@@ -34,6 +34,17 @@ defmodule Sleeky.Model.Generator.CreateFunction do
   defp batch_fun(model) do
     quote do
       def create_many(items, opts \\ []) when is_list(items) do
+        now = DateTime.utc_now()
+
+        items =
+          for item <- items do
+            item
+            |> atom_keys()
+            |> Map.put_new_lazy(:id, &Ecto.UUID.generate/0)
+            |> Map.put_new(:inserted_at, now)
+            |> Map.put_new(:updated_at, now)
+          end
+
         unquote(model.context).repo().insert_all(__MODULE__, items, opts)
 
         :ok

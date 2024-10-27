@@ -8,6 +8,7 @@ defmodule Sleeky.Model do
     generators: [
       Sleeky.Model.Generator.Metadata,
       Sleeky.Model.Generator.EctoSchema,
+      Sleeky.Model.Generator.Helpers,
       Sleeky.Model.Generator.FieldNames,
       Sleeky.Model.Generator.Changesets,
       Sleeky.Model.Generator.CreateFunction,

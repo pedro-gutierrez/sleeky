@@ -25,4 +25,12 @@ defmodule Sleeky.Model.CreateTest do
       assert errors_on(changeset) == %{name: ["is invalid"]}
     end
   end
+
+  describe "create_many/2" do
+    test "creates many models at once" do
+      authors = [%{name: "a1", profile: "publisher"}, %{name: "a2", profile: "publisher"}]
+
+      assert :ok = Author.create_many(authors)
+    end
+  end
 end
