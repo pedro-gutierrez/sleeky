@@ -19,15 +19,20 @@ defmodule Sleeky.Context.Generator.Scope do
 
       quote do
         def scope(%Ecto.Query{} = query, unquote(model_name), unquote(action.name), params) do
-          roles = roles(params)
-          policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
+          roles = roles(params) || []
 
-          Sleeky.Authorization.Query.scope(
-            unquote(model),
-            query,
-            policy.scope,
-            params
-          )
+          if roles == [] do
+            query
+          else
+            policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
+
+            Sleeky.Authorization.Query.scope(
+              unquote(model),
+              query,
+              policy.scope,
+              params
+            )
+          end
         end
       end
     end
