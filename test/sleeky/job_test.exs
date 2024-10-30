@@ -14,7 +14,7 @@ defmodule Sleeky.JobTest do
         end
       end
 
-      args = %{"model" => Publishing.Blog, "id" => blog.id, "task" => BlogTask}
+      args = %{"model" => Publishing.Blog, "id" => blog.id, "task" => BlogTask, "atomic" => false}
       assert :ok == Job.perform(%Oban.Job{args: args})
     end
 
@@ -37,7 +37,13 @@ defmodule Sleeky.JobTest do
         end
       end
 
-      args = %{"model" => Publishing.Blog, "id" => blog.id, "task" => CreatePostTask}
+      args = %{
+        "model" => Publishing.Blog,
+        "id" => blog.id,
+        "task" => CreatePostTask,
+        "atomic" => true
+      }
+
       assert {:error, :timeout} == Job.perform(%Oban.Job{args: args})
 
       assert %{entries: [^post]} = Publishing.list_posts()

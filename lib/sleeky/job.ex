@@ -11,7 +11,15 @@ defmodule Sleeky.Job do
   def schedule_all(model, action, jobs) do
     with [_ | _] <-
            jobs
-           |> Enum.map(&new(%{model: model.__struct__, id: model.id, action: action, task: &1}))
+           |> Enum.map(
+             &new(%{
+               model: model.__struct__,
+               id: model.id,
+               action: action,
+               task: &1,
+               atomic: false
+             })
+           )
            |> Oban.insert_all(),
          do: :ok
   end
@@ -19,37 +27,48 @@ defmodule Sleeky.Job do
   require Logger
 
   @impl Oban.Worker
-  def perform(%Oban.Job{args: %{"model" => model, "id" => id, "task" => task}} = job) do
+  def perform(
+        %Oban.Job{args: %{"model" => model, "id" => id, "task" => task, "atomic" => atomic}} = job
+      ) do
     model = Module.concat([model])
     task = Module.concat([task])
+
+    with {:ok, model} <- model.fetch(id, preload: model.parent_field_names()),
+         :ok <- do_perform(model, task, atomic) do
+      :ok
+    else
+      {:error, reason} ->
+        log_error(job, model, id, task, reason)
+
+        {:error, reason}
+    end
+  rescue
+    e ->
+      reason = Exception.format(:error, e, __STACKTRACE__)
+      log_error(job, model, id, task, reason)
+
+      {:error, reason}
+  end
+
+  defp do_perform(%{__struct__: model} = record, task, true) do
     repo = model.repo()
 
     with {:ok, :ok} <-
            repo.transaction(fn ->
-             with {:error, reason} <- do_perform(model, id, task) do
-               log_error(job, model, id, task, reason)
+             with {:error, reason} <- do_perform(record, task) do
                repo.rollback(reason)
              end
            end),
          do: :ok
-  rescue
-    e ->
-      reason = Exception.format(:error, e, __STACKTRACE__)
-      handle_error(job, model, id, task, reason)
   end
 
-  defp do_perform(model, id, task) do
-    opts = [preload: model.parent_field_names()]
+  defp do_perform(record, task, false), do: do_perform(record, task)
 
-    case id |> model.fetch!(opts) |> task.execute() do
+  defp do_perform(record, task) do
+    case task.execute(record) do
       {:error, _} = error -> error
       _ -> :ok
     end
-  end
-
-  defp handle_error(job, model, id, task, reason) do
-    log_error(job, model, id, task, reason)
-    {:error, reason}
   end
 
   defp log_error(job, model, id, task, reason) do
