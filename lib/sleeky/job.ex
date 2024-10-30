@@ -52,16 +52,19 @@ defmodule Sleeky.Job do
     {:error, reason}
   end
 
-  defp log_error(job, model, id, task, reason),
-    do:
-      Logger.warning("task failed",
-        task: task,
-        model: model,
-        id: id,
-        queue: job.queue,
-        reason: format_error(reason),
-        attempts_left: job.max_attempts - job.attempt
-      )
+  defp log_error(job, model, id, task, reason) do
+    attempts_left = job.max_attempts - job.attempt
+    level = if attempts_left == 0, do: :error, else: :warning
+
+    Logger.log(level, "task failed",
+      task: task,
+      model: model,
+      id: id,
+      queue: job.queue,
+      reason: format_error(reason),
+      attempts_left: attempts_left
+    )
+  end
 
   defp format_error(%Ecto.Changeset{} = changeset) do
     changeset
