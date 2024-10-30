@@ -7,7 +7,7 @@ defmodule Sleeky.Model.Dsl.Attribute do
 
     attribute :kind,
       kind: :atom,
-      in: [:integer, :float, :decimal, :string, :boolean, :timestamp, :date, :text],
+      in: [:integer, :float, :decimal, :string, :boolean, :datetime, :date, :text],
       required: true
 
     attribute :required, kind: :boolean, required: false, default: true

@@ -65,7 +65,7 @@ defmodule Sleeky.Decoder do
     Keyword.merge(opts, required: false, nullable: true)
   end
 
-  def attribute_type(opts, %{kind: :timestamp}) do
+  def attribute_type(opts, %{kind: :datetime}) do
     Keyword.merge(opts, type: :string, cast: {:datetime, "{ISO:Extended}"})
   end
 
