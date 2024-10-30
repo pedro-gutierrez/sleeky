@@ -33,8 +33,10 @@ defmodule Sleeky.Job do
     model = Module.concat([model])
     task = Module.concat([task])
 
-    with {:ok, model} <- model.fetch(id, preload: model.parent_field_names()),
-         :ok <- do_perform(model, task, atomic) do
+    with {:ok, record} <- model.fetch(id, preload: model.parent_field_names()),
+         :ok <- do_perform(record, task, atomic) do
+      log_success(job, model, id, task)
+
       :ok
     else
       {:error, reason} ->
@@ -82,6 +84,15 @@ defmodule Sleeky.Job do
       queue: job.queue,
       reason: format_error(reason),
       attempts_left: attempts_left
+    )
+  end
+
+  defp log_success(job, model, id, task) do
+    Logger.info("task succeeded",
+      task: task,
+      model: model,
+      id: id,
+      queue: job.queue
     )
   end
 
