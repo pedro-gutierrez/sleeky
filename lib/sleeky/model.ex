@@ -51,6 +51,7 @@ defmodule Sleeky.Model do
     defstruct [
       :name,
       :kind,
+      :ecto_type,
       :storage,
       :default,
       :enum,
