@@ -43,6 +43,7 @@ defmodule Sleeky.Model.Parser do
       for {:attribute, opts, _} <- definition do
         attr_name = Keyword.fetch!(opts, :name)
         kind = Keyword.fetch!(opts, :kind)
+        ecto_type = ecto_type(kind)
         storage = storage(kind)
         required = Keyword.get(opts, :required, true)
         allowed_values = Keyword.get(opts, :in, [])
@@ -54,6 +55,7 @@ defmodule Sleeky.Model.Parser do
           name: attr_name,
           column_name: attr_name,
           kind: kind,
+          ecto_type: ecto_type,
           storage: storage,
           aliases: [attr_name],
           required?: required,
@@ -235,7 +237,11 @@ defmodule Sleeky.Model.Parser do
 
   defp storage(:id), do: :binary_id
   defp storage(:timestamp), do: :utc_datetime
+  defp storage(:text), do: :text
   defp storage(kind), do: kind
+
+  defp ecto_type(:text), do: :string
+  defp ecto_type(kind), do: kind
 
   @primary_key %Attribute{
     name: :id,

@@ -55,17 +55,17 @@ defmodule Sleeky.Model.Generator.EctoSchema do
 
     for attr <- attrs do
       name = attr.name
-      storage = attr.storage
+      type = attr.ecto_type
 
       case attr.default do
         nil ->
           quote do
-            field(unquote(name), unquote(storage))
+            field(unquote(name), unquote(type))
           end
 
         default ->
           quote do
-            field(unquote(name), unquote(storage), default: unquote(default))
+            field(unquote(name), unquote(type), default: unquote(default))
           end
       end
     end
