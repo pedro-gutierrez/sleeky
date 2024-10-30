@@ -236,11 +236,12 @@ defmodule Sleeky.Model.Parser do
   defp scope({:all, [], scopes}), do: {:all, scope(scopes)}
 
   defp storage(:id), do: :binary_id
-  defp storage(:timestamp), do: :utc_datetime
+  defp storage(:datetime), do: :utc_datetime
   defp storage(:text), do: :text
   defp storage(kind), do: kind
 
   defp ecto_type(:text), do: :string
+  defp ecto_type(:datetime), do: :utc_datetime
   defp ecto_type(kind), do: kind
 
   @primary_key %Attribute{
