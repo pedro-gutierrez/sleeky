@@ -3,6 +3,7 @@ defmodule Sleeky.Ui.Dsl.Page do
   use Diesel.Tag
 
   tag do
-    child kind: :module, min: 1, max: 1
+    attribute :name, kind: :module
+    attribute :at, kind: :string
   end
 end
