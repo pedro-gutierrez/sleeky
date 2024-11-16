@@ -1,4 +1,4 @@
-defmodule Sleeky.View.Render do
+defmodule Sleeky.Ui.View.Render do
   @moduledoc false
 
   @self_closing_tags [

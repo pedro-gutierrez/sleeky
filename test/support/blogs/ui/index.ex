@@ -1,6 +1,6 @@
 defmodule Blogs.Ui.Index do
   @moduledoc false
-  use Sleeky.View
+  use Sleeky.Ui.View
 
   view do
     html do
