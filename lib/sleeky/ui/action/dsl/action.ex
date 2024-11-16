@@ -1,9 +1,9 @@
-defmodule Sleeky.Ui.Dsl.Page do
+defmodule Sleeky.Ui.Action.Dsl.Action do
   @moduledoc false
   use Diesel.Tag
 
   tag do
     attribute :name, kind: :module
-    attribute :at, kind: :string
+    child :on, min: 1
   end
 end

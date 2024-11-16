@@ -2,6 +2,7 @@ defmodule Sleeky.Ui do
   @moduledoc false
   use Diesel,
     otp_app: :sleeky,
+    dsl: Sleeky.Ui.Dsl,
     generators: [
       Sleeky.Ui.Generator.Router
     ]
@@ -10,6 +11,6 @@ defmodule Sleeky.Ui do
 
   defmodule Page do
     @moduledoc false
-    defstruct [:path, :module]
+    defstruct [:method, :path, :module, :runtime]
   end
 end

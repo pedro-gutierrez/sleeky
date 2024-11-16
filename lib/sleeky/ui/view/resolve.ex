@@ -1,9 +1,9 @@
-defmodule Sleeky.View.Resolve do
+defmodule Sleeky.Ui.View.Resolve do
   @moduledoc false
 
   alias Sleeky.Template
 
-  def resolve({:using, [name: layout], children}, slots) do
+  def resolve({:layout, [name: layout], children}, slots) do
     more_slots =
       for {:slot, [name: name], value} <- children, into: %{} do
         value =
@@ -25,8 +25,11 @@ defmodule Sleeky.View.Resolve do
       nil ->
         {:div, [], []}
 
-      component ->
+      component when is_atom(component) ->
         component.source() |> resolve(slots)
+
+      nodes when is_list(nodes) ->
+        resolve(nodes, slots)
     end
   end
 
@@ -69,6 +72,8 @@ defmodule Sleeky.View.Resolve do
       text
     end
   end
+
+  def resolve(nodes, slots) when is_list(nodes), do: Enum.map(nodes, &resolve(&1, slots))
 
   def resolve(other, slots), do: other |> to_string() |> resolve(slots)
 
