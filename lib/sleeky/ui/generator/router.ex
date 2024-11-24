@@ -51,6 +51,10 @@ defmodule Sleeky.Ui.Generator.Router do
             html = unquote(page.module).render(data)
             send_html(unquote(conn), html, 200)
 
+          {:ok, :redirect, path} ->
+            conn = put_resp_header(unquote(conn), "location", path)
+            send_resp(conn, 302, "")
+
           {:error, :not_found} ->
             html = unquote(not_found_view).render(unquote(conn).params)
             send_html(unquote(conn), html, 200)
