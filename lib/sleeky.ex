@@ -13,7 +13,6 @@ defmodule Sleeky do
     Sleeky.JsonApi.Dsl,
     Sleeky.Endpoint.Dsl,
     Sleeky.Ui.Dsl,
-    Sleeky.Ui.Action.Dsl,
     Sleeky.Ui.View.Dsl
   ]
 
