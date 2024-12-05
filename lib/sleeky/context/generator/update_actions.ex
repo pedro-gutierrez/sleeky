@@ -20,7 +20,15 @@ defmodule Sleeky.Context.Generator.UpdateActions do
             do: {rel.name, rel.column_name}
 
       quote do
-        def unquote(action_fun_name)(model, attrs, context) do
+        def unquote(action_fun_name)(model, attrs, context \\ %{})
+
+        def unquote(action_fun_name)(model, attrs, context) when is_list(attrs) do
+          attrs = Map.new(attrs)
+
+          unquote(action_fun_name)(model, attrs, context)
+        end
+
+        def unquote(action_fun_name)(model, attrs, context) when is_map(attrs) do
           context = attrs |> Map.merge(context) |> Map.put(unquote(model_name), model)
 
           fields =
