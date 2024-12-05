@@ -116,9 +116,11 @@ defmodule Sleeky.Ui.View.Dsl do
       :video,
       :wbr,
       # custom extensions
-      :layout,
       :slot,
       :each,
-      :expand
+      :component,
+      :choose,
+      :value,
+      :otherwise
     ]
 end

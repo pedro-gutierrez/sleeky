@@ -11,6 +11,8 @@ defmodule Sleeky.Ui.Generator.Router do
 
     conn = var(:conn)
 
+    not_found_view = ui.not_found_view
+
     routes = Enum.map(ui.pages, &route(ui, &1))
 
     quote do
@@ -20,6 +22,9 @@ defmodule Sleeky.Ui.Generator.Router do
         import Plug.Conn
 
         @html "text/html"
+
+        plug Plug.Parsers, parsers: [:urlencoded, :multipart], pass: ["*/*"]
+        plug Plug.MethodOverride
 
         plug(:match)
         plug(:dispatch)
@@ -33,7 +38,8 @@ defmodule Sleeky.Ui.Generator.Router do
         unquote_splicing(routes)
 
         match _ do
-          send_html(unquote(conn), "<h1>Not Found</h1>", 404)
+          html = unquote(not_found_view).render(unquote(conn).params)
+          send_html(unquote(conn), html, 404)
         end
       end
     end

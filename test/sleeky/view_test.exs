@@ -25,7 +25,7 @@ defmodule Sleeky.Ui.ViewTest do
     use Sleeky.Ui.View
 
     view do
-      layout Layout do
+      component Layout do
         slot :header do
           Div
         end
@@ -38,7 +38,7 @@ defmodule Sleeky.Ui.ViewTest do
 
     view do
       ul do
-        each :items, as: :item do
+        each :item, in: :items do
           li do
             "{{ item }}"
           end
@@ -62,7 +62,7 @@ defmodule Sleeky.Ui.ViewTest do
 
     view do
       ul do
-        each :items, as: :item do
+        each :item, in: :items do
           Item
         end
       end
@@ -93,6 +93,32 @@ defmodule Sleeky.Ui.ViewTest do
     end
   end
 
+  defmodule VisibleView do
+    use Sleeky.Ui.View
+
+    view do
+      p if: "{{ visible }}" do
+        "Visible"
+      end
+    end
+  end
+
+  defmodule ChooseView do
+    use Sleeky.Ui.View
+
+    view do
+      choose "{{ visible }}" do
+        value "true" do
+          p "Visible"
+        end
+
+        otherwise do
+          p "Not visible"
+        end
+      end
+    end
+  end
+
   describe "html" do
     test "renders liquid variables" do
       params = %{"title" => "Foo", "myClass" => "bar"}
@@ -118,8 +144,24 @@ defmodule Sleeky.Ui.ViewTest do
       assert "<ul><li>one</li><li>two</li><li>three</li></ul>" = NamedItems.render(params)
     end
 
+    test "supports dot notation when interpolating values" do
+      params = %{"link" => %{"url" => "https://example.com", "title" => "Example"}}
+
+      assert "<a href=\"https://example.com\">Example</a>" == Link.render(params)
+    end
+
     test "renders doctype for html pages" do
       assert "<!DOCTYPE html><html><head></head><body></body></html>" = Html.render()
+    end
+
+    test "supports if conditionals" do
+      assert "<p>Visible</p>" == VisibleView.render(%{"visible" => true})
+      assert "<div></div>" == VisibleView.render(%{"visible" => false})
+    end
+
+    test "supports switch case type of logic" do
+      assert "<p>Visible</p>" == ChooseView.render(%{"visible" => true})
+      assert "<p>Not visible</p>" == ChooseView.render(%{"visible" => false})
     end
   end
 end

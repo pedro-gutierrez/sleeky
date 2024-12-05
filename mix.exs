@@ -36,6 +36,7 @@ defmodule Sleeky.MixProject do
   defp deps do
     [
       {:bandit, "~> 1.5"},
+      {:bbmustache, "~> 1.12"},
       {:calendar, "~> 1.0"},
       {:diesel, "~> 0.7"},
       {:ecto, "~> 3.9"},
@@ -52,7 +53,6 @@ defmodule Sleeky.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:plug, "~> 1.14"},
       {:slugify, "~> 1.3"},
-      {:solid, "~> 0.15"},
       {:validate, "~> 1.3"}
     ]
   end

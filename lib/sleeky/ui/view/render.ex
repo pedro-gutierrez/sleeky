@@ -27,12 +27,6 @@ defmodule Sleeky.Ui.View.Render do
 
   def render(view), do: do_tags(view)
 
-  defp do_tags({:each, [name: assign, as: alias], [template]}) do
-    template = do_tags(template)
-
-    "{% for #{alias} in #{assign} %}#{template}{% endfor %}"
-  end
-
   defp do_tags({tag, attrs, _}) when tag in @self_closing_tags do
     "<#{tag}#{do_attrs(attrs)}>"
   end
