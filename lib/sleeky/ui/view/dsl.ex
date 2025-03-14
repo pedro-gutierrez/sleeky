@@ -51,6 +51,7 @@ defmodule Sleeky.Ui.View.Dsl do
       :h6,
       :head,
       :header,
+      :hgroup,
       :hr,
       :html,
       :i,
@@ -119,8 +120,6 @@ defmodule Sleeky.Ui.View.Dsl do
       :slot,
       :each,
       :component,
-      :choose,
-      :value,
-      :otherwise
+      :value
     ]
 end

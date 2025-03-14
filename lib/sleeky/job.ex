@@ -89,14 +89,9 @@ defmodule Sleeky.Job do
     )
   end
 
-  defp log_success(job, model, id, task) do
-    Logger.info("task succeeded",
-      task: task,
-      model: model,
-      id: id,
-      job: job.id,
-      queue: job.queue,
-      attempt: job.attempt
+  defp log_success(_job, _model, _id, task) do
+    Logger.debug("task succeeded",
+      task: task
     )
   end
 

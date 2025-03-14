@@ -62,6 +62,7 @@ locals_without_parens = [
   has_many: :*,
   head: :*,
   header: :*,
+  hgroup: :*,
   hr: :*,
   html: :*,
   i: :*,

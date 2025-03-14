@@ -23,11 +23,14 @@ defmodule Sleeky.Endpoint.Generator.Supervisor do
         @default_children []
       end
 
+      @custom_options [:log_requests]
+
       @impl true
       def init(_opts) do
         bandit_opts =
           unquote(otp_app)
           |> Application.fetch_env!(__MODULE__)
+          |> Keyword.drop(@custom_options)
           |> Keyword.put(:plug, unquote(router))
 
         Supervisor.init(

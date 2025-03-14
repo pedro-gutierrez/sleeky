@@ -22,6 +22,8 @@ defmodule Sleeky.Context.Generator.DeleteActions do
       ]
 
       quote do
+        def unquote(action_fun_name)(unquote(model_var), unquote(context) \\ %{})
+
         def unquote(action_fun_name)(
               unquote(model_var),
               unquote(context)

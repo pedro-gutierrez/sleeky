@@ -44,4 +44,36 @@ defmodule Sleeky.Context.Helpers do
       {to_string(key), value}
     end
   end
+
+  def tasks_to_execute(tasks, model) do
+    tasks
+    |> Enum.filter(fn
+      {_module, nil} ->
+        true
+
+      {_module, conditions} when is_list(conditions) ->
+        Enum.all?(conditions, fn {field, value} -> Map.get(model, field) == value end)
+
+      {_module, condition} ->
+        condition.execute(model)
+    end)
+    |> Enum.map(fn {module, _} -> module end)
+  end
+
+  def tasks_to_execute(tasks, model, updated) do
+    tasks
+    |> Enum.filter(fn
+      {_module, nil} ->
+        true
+
+      {_module, conditions} when is_list(conditions) ->
+        Enum.all?(conditions, fn {field, value} ->
+          Map.get(updated, field) == value && Map.get(model, field) != value
+        end)
+
+      {_module, condition} ->
+        condition.execute(model, updated)
+    end)
+    |> Enum.map(fn {module, _} -> module end)
+  end
 end

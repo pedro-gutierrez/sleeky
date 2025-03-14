@@ -38,7 +38,7 @@ defmodule Sleeky.MixProject do
       {:bandit, "~> 1.5"},
       {:bbmustache, "~> 1.12"},
       {:calendar, "~> 1.0"},
-      {:diesel, "~> 0.7"},
+      {:diesel, "~> 0.8"},
       {:ecto, "~> 3.9"},
       {:ecto_sql, "~> 3.9"},
       {:estree, "~> 2.7"},

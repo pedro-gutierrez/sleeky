@@ -1,6 +1,19 @@
 defmodule Sleeky.Ui.View.Resolve do
   @moduledoc false
 
+  @empty {:span, [], []}
+
+  def resolve({:component, [name: component, using: slot], _}, params) do
+    slot = resolve(slot, params)
+    params = Map.get(params, slot, %{})
+
+    component.source() |> resolve(params)
+  end
+
+  def resolve({:component, [], [component]}, params) do
+    component.source() |> resolve(params)
+  end
+
   def resolve({:component, [name: component], slots}, params) do
     more_params = slot_values(slots)
     params = Map.merge(params, more_params)
@@ -9,9 +22,9 @@ defmodule Sleeky.Ui.View.Resolve do
   end
 
   def resolve({:slot, _, [name]}, params) do
-    case Map.get(params, name) do
+    case Map.get(params, to_string(name)) do
       nil ->
-        {:div, [], []}
+        @empty
 
       component when is_atom(component) ->
         component.source() |> resolve(params)
@@ -33,31 +46,30 @@ defmodule Sleeky.Ui.View.Resolve do
   def resolve({:each, attrs, [component]}, params) when is_atom(component),
     do: resolve({:each, attrs, [component.source()]}, params)
 
-  def resolve({:choose, [name: expr], cases}, params) do
-    resolved_cases =
-      for {:value, [name: value], result} <- cases,
-          into: %{},
-          do: {value, result}
+  def resolve({tag, attrs, children}, params) do
+    attrs = resolve_attrs(attrs, params)
 
-    actual = expr |> resolve(params) |> String.trim()
+    case Keyword.pop(attrs, :if) do
+      {nil, attrs} ->
+        case Keyword.pop(attrs, :unless) do
+          {nil, attrs} ->
+            {tag, attrs, resolve(children, params)}
 
-    case Map.get(resolved_cases, actual) do
-      [result] ->
-        resolve(result, params)
+          {expr, attrs} ->
+            if expr |> resolve(params) |> falsy?() do
+              {tag, attrs, resolve(children, params)}
+            else
+              @empty
+            end
+        end
 
-      nil ->
-        case for {:otherwise, _, [result]} <- cases, do: result do
-          [] ->
-            {:div, [], []}
-
-          [result] ->
-            resolve(result, params)
+      {expr, attrs} ->
+        if expr |> resolve(params) |> truthy?() do
+          {tag, attrs, resolve(children, params)}
+        else
+          @empty
         end
     end
-  end
-
-  def resolve({tag, attrs, children}, params) do
-    {tag, resolve_attrs(attrs, params), Enum.map(children, &resolve(&1, params))}
   end
 
   def resolve(nodes, params) when is_list(nodes), do: Enum.map(nodes, &resolve(&1, params))
@@ -82,7 +94,14 @@ defmodule Sleeky.Ui.View.Resolve do
           values when is_list(values) -> values
         end
 
-      {name, value}
+      {to_string(name), value}
     end
   end
+
+  defp truthy?(nil), do: false
+  defp truthy?(""), do: false
+  defp truthy?("false"), do: false
+  defp truthy?(_), do: true
+
+  defp falsy?(value), do: not truthy?(value)
 end

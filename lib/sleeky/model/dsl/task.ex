@@ -4,6 +4,8 @@ defmodule Sleeky.Model.Dsl.Task do
   use Diesel.Tag
 
   tag do
-    child kind: :module, min: 1, max: 1
+    child kind: :module, min: 0, max: 1
+    attribute :name, kind: :module, required: false
+    attribute :if, kind: :module, required: false
   end
 end

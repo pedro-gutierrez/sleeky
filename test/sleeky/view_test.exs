@@ -16,7 +16,7 @@ defmodule Sleeky.Ui.ViewTest do
 
     view do
       header do
-        slot(:header)
+        slot :header
       end
     end
   end
@@ -30,6 +30,44 @@ defmodule Sleeky.Ui.ViewTest do
           Div
         end
       end
+    end
+  end
+
+  defmodule Title do
+    use Sleeky.Ui.View
+
+    view do
+      h1 do
+        "{{ title }}"
+      end
+    end
+  end
+
+  defmodule ComponentView do
+    use Sleeky.Ui.View
+
+    view do
+      component Title, using: "data"
+    end
+  end
+
+  defmodule ComponentWithStaticParamView do
+    use Sleeky.Ui.View
+
+    view do
+      component Title do
+        slot :title do
+          "Static Title"
+        end
+      end
+    end
+  end
+
+  defmodule ComponentWithoutParamsView do
+    use Sleeky.Ui.View
+
+    view do
+      component Title
     end
   end
 
@@ -93,11 +131,21 @@ defmodule Sleeky.Ui.ViewTest do
     end
   end
 
-  defmodule VisibleView do
+  defmodule IfView do
     use Sleeky.Ui.View
 
     view do
       p if: "{{ visible }}" do
+        "Visible"
+      end
+    end
+  end
+
+  defmodule UnlessView do
+    use Sleeky.Ui.View
+
+    view do
+      p unless: "{{ hidden }}" do
         "Visible"
       end
     end
@@ -119,6 +167,14 @@ defmodule Sleeky.Ui.ViewTest do
     end
   end
 
+  defmodule IfViewAsComponentView do
+    use Sleeky.Ui.View
+
+    view do
+      component IfView
+    end
+  end
+
   describe "html" do
     test "renders liquid variables" do
       params = %{"title" => "Foo", "myClass" => "bar"}
@@ -126,10 +182,28 @@ defmodule Sleeky.Ui.ViewTest do
       assert "<div id=\"myDiv\" class=\"bar\">Foo</div>" = Div.render(params)
     end
 
-    test "supports layouts and composition" do
+    test "supports components as layouts" do
       params = %{"title" => "Foo", "myClass" => "bar"}
 
       assert "<header><div id=\"myDiv\" class=\"bar\">Foo</div></header>" = Page.render(params)
+    end
+
+    test "supports components as functions" do
+      params = %{"data" => %{"title" => "Foo"}}
+
+      assert "<h1>Foo</h1>" = ComponentView.render(params)
+    end
+
+    test "supports components without params" do
+      params = %{"title" => "Foo"}
+
+      assert "<h1>Foo</h1>" = ComponentWithoutParamsView.render(params)
+    end
+
+    test "supports components with static params" do
+      params = %{"title" => "Ignored"}
+
+      assert "<h1>Static Title</h1>" == ComponentWithStaticParamView.render(params)
     end
 
     test "generates liquid for loops" do
@@ -155,13 +229,18 @@ defmodule Sleeky.Ui.ViewTest do
     end
 
     test "supports if conditionals" do
-      assert "<p>Visible</p>" == VisibleView.render(%{"visible" => true})
-      assert "<div></div>" == VisibleView.render(%{"visible" => false})
+      assert "<p>Visible</p>" == IfView.render(%{"visible" => true})
+      assert "<span></span>" == IfView.render(%{"visible" => false})
     end
 
-    test "supports switch case type of logic" do
-      assert "<p>Visible</p>" == ChooseView.render(%{"visible" => true})
-      assert "<p>Not visible</p>" == ChooseView.render(%{"visible" => false})
+    test "supports unless conditionals" do
+      assert "<p>Visible</p>" == UnlessView.render(%{"hidden" => false})
+      assert "<span></span>" == UnlessView.render(%{"hidden" => true})
+    end
+
+    test "supports if conditionals inside components" do
+      assert "<p>Visible</p>" == IfViewAsComponentView.render(%{"visible" => true})
+      assert "<span></span>" == IfViewAsComponentView.render(%{"visible" => false})
     end
   end
 end

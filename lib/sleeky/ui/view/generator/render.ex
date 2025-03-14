@@ -6,8 +6,6 @@ defmodule Sleeky.Ui.View.Generator.Render do
 
   @impl true
   def generate(html, _opts) do
-    html = Sleeky.Ui.View.Expand.expand(html)
-
     quote do
       @expanded_source unquote(Macro.escape(html))
 
@@ -15,6 +13,7 @@ defmodule Sleeky.Ui.View.Generator.Render do
         @expanded_source
         |> Sleeky.Ui.View.Resolve.resolve(args)
         |> Sleeky.Ui.View.Render.render()
+        |> to_string()
       end
     end
   end
