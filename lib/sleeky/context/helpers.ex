@@ -45,7 +45,9 @@ defmodule Sleeky.Context.Helpers do
     end
   end
 
-  def tasks_to_execute(tasks, model) do
+  def tasks_to_execute(_, _, %{skip_tasks: true}), do: []
+
+  def tasks_to_execute(tasks, model, _context) do
     tasks
     |> Enum.filter(fn
       {_module, nil} ->
@@ -60,7 +62,9 @@ defmodule Sleeky.Context.Helpers do
     |> Enum.map(fn {module, _} -> module end)
   end
 
-  def tasks_to_execute(tasks, model, updated) do
+  def tasks_to_execute(_, _, _, %{skip_tasks: true}), do: []
+
+  def tasks_to_execute(tasks, model, updated, _context) do
     tasks
     |> Enum.filter(fn
       {_module, nil} ->

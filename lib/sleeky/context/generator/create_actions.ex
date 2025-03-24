@@ -29,7 +29,7 @@ defmodule Sleeky.Context.Generator.CreateActions do
             repo.transaction(fn ->
               with {:ok, model} <- unquote(do_action_fun_name)(attrs, context),
                    :ok <- unquote(children_action_fun_name)(model, attrs, context),
-                   tasks <- tasks_to_execute(unquote(tasks), model),
+                   tasks <- tasks_to_execute(unquote(tasks), model, context),
                    :ok <- Sleeky.Job.schedule_all(model, :create, tasks) do
                 model
               else

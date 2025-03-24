@@ -45,7 +45,7 @@ defmodule Sleeky.Context.Generator.UpdateActions do
 
             repo.transaction(fn ->
               with {:ok, updated} <- unquote(do_action_fun_name)(model, attrs, context),
-                   tasks <- tasks_to_execute(unquote(tasks), model, updated),
+                   tasks <- tasks_to_execute(unquote(tasks), model, updated, context),
                    :ok <- Sleeky.Job.schedule_all(updated, :update, tasks) do
                 updated
               else
