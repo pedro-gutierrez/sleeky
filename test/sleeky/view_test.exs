@@ -51,6 +51,14 @@ defmodule Sleeky.Ui.ViewTest do
     end
   end
 
+  defmodule ComponentWithDotUsingView do
+    use Sleeky.Ui.View
+
+    view do
+      component Title, using: "foo.bar"
+    end
+  end
+
   defmodule ComponentWithStaticParamView do
     use Sleeky.Ui.View
 
@@ -60,6 +68,14 @@ defmodule Sleeky.Ui.ViewTest do
           "Static Title"
         end
       end
+    end
+  end
+
+  defmodule CompactParamsView do
+    use Sleeky.Ui.View
+
+    view do
+      component Title, title: "{{ title }}"
     end
   end
 
@@ -151,22 +167,6 @@ defmodule Sleeky.Ui.ViewTest do
     end
   end
 
-  defmodule ChooseView do
-    use Sleeky.Ui.View
-
-    view do
-      choose "{{ visible }}" do
-        value "true" do
-          p "Visible"
-        end
-
-        otherwise do
-          p "Not visible"
-        end
-      end
-    end
-  end
-
   defmodule IfViewAsComponentView do
     use Sleeky.Ui.View
 
@@ -194,6 +194,12 @@ defmodule Sleeky.Ui.ViewTest do
       assert "<h1>Foo</h1>" = ComponentView.render(params)
     end
 
+    test "dynamically resolves params passed to components" do
+      params = %{"foo" => %{"bar" => %{"title" => "Foo"}}}
+
+      assert "<h1>Foo</h1>" == ComponentWithDotUsingView.render(params)
+    end
+
     test "supports components without params" do
       params = %{"title" => "Foo"}
 
@@ -204,6 +210,12 @@ defmodule Sleeky.Ui.ViewTest do
       params = %{"title" => "Ignored"}
 
       assert "<h1>Static Title</h1>" == ComponentWithStaticParamView.render(params)
+    end
+
+    test "supports components with compact params" do
+      params = %{"title" => "Hello"}
+
+      assert "<h1>Hello</h1>" == CompactParamsView.render(params)
     end
 
     test "generates liquid for loops" do

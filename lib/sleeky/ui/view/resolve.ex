@@ -4,8 +4,14 @@ defmodule Sleeky.Ui.View.Resolve do
   @empty {:span, [], []}
 
   def resolve({:component, [name: component, using: slot], _}, params) do
-    slot = resolve(slot, params)
-    params = Map.get(params, slot, %{})
+    params =
+      case resolve_value(slot, params) || %{} do
+        more_params when is_map(more_params) ->
+          Map.merge(params, more_params)
+
+        values when is_list(values) ->
+          Map.put(params, slot, values)
+      end
 
     component.source() |> resolve(params)
   end
@@ -15,7 +21,14 @@ defmodule Sleeky.Ui.View.Resolve do
   end
 
   def resolve({:component, [name: component], slots}, params) do
-    more_params = slot_values(slots)
+    more_params = resolve_slots(slots, params)
+    params = Map.merge(params, more_params)
+
+    component.source() |> resolve(params)
+  end
+
+  def resolve({:component, [{:name, component} | slots], []}, params) do
+    more_params = resolve_slots(slots, params)
     params = Map.merge(params, more_params)
 
     component.source() |> resolve(params)
@@ -37,10 +50,9 @@ defmodule Sleeky.Ui.View.Resolve do
   def resolve({:each, attrs, [{_, _, _} = child]}, params) do
     alias = attrs |> Keyword.fetch!(:name) |> to_string()
     collection = attrs |> Keyword.fetch!(:in) |> to_string()
+    collection = resolve_value(collection, params) || []
 
-    params
-    |> Map.get(collection, [])
-    |> Enum.map(&resolve(child, Map.put(params, alias, &1)))
+    Enum.map(collection, &resolve(child, Map.put(params, alias, &1)))
   end
 
   def resolve({:each, attrs, [component]}, params) when is_atom(component),
@@ -86,16 +98,20 @@ defmodule Sleeky.Ui.View.Resolve do
     end
   end
 
-  defp slot_values(params) do
-    for {:slot, [name: name], value} <- params, into: %{} do
-      value =
-        case value do
-          [component] when is_atom(component) -> component
-          values when is_list(values) -> values
-        end
+  defp resolve_slots(slots, params) do
+    slots
+    |> Enum.map(fn
+      {:slot, [name: name], [component]} when is_atom(component) -> {to_string(name), component}
+      {:slot, [name: name], value} -> {to_string(name), resolve(value, params)}
+      {name, value} -> {to_string(name), resolve(value, params)}
+    end)
+    |> Enum.into(%{})
+  end
 
-      {to_string(name), value}
-    end
+  defp resolve_value(path, params) do
+    path = path |> resolve(params) |> String.split(".")
+
+    get_in(params, path)
   end
 
   defp truthy?(nil), do: false
