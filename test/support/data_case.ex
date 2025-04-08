@@ -12,12 +12,12 @@ defmodule Sleeky.DataCase do
       @router @endpoint.router()
 
       use ExUnit.Case, unquote(opts)
-      use Plug.Test
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
       import Sleeky.Fixtures
+      import Plug.Test
       import Plug.Conn
 
       alias Ecto.Adapters.SQL.Sandbox
