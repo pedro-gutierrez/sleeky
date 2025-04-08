@@ -17,21 +17,37 @@ defmodule Sleeky.Context.Generator.Scope do
       model_name = model.name()
       policies = Policies.resolve!(model_name, action, scopes)
 
-      quote do
-        def scope(%Ecto.Query{} = query, unquote(model_name), unquote(action.name), params) do
+      quote location: :keep do
+        def scope(
+              %Ecto.Query{} = query,
+              unquote(model_name) = model,
+              unquote(action.name) = action,
+              params
+            ) do
           roles = roles(params) || []
 
           if roles == [] do
             query
           else
-            policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
+            policies = unquote(Macro.escape(policies))
+            policy = Policies.reduce(policies, roles)
 
-            Sleeky.Authorization.Query.scope(
-              unquote(model),
-              query,
-              policy.scope,
-              params
-            )
+            if policy == nil do
+              raise """
+              No policy found for roles
+
+                #{inspect(roles)}
+
+              when scoping action #{action} on model #{model}
+              """
+            else
+              Sleeky.Authorization.Query.scope(
+                unquote(model),
+                query,
+                policy.scope,
+                params
+              )
+            end
           end
         end
       end
