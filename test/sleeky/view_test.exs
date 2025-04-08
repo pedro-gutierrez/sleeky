@@ -101,6 +101,14 @@ defmodule Sleeky.Ui.ViewTest do
     end
   end
 
+  defmodule AliasedItems do
+    use Sleeky.Ui.View
+
+    view do
+      component Items, using: "products", as: "items"
+    end
+  end
+
   defmodule Item do
     use Sleeky.Ui.View
 
@@ -222,6 +230,12 @@ defmodule Sleeky.Ui.ViewTest do
       params = %{"items" => ["one", "two", "three"]}
 
       assert "<ul><li>one</li><li>two</li><li>three</li></ul>" = Items.render(params)
+    end
+
+    test "supports aliases when passing parameters to components" do
+      params = %{"products" => ["one", "two", "three"]}
+
+      assert "<ul><li>one</li><li>two</li><li>three</li></ul>" = AliasedItems.render(params)
     end
 
     test "supports compositions inside loops" do

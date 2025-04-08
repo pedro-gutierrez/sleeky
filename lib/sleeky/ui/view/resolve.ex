@@ -3,14 +3,24 @@ defmodule Sleeky.Ui.View.Resolve do
 
   @empty {:span, [], []}
 
-  def resolve({:component, [name: component, using: slot], _}, params) do
+  def resolve({:component, [{:name, component}, {:using, slot} | _] = opts, _}, params) do
+    alias = Keyword.get(opts, :as)
+
     params =
       case resolve_value(slot, params) || %{} do
         more_params when is_map(more_params) ->
-          Map.merge(params, more_params)
+          if alias do
+            Map.put(more_params, alias, more_params)
+          else
+            Map.merge(params, more_params)
+          end
 
         values when is_list(values) ->
-          Map.put(params, slot, values)
+          if alias do
+            Map.put(params, alias, values)
+          else
+            Map.put(params, slot, values)
+          end
       end
 
     component.source() |> resolve(params)
