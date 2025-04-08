@@ -213,22 +213,24 @@ defmodule Sleeky.Model.Parser do
     %{model | actions: actions}
   end
 
-  defp action_policy({:role, [], [name]}) do
+  defp action_policy({:role, [name: nil, scope: nil], [name]}) do
     %Policy{role: name, policy: :allow}
+  end
+
+  defp action_policy({:role, [name: role, scope: nil], [scope]}) do
+    %Policy{role: role, scope: scope(scope), policy: :allow}
   end
 
   defp action_policy({:role, [name: role, scope: scope], []}) do
     %Policy{role: role, scope: scope(scope), policy: :allow}
   end
 
-  defp action_policy({:role, [name: role], [scope]}) do
-    %Policy{role: role, scope: scope(scope), policy: :allow}
-  end
-
   defp action_policy(_), do: nil
 
-  defp action_tasks({:task, [], [module]}), do: %Sleeky.Model.Task{module: module}
-  defp action_tasks({:task, [name: module], _}), do: %Sleeky.Model.Task{module: module}
+  defp action_tasks({:task, [name: nil, if: nil], [module]}),
+    do: %Sleeky.Model.Task{module: module}
+
+  defp action_tasks({:task, [name: module, if: nil], _}), do: %Sleeky.Model.Task{module: module}
 
   defp action_tasks({:task, [name: module, if: condition], _}),
     do: %Sleeky.Model.Task{module: module, if: condition}
