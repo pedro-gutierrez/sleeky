@@ -1,15 +1,15 @@
-defmodule Blogs.Ui.NotFound do
+defmodule Blogs.Ui.Views.NotFound do
   @moduledoc false
   use Sleeky.Ui.View
 
   view do
     html do
       head do
-        title "Blogs Index Page"
+        title "Not found"
       end
 
       body do
-        h1 "Not found"
+        h1 "No such route"
       end
     end
   end

@@ -1,4 +1,4 @@
-defmodule Blogs.Ui.Error do
+defmodule Blogs.Ui.Views.Error do
   @moduledoc false
   use Sleeky.Ui.View
 

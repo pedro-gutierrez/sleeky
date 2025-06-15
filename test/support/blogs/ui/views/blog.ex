@@ -1,15 +1,15 @@
-defmodule Blogs.Ui.Index do
+defmodule Blogs.Ui.Views.Blog do
   @moduledoc false
   use Sleeky.Ui.View
 
   view do
     html do
       head do
-        title "Blogs Index Page"
+        title "My Blog"
       end
 
       body do
-        h1 "It works!"
+        h1 "Welcome to my Blog"
       end
     end
   end

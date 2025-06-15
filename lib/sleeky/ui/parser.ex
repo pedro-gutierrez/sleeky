@@ -6,11 +6,11 @@ defmodule Sleeky.Ui.Parser do
   alias Sleeky.Ui.Page
 
   @impl true
-  def parse({:ui, _, pages}, opts) do
+  def parse({:ui, _, children}, opts) do
     ui = Keyword.fetch!(opts, :caller_module)
 
     pages =
-      for {:page, page, _} <- pages do
+      for {:page, page, _} <- children do
         path = Keyword.fetch!(page, :at)
         module = Keyword.fetch!(page, :name)
         method = Keyword.get(page, :method, :get)
@@ -22,9 +22,17 @@ defmodule Sleeky.Ui.Parser do
         }
       end
 
-    error_view = Module.concat(ui, Error)
-    not_found_view = Module.concat(ui, NotFound)
+    namespaces = for {:namespaces, _, modules} <- children, do: modules
+    namespaces = List.flatten(namespaces)
 
-    %Ui{pages: pages, error_view: error_view, not_found_view: not_found_view}
+    error_view = Module.concat(ui, Views.Error)
+    not_found_view = Module.concat(ui, Views.NotFound)
+
+    %Ui{
+      pages: pages,
+      namespaces: namespaces,
+      error_view: error_view,
+      not_found_view: not_found_view
+    }
   end
 end

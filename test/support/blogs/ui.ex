@@ -3,6 +3,8 @@ defmodule Blogs.Ui do
   use Sleeky.Ui
 
   ui do
-    page Blogs.Ui.Index, at: "/"
+    namespaces do
+      Blogs.Ui.Namespaces.Root
+    end
   end
 end

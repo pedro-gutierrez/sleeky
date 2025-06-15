@@ -7,16 +7,16 @@ defmodule Sleeky.Ui.Generator.Router do
   @impl true
   def generate(ui, opts) do
     caller = opts[:caller_module]
-    module_name = Module.concat(caller, Router)
+    router_module = Module.concat(caller, Router)
 
     conn = var(:conn)
 
     not_found_view = ui.not_found_view
 
-    routes = Enum.map(ui.pages, &route(ui, &1))
+    routes = Enum.map(ui.namespaces, &route(ui, &1))
 
     quote do
-      defmodule unquote(module_name) do
+      defmodule unquote(router_module) do
         @moduledoc false
         use Plug.Router
         import Plug.Conn
@@ -29,47 +29,30 @@ defmodule Sleeky.Ui.Generator.Router do
         plug(:match)
         plug(:dispatch)
 
-        defp send_html(conn, body, status \\ 200) do
-          conn
-          |> put_resp_content_type(@html)
-          |> send_resp(status, body)
-        end
-
         unquote_splicing(routes)
 
         match _ do
           html = unquote(not_found_view).render(unquote(conn).params)
           send_html(unquote(conn), html, 404)
         end
+
+        defp send_html(conn, body, status \\ 200) do
+          conn
+          |> put_resp_content_type(@html)
+          |> send_resp(status, body)
+        end
       end
+
+      # convenience function that hides the fact tuat the actual router is implemented in a separate module
+      defdelegate call(conn, opts \\ []), to: unquote(router_module)
     end
   end
 
-  defp route(ui, page) do
-    conn = var(:conn)
-    not_found_view = ui.not_found_view
-    error_view = ui.error_view
+  defp route(_ui, ns) do
+    router = Module.concat(ns, Router)
 
     quote do
-      match unquote(page.path), via: unquote(page.method) do
-        case unquote(page.module).data(unquote(conn).params) do
-          {:ok, data} ->
-            html = unquote(page.module).render(data)
-            send_html(unquote(conn), html, 200)
-
-          {:ok, :redirect, path} ->
-            conn = put_resp_header(unquote(conn), "location", path)
-            send_resp(conn, 302, "")
-
-          {:error, :not_found} ->
-            html = unquote(not_found_view).render(unquote(conn).params)
-            send_html(unquote(conn), html, 200)
-
-          {:error, other} ->
-            html = unquote(error_view).render(unquote(conn).params)
-            send_html(unquote(conn), html, 200)
-        end
-      end
+      forward unquote(ns).path(), to: unquote(router)
     end
   end
 end

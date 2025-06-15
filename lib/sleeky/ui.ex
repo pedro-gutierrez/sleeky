@@ -7,7 +7,7 @@ defmodule Sleeky.Ui do
       Sleeky.Ui.Generator.Router
     ]
 
-  defstruct [:pages, :error_view, :not_found_view]
+  defstruct [:pages, :namespaces, :error_view, :not_found_view]
 
   defmodule Page do
     @moduledoc false
