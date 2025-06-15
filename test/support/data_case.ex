@@ -12,12 +12,12 @@ defmodule Sleeky.DataCase do
       @router @endpoint.router()
 
       use ExUnit.Case, unquote(opts)
-      use Plug.Test
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
       import Sleeky.Fixtures
+      import Plug.Test
       import Plug.Conn
 
       alias Ecto.Adapters.SQL.Sandbox
@@ -77,9 +77,14 @@ defmodule Sleeky.DataCase do
       defp route(method, path, opts) do
         conn =
           method
-          |> conn(path, opts[:params])
-          |> with_req_headers(opts[:headers] || %{})
+          |> new_conn(path, opts)
           |> @router.call(@router_opts)
+      end
+
+      defp new_conn(method, path, opts \\ []) do
+        method
+        |> conn(path, opts[:params])
+        |> with_req_headers(opts[:headers] || %{})
       end
 
       def ok!(conn) do

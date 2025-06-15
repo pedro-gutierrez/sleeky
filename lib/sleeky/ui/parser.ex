@@ -3,31 +3,36 @@ defmodule Sleeky.Ui.Parser do
   @behaviour Diesel.Parser
 
   alias Sleeky.Ui
+  alias Sleeky.Ui.Page
 
   @impl true
-  def parse({_, _, children}, opts) do
-    caller = opts[:caller_module]
+  def parse({:ui, _, children}, opts) do
+    ui = Keyword.fetch!(opts, :caller_module)
 
     pages =
-      for {:page, _, [module]} <- children, into: %{} do
-        {path(caller, module), module}
+      for {:page, page, _} <- children do
+        path = Keyword.fetch!(page, :at)
+        module = Keyword.fetch!(page, :name)
+        method = Keyword.get(page, :method, :get)
+
+        %Page{
+          method: method,
+          path: path,
+          module: module
+        }
       end
 
-    %Ui{pages: pages}
-  end
+    namespaces = for {:namespaces, _, modules} <- children, do: modules
+    namespaces = List.flatten(namespaces)
 
-  defp path(caller, module) do
-    caller = Module.split(caller)
+    error_view = Module.concat(ui, Views.Error)
+    not_found_view = Module.concat(ui, Views.NotFound)
 
-    path =
-      module
-      |> Module.split()
-      |> Kernel.--(caller)
-      |> Enum.map(&Inflex.parameterize/1)
-      |> Enum.reject(&(&1 == "index"))
-      |> Enum.join("/")
-      |> String.replace("//", "/")
-
-    "/" <> path
+    %Ui{
+      pages: pages,
+      namespaces: namespaces,
+      error_view: error_view,
+      not_found_view: not_found_view
+    }
   end
 end

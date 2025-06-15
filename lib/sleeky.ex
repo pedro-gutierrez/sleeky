@@ -12,15 +12,17 @@ defmodule Sleeky do
     Sleeky.Context.Dsl,
     Sleeky.JsonApi.Dsl,
     Sleeky.Endpoint.Dsl,
-    Sleeky.View.Dsl,
-    Sleeky.Ui.Dsl
+    Sleeky.Ui.Dsl,
+    Sleeky.Ui.View.Dsl,
+    Sleeky.Ui.Namespace.Dsl,
+    Sleeky.Ui.Route.Dsl
   ]
 
   @doc """
   Returns a sorted list of local functions without parentheses from all the DSL modules.
   """
   def locals_without_parens,
-    do: @dsls |> Enum.flat_map(& &1.locals_without_parens()) |> Enum.sort()
+    do: @dsls |> Enum.flat_map(& &1.locals_without_parens()) |> Enum.uniq() |> Enum.sort()
 
   @doc """
   Returns a flat list of tags from all the DSL modules.

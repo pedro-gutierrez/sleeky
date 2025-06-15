@@ -3,6 +3,6 @@ defmodule Sleeky.Ui.Dsl.Ui do
   use Diesel.Tag
 
   tag do
-    child :page, min: 0
+    child :namespaces, min: 1
   end
 end

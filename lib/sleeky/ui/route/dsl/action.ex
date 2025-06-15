@@ -1,4 +1,4 @@
-defmodule Sleeky.Ui.Dsl.Page do
+defmodule Sleeky.Ui.Route.Dsl.Action do
   @moduledoc false
   use Diesel.Tag
 

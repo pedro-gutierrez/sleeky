@@ -1,6 +1,6 @@
-defmodule Blogs.Ui.Index do
+defmodule Blogs.Ui.Views.Error do
   @moduledoc false
-  use Sleeky.View
+  use Sleeky.Ui.View
 
   view do
     html do
@@ -9,7 +9,7 @@ defmodule Blogs.Ui.Index do
       end
 
       body do
-        h1 "It works!"
+        h1 "Error Page"
       end
     end
   end

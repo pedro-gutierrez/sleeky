@@ -2,7 +2,7 @@ defmodule Sleeky.Endpoint.UiTest do
   use Sleeky.DataCase
 
   describe "an endpoint" do
-    test "returns static pages" do
+    test "routes requests to the ui" do
       resp =
         get("/")
         |> html_response!()

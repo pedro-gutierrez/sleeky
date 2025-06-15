@@ -1,4 +1,4 @@
-defmodule Sleeky.Plug.Logger do
+defmodule Sleeky.Endpoint.Logger do
   @moduledoc false
   @behaviour Plug
 
@@ -9,7 +9,22 @@ defmodule Sleeky.Plug.Logger do
   def init(opts), do: opts
 
   @impl true
-  def call(conn, _opts) do
+  def call(conn, opts) do
+    if log_request?(opts) do
+      do_log_request(conn)
+    else
+      conn
+    end
+  end
+
+  defp log_request?(opts) do
+    otp_app = Keyword.fetch!(opts, :otp_app)
+    endpoint = Keyword.fetch!(opts, :endpoint)
+
+    otp_app |> Application.get_env(endpoint) |> Keyword.get(:log_requests, false)
+  end
+
+  defp do_log_request(conn) do
     start = System.monotonic_time()
 
     Conn.register_before_send(conn, fn conn ->

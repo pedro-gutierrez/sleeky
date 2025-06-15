@@ -12,6 +12,6 @@ defmodule Sleeky.Model.Dsl.Attribute do
 
     attribute :required, kind: :boolean, required: false, default: true
     attribute :default, kind: :any, required: false
-    attribute :in, kind: :list, required: false
+    attribute :in, kind: :list, required: false, default: []
   end
 end

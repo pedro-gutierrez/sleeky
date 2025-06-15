@@ -15,6 +15,8 @@ defmodule Sleeky.Model.Generator.Metadata do
     keys = model.keys
 
     parent_field_names = Enum.map(parents, & &1.name)
+    attribute_field_names = Enum.map(attributes, & &1.name)
+    field_names = attribute_field_names ++ parent_field_names
 
     quote do
       @repo unquote(model.repo)
@@ -22,7 +24,9 @@ defmodule Sleeky.Model.Generator.Metadata do
 
       @attributes unquote(Macro.escape(attributes))
       @parents unquote(Macro.escape(parents))
+      @attribute_field_names unquote(attribute_field_names)
       @parent_field_names unquote(parent_field_names)
+      @field_names unquote(field_names)
       @children unquote(Macro.escape(children))
       @fields unquote(Macro.escape(fields))
       @string_fields unquote(Macro.escape(string_fields))
@@ -45,6 +49,8 @@ defmodule Sleeky.Model.Generator.Metadata do
       def actions, do: @actions
 
       def parent_field_names, do: @parent_field_names
+      def attribute_field_names, do: @attribute_field_names
+      def field_names, do: @field_names
 
       def field(name) when is_atom(name) do
         case Map.get(@fields, name) do

@@ -23,10 +23,10 @@ defmodule Sleeky.Endpoint.Generator.Router do
       defmodule unquote(router_module) do
         use Plug.Router
 
-        plug Sleeky.Plug.Logger
-        plug(Plug.Static, at: "/assets", from: {unquote(otp_app), "priv/assets"})
-        plug(:match)
-        plug(:dispatch)
+        plug Sleeky.Endpoint.Logger, otp_app: unquote(otp_app), endpoint: unquote(caller)
+        plug Plug.Static, at: "/assets", from: {unquote(otp_app), "priv/assets"}
+        plug :match
+        plug :dispatch
 
         get "/healthz" do
           send_resp(unquote(conn), 200, "")

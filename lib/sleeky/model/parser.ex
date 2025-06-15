@@ -196,7 +196,8 @@ defmodule Sleeky.Model.Parser do
 
         tasks =
           children
-          |> Enum.map(&action_task/1)
+          |> Enum.map(&action_tasks/1)
+          |> List.flatten()
           |> Enum.reject(&is_nil/1)
 
         kind = Keyword.get(opts, :kind, name)
@@ -212,22 +213,35 @@ defmodule Sleeky.Model.Parser do
     %{model | actions: actions}
   end
 
-  defp action_policy({:role, [], [name]}) do
+  defp action_policy({:role, [name: nil, scope: nil], [name]}) do
     %Policy{role: name, policy: :allow}
+  end
+
+  defp action_policy({:role, [name: role, scope: nil], [scope]}) do
+    %Policy{role: role, scope: scope(scope), policy: :allow}
   end
 
   defp action_policy({:role, [name: role, scope: scope], []}) do
     %Policy{role: role, scope: scope(scope), policy: :allow}
   end
 
-  defp action_policy({:role, [name: role], [scope]}) do
-    %Policy{role: role, scope: scope(scope), policy: :allow}
-  end
-
   defp action_policy(_), do: nil
 
-  defp action_task({:task, [], [module]}), do: module
-  defp action_task(_), do: nil
+  defp action_tasks({:task, [name: nil, if: nil], [module]}),
+    do: %Sleeky.Model.Task{module: module}
+
+  defp action_tasks({:task, [name: module, if: nil], _}), do: %Sleeky.Model.Task{module: module}
+
+  defp action_tasks({:task, [name: module, if: condition], _}),
+    do: %Sleeky.Model.Task{module: module, if: condition}
+
+  defp action_tasks({:on, conditions, modules}) do
+    for module <- modules do
+      %Sleeky.Model.Task{module: module, if: conditions}
+    end
+  end
+
+  defp action_tasks(_), do: nil
 
   defp scope(name) when is_atom(name), do: name
   defp scope(scopes) when is_list(scopes), do: Enum.map(scopes, &scope/1)

@@ -7,6 +7,7 @@ defmodule Sleeky.Model do
     ],
     generators: [
       Sleeky.Model.Generator.Metadata,
+      Sleeky.Model.Generator.Cast,
       Sleeky.Model.Generator.EctoSchema,
       Sleeky.Model.Generator.Helpers,
       Sleeky.Model.Generator.FieldNames,
@@ -97,6 +98,15 @@ defmodule Sleeky.Model do
       :kind,
       policies: %{},
       tasks: []
+    ]
+  end
+
+  defmodule Task do
+    @moduledoc false
+
+    defstruct [
+      :module,
+      :if
     ]
   end
 

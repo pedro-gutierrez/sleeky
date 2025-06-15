@@ -7,44 +7,52 @@ defmodule Sleeky.Ui.Generator.Router do
   @impl true
   def generate(ui, opts) do
     caller = opts[:caller_module]
-    module_name = Module.concat(caller, Router)
+    router_module = Module.concat(caller, Router)
 
     conn = var(:conn)
 
-    routes =
-      for {path, page} <- ui.pages do
-        html = page.render()
+    not_found_view = ui.not_found_view
 
-        quote do
-          get unquote(path) do
-            send_html(unquote(conn), unquote(html), 200)
-          end
-        end
-      end
+    routes = Enum.map(ui.namespaces, &route(ui, &1))
 
     quote do
-      defmodule unquote(module_name) do
+      defmodule unquote(router_module) do
         @moduledoc false
         use Plug.Router
         import Plug.Conn
 
         @html "text/html"
 
+        plug Plug.Parsers, parsers: [:urlencoded, :multipart], pass: ["*/*"]
+        plug Plug.MethodOverride
+
         plug(:match)
         plug(:dispatch)
+
+        unquote_splicing(routes)
+
+        match _ do
+          html = unquote(not_found_view).render(unquote(conn).params)
+          send_html(unquote(conn), html, 404)
+        end
 
         defp send_html(conn, body, status \\ 200) do
           conn
           |> put_resp_content_type(@html)
           |> send_resp(status, body)
         end
-
-        unquote_splicing(routes)
-
-        match _ do
-          send_html(unquote(conn), "<h1>Not Found</h1>", 404)
-        end
       end
+
+      # convenience function that hides the fact tuat the actual router is implemented in a separate module
+      defdelegate call(conn, opts \\ []), to: unquote(router_module)
+    end
+  end
+
+  defp route(_ui, ns) do
+    router = Module.concat(ns, Router)
+
+    quote do
+      forward unquote(ns).path(), to: unquote(router)
     end
   end
 end
