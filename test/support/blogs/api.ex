@@ -3,8 +3,12 @@ defmodule Blogs.Api do
   use Sleeky.Api
 
   api do
-    plugs [Blogs.FakeAuth]
+    plugs do
+      Blogs.FakeAuth
+    end
 
-    context Blogs.Publishing
+    domains do
+      Blogs.Publishing
+    end
   end
 end

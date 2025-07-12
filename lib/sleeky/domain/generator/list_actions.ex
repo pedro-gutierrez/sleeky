@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Generator.ListActions do
+defmodule Sleeky.Domain.Generator.ListActions do
   @moduledoc false
 
   @behaviour Diesel.Generator

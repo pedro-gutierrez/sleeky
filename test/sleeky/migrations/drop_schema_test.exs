@@ -3,7 +3,7 @@ defmodule Sleeky.Migrations.DropSchemaTest do
   import MigrationHelper
 
   describe "migrations" do
-    test "drops schemas for obsolete contexts" do
+    test "drops schemas for obsolete domains" do
       existing = [
         """
         defmodule Sleeky.Migration.V1 do

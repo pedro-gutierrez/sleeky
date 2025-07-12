@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.DeleteActionTest do
+defmodule Sleeky.Domain.DeleteActionTest do
   use Sleeky.DataCase
 
   alias Blogs.Publishing

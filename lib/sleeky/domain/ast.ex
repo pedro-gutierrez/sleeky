@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Ast do
+defmodule Sleeky.Domain.Ast do
   @moduledoc """
   Context specific ast helpers
   """

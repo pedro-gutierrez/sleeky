@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Scopes do
+defmodule Sleeky.Domain.Scopes do
   @moduledoc false
 
   @doc "Returns all the scopes defined for the given context module"

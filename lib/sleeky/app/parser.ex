@@ -10,11 +10,11 @@ defmodule Sleeky.App.Parser do
 
     repos = for {:repos, _, repos} <- children, do: repos
     endpoints = for {:endpoints, _, endpoints} <- children, do: endpoints
-    contexts = for {:contexts, _, contexts} <- children, do: contexts
+    domains = for {:domains, _, domains} <- children, do: domains
 
     repos = List.flatten(repos)
     endpoints = List.flatten(endpoints)
-    contexts = List.flatten(contexts)
+    domains = List.flatten(domains)
 
     name = caller_module |> Module.split() |> Enum.drop(-1) |> Module.concat()
 
@@ -26,7 +26,7 @@ defmodule Sleeky.App.Parser do
       module: caller_module,
       repos: repos,
       endpoints: endpoints,
-      contexts: contexts
+      domains: domains
     }
   end
 end

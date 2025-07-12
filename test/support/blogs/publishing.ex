@@ -1,9 +1,11 @@
 defmodule Blogs.Publishing do
   @moduledoc false
-  use Sleeky.Context
+  use Sleeky.Domain
 
-  context do
-    scopes(Blogs.Scopes)
+  domain do
+    scopes do
+      Blogs.Scopes
+    end
 
     model Blogs.Publishing.Author
     model Blogs.Publishing.Blog

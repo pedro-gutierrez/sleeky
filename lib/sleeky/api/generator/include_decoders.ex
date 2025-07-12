@@ -4,13 +4,13 @@ defmodule Sleeky.Api.Generator.IncludeDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models() do
+    for domain <- api.domains, model <- domain.models() do
       module_name = Module.concat(model, ApiIncludeDecoder)
 
       quote do
         defmodule unquote(module_name) do
           use Sleeky.Decoder.IncludeDecoder,
-            context: unquote(context),
+            domain: unquote(domain),
             model: unquote(model)
         end
       end

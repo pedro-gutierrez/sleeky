@@ -28,5 +28,5 @@ defmodule Sleeky.Api do
       Sleeky.Api.Generator.Router
     ]
 
-  defstruct [:contexts, :plugs]
+  defstruct [:domains, :plugs]
 end

@@ -9,7 +9,7 @@ defmodule Sleeky.Model.Generator.DeleteFunction do
         with {:ok, _} <-
                model
                |> delete_changeset()
-               |> unquote(model.context).repo().delete(),
+               |> unquote(model.domain).repo().delete(),
              do: :ok
       end
     end

@@ -505,7 +505,7 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:lib_accounts, """
   defmodule <%= @mod %>.Accounts do
     @moduledoc false
-    use Sleeky.Context
+    use Sleeky.Domain
 
     context do
       authorization <%= @mod %>.Authorization
@@ -588,7 +588,7 @@ defmodule Mix.Tasks.Sleeky.New do
   config :sleeky, Sleeky,
     repo: <%= @mod %>.Repo,
     endpoint: <%= @mod %>.Endpoint,
-    contexts: [
+    domains: [
       <%= @mod %>.Accounts
     ]
 

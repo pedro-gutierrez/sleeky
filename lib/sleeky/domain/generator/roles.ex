@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Generator.Roles do
+defmodule Sleeky.Domain.Generator.Roles do
   @moduledoc false
 
   @behaviour Diesel.Generator

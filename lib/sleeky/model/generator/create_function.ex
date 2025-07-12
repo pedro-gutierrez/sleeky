@@ -16,7 +16,7 @@ defmodule Sleeky.Model.Generator.CreateFunction do
       def create(attrs) when is_map(attrs) do
         %__MODULE__{}
         |> insert_changeset(attrs)
-        |> unquote(model.context).repo().insert()
+        |> unquote(model.domain).repo().insert()
       end
     end
   end
@@ -45,7 +45,7 @@ defmodule Sleeky.Model.Generator.CreateFunction do
             |> Map.put_new(:updated_at, now)
           end
 
-        unquote(model.context).repo().insert_all(__MODULE__, items, opts)
+        unquote(model.domain).repo().insert_all(__MODULE__, items, opts)
 
         :ok
       end

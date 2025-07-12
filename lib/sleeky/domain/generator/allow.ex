@@ -1,11 +1,11 @@
-defmodule Sleeky.Context.Generator.Allow do
+defmodule Sleeky.Domain.Generator.Allow do
   @moduledoc """
   Generates authorization code for a context
   """
   @behaviour Diesel.Generator
 
-  alias Sleeky.Context.Policies
-  alias Sleeky.Context.Scopes
+  alias Sleeky.Domain.Policies
+  alias Sleeky.Domain.Scopes
 
   @impl true
   def generate(context, _) do
