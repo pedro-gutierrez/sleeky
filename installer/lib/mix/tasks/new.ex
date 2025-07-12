@@ -405,7 +405,7 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:lib_authorization, """
   defmodule <%= @mod %>.Authorization do
     @moduledoc "Defines authorization rules"
-    use Sleeky.Authorization
+    use Sleeky.Scopes
 
     authorization roles: "subject.roles" do
       scope :self do

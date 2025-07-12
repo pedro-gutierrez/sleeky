@@ -3,7 +3,7 @@ defmodule Blogs.Publishing do
   use Sleeky.Context
 
   context do
-    authorization Blogs.Authorization
+    scopes(Blogs.Scopes)
 
     model Blogs.Publishing.Author
     model Blogs.Publishing.Blog

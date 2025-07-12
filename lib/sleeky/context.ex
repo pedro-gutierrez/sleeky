@@ -20,5 +20,5 @@ defmodule Sleeky.Context do
       Sleeky.Context.Generator.ListActions
     ]
 
-  defstruct [:name, :authorization, :repo, models: []]
+  defstruct [:name, :scopes, :repo, models: []]
 end

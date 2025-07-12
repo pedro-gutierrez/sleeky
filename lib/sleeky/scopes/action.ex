@@ -1,4 +1,4 @@
-defmodule Sleeky.Authorization.Action do
+defmodule Sleeky.Scopes.Action do
   @moduledoc false
 
   def allow?(_model, _action, nil, _params), do: false

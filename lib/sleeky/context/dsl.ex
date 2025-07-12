@@ -5,6 +5,6 @@ defmodule Sleeky.Context.Dsl do
     root: Sleeky.Context.Dsl.Context,
     tags: [
       Sleeky.Context.Dsl.Model,
-      Sleeky.Context.Dsl.Authorization
+      Sleeky.Context.Dsl.Scopes
     ]
 end

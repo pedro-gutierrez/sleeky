@@ -1,13 +1,13 @@
-defmodule Sleeky.Authorization.Parser do
+defmodule Sleeky.Scopes.Parser do
   @moduledoc false
 
   @behaviour Diesel.Parser
 
-  alias Sleeky.Authorization
-  alias Sleeky.Authorization.{Expression, Scope}
+  alias Sleeky.Scopes
+  alias Sleeky.Scopes.{Expression, Scope}
 
   @impl true
-  def parse({:authorization, opts, children}, _) do
+  def parse({:scopes, opts, children}, _) do
     roles = opts |> Keyword.fetch!(:roles) |> path()
 
     scopes =
@@ -25,7 +25,7 @@ defmodule Sleeky.Authorization.Parser do
       |> Enum.reduce(%{}, &Map.put(&2, &1.name, &1))
       |> resolve_scopes()
 
-    %Authorization{roles: roles, scopes: scopes}
+    %Scopes{roles: roles, scopes: scopes}
   end
 
   defp resolve_expressions(scopes) do

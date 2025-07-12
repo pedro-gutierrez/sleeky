@@ -1,8 +1,8 @@
-defmodule Blogs.Authorization do
+defmodule Blogs.Scopes do
   @moduledoc false
-  use Sleeky.Authorization
+  use Sleeky.Scopes
 
-  authorization roles: "current_user.roles" do
+  scopes roles: "current_user.roles" do
     scope :author do
       same do
         path "**.author"

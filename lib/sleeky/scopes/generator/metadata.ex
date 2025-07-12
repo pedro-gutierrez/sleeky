@@ -1,4 +1,4 @@
-defmodule Sleeky.Authorization.Generator.Metadata do
+defmodule Sleeky.Scopes.Generator.Metadata do
   @moduledoc false
   @behaviour Diesel.Generator
 

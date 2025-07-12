@@ -4,6 +4,6 @@ defmodule Blogs.Accounts do
 
   context do
     model Blogs.Accounts.User
-    authorization Blogs.Authorization
+    scopes(Blogs.Scopes)
   end
 end
