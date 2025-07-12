@@ -41,7 +41,7 @@ defmodule Sleeky.Context.Generator.Scope do
               when scoping action #{action} on model #{model}
               """
             else
-              Sleeky.Authorization.Query.scope(
+              Sleeky.Scopes.Query.scope(
                 unquote(model),
                 query,
                 policy.scope,

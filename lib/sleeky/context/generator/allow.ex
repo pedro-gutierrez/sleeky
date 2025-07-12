@@ -24,7 +24,7 @@ defmodule Sleeky.Context.Generator.Allow do
           else
             policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
 
-            if Sleeky.Authorization.Action.allow?(
+            if Sleeky.Scopes.Action.allow?(
                  unquote(model),
                  unquote(action.name),
                  policy,

@@ -22,8 +22,8 @@ defmodule Sleeky.Context.Policies do
     args = for policy <- policies, do: policy.scope
 
     %Sleeky.Model.Policy{
-      scope: %Sleeky.Authorization.Scope{
-        expression: %Sleeky.Authorization.Expression{
+      scope: %Sleeky.Scopes.Scope{
+        expression: %Sleeky.Scopes.Expression{
           op: op,
           args: args
         }
@@ -73,8 +73,8 @@ defmodule Sleeky.Context.Policies do
              end
            end) do
       {:ok,
-       %Sleeky.Authorization.Scope{
-         expression: %Sleeky.Authorization.Expression{
+       %Sleeky.Scopes.Scope{
+         expression: %Sleeky.Scopes.Expression{
            op: op,
            args: Enum.reverse(scopes)
          }

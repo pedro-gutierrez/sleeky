@@ -1,14 +1,14 @@
-defmodule Sleeky.Authorization do
+defmodule Sleeky.Scopes do
   @moduledoc false
 
   use Diesel,
     otp_app: :sleeky,
-    dsl: Sleeky.Authorization.Dsl,
+    dsl: Sleeky.Scopes.Dsl,
     generators: [
-      Sleeky.Authorization.Generator.Metadata
+      Sleeky.Scopes.Generator.Metadata
     ],
     parsers: [
-      Sleeky.Authorization.Parser
+      Sleeky.Scopes.Parser
     ]
 
   defmodule Scope do

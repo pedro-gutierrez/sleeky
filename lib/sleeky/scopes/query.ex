@@ -1,4 +1,4 @@
-defmodule Sleeky.Authorization.Query do
+defmodule Sleeky.Scopes.Query do
   @moduledoc false
 
   alias Sleeky.Evaluate

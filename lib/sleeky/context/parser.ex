@@ -24,9 +24,9 @@ defmodule Sleeky.Context.Parser do
   end
 
   defp with_authorization(context, children) do
-    authorization = for {:authorization, _, [authorization]} <- children, do: authorization
-    authorization = List.first(authorization)
+    scopes = for {:scopes, _, [scopes]} <- children, do: scopes
+    scopes = List.first(scopes)
 
-    %{context | authorization: authorization}
+    %{context | scopes: scopes}
   end
 end

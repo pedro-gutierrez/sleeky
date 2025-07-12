@@ -6,7 +6,7 @@ defmodule Sleeky do
   """
 
   @dsls [
-    Sleeky.Authorization.Dsl,
+    Sleeky.Scopes.Dsl,
     Sleeky.Context.Dsl,
     Sleeky.Model.Dsl,
     Sleeky.Context.Dsl,

@@ -1,4 +1,4 @@
-defmodule Sleeky.Authorization.Dsl.Path do
+defmodule Sleeky.Scopes.Dsl.Path do
   @moduledoc false
   use Diesel.Tag
 

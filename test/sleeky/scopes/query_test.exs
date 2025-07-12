@@ -1,7 +1,7 @@
-defmodule Sleeky.Authorization.QueryTest do
+defmodule Sleeky.Scopes.QueryTest do
   use ExUnit.Case
 
-  alias Sleeky.Authorization.{Expression, Query, Scope}
+  alias Sleeky.Scopes.{Expression, Query, Scope}
   alias Blogs.Publishing.{Blog, Post, Comment}
 
   import Ecto.Query

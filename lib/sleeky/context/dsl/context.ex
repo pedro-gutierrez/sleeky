@@ -4,6 +4,6 @@ defmodule Sleeky.Context.Dsl.Context do
 
   tag do
     child :model, min: 1
-    child :authorization, min: 0
+    child :scopes, min: 0, max: 1
   end
 end
