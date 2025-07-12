@@ -102,7 +102,7 @@ defmodule Sleeky.Fixtures do
     |> Map.put(:comment3, comment3)
   end
 
-  def post_json_api_params(context) do
+  def post_api_params(context) do
     params = %{
       "deleted" => false,
       "locked" => false,
@@ -114,6 +114,6 @@ defmodule Sleeky.Fixtures do
       "author" => %{"id" => context.author.id}
     }
 
-    Map.put(context, :post_json_api_params, params)
+    Map.put(context, :post_api_params, params)
   end
 end

@@ -3,7 +3,7 @@ defmodule Blogs.Endpoint do
   use Sleeky.Endpoint, otp_app: :sleeky
 
   endpoint do
-    mount Blogs.JsonApi, at: "/api"
+    mount Blogs.Api, at: "/api"
     mount Blogs.Ui, at: "/"
   end
 end

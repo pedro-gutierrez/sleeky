@@ -10,7 +10,7 @@ defmodule Sleeky do
     Sleeky.Context.Dsl,
     Sleeky.Model.Dsl,
     Sleeky.Context.Dsl,
-    Sleeky.JsonApi.Dsl,
+    Sleeky.Api.Dsl,
     Sleeky.Endpoint.Dsl,
     Sleeky.Ui.Dsl,
     Sleeky.Ui.View.Dsl,

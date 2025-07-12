@@ -66,7 +66,7 @@ locals_without_parens = [
   ins: :*,
   is_false: :*,
   is_true: :*,
-  json_api: :*,
+  api: :*,
   kbd: :*,
   key: :*,
   label: :*,
@@ -148,7 +148,7 @@ locals_without_parens = [
   var: :*,
   video: :*,
   view: :*,
-  wbr: :*,
+  wbr: :*
 ]
 
 [
