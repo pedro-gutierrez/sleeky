@@ -1,8 +1,8 @@
-defmodule Blogs.JsonApi do
+defmodule Blogs.Api do
   @moduledoc false
-  use Sleeky.JsonApi
+  use Sleeky.Api
 
-  json_api do
+  api do
     plugs [Blogs.FakeAuth]
 
     context Blogs.Publishing

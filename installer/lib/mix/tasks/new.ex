@@ -94,7 +94,7 @@ defmodule Mix.Tasks.Sleeky.New do
     create_file("lib/#{mod_filename}/authorization.ex", lib_authorization_template(assigns))
     create_file("lib/#{mod_filename}/authentication.ex", lib_authentication_template(assigns))
     create_file("lib/#{mod_filename}/endpoint.ex", lib_endpoint_template(assigns))
-    create_file("lib/#{mod_filename}/json_api.ex", lib_json_api_template(assigns))
+    create_file("lib/#{mod_filename}/api.ex", lib_api_template(assigns))
     create_file("lib/#{mod_filename}/ui.ex", lib_ui_template(assigns))
     create_file("lib/#{mod_filename}/ui/index.ex", lib_ui_index_template(assigns))
     create_file("lib/#{mod_filename}/accounts.ex", lib_accounts_template(assigns))
@@ -450,18 +450,18 @@ defmodule Mix.Tasks.Sleeky.New do
     use Sleeky.Endpoint, otp_app: :<%= @app %>
 
     endpoint do
-      mount <%= @mod %>.JsonApi, at: "/api"
+      mount <%= @mod %>.Api, at: "/api"
       mount <%= @mod %>.Ui, at: "/"
     end
   end
   """)
 
-  embed_template(:lib_json_api, """
-  defmodule <%= @mod %>.JsonApi do
+  embed_template(:lib_api, """
+  defmodule <%= @mod %>.Api do
     @moduledoc false
-    use Sleeky.JsonApi
+    use Sleeky.Api
 
-    json_api do
+    api do
       plugs do
         <%= @mod %>.Authentication
       end
