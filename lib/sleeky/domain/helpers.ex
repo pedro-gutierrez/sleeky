@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Helpers do
+defmodule Sleeky.Domain.Helpers do
   @moduledoc false
 
   alias Sleeky.QueryBuilder

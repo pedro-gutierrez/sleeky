@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.AuthorizationTest do
+defmodule Sleeky.Domain.AuthorizationTest do
   use Sleeky.DataCase
 
   alias Blogs.Accounts

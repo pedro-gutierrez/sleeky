@@ -13,14 +13,14 @@ defmodule Sleeky.Migrations do
     |> Enum.map(&File.read!(&1))
   end
 
-  def missing(existing, contexts) do
+  def missing(existing, domains) do
     existing =
       existing
       |> Enum.map(&Code.string_to_quoted!(&1))
       |> Enum.map(&Migration.decode/1)
       |> Enum.reject(& &1.skip)
 
-    new_state = state_from_contexts(contexts)
+    new_state = state_from_domains(domains)
     old_state = state_from_migrations(existing)
     next_version = next_version(existing)
 
@@ -33,10 +33,10 @@ defmodule Sleeky.Migrations do
     |> Enum.reduce(State.new(), &Migration.aggregate/2)
   end
 
-  defp state_from_contexts(contexts) do
-    state = Enum.reduce(contexts, State.new(), &state_with_schema/2)
+  defp state_from_domains(domains) do
+    state = Enum.reduce(domains, State.new(), &state_with_schema/2)
 
-    contexts
+    domains
     |> Enum.flat_map(& &1.models())
     |> Enum.reject(& &1.virtual?())
     |> Enum.reduce(state, &state_with_model/2)

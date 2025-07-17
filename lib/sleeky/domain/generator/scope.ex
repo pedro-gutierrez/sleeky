@@ -1,9 +1,9 @@
-defmodule Sleeky.Context.Generator.Scope do
+defmodule Sleeky.Domain.Generator.Scope do
   @moduledoc false
   @behaviour Diesel.Generator
 
-  alias Sleeky.Context.Policies
-  alias Sleeky.Context.Scopes
+  alias Sleeky.Domain.Policies
+  alias Sleeky.Domain.Scopes
 
   @impl true
   def generate(context, _) do

@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Policies do
+defmodule Sleeky.Domain.Policies do
   @moduledoc false
 
   def resolve!(model, action, scopes) do

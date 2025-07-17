@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Generator.CreateActions do
+defmodule Sleeky.Domain.Generator.CreateActions do
   @moduledoc false
   @behaviour Diesel.Generator
 
@@ -78,7 +78,7 @@ defmodule Sleeky.Context.Generator.CreateActions do
             attrs
             |> Map.take(unquote(attr_names))
             |> collect_ids(attrs, unquote(Macro.escape(parent_fields)))
-            |> Sleeky.Context.Helpers.set_default_values(unquote(Macro.escape(default_values)))
+            |> Sleeky.Domain.Helpers.set_default_values(unquote(Macro.escape(default_values)))
             |> string_keys()
             |> Map.put_new_lazy("id", &Ecto.UUID.generate/0)
 

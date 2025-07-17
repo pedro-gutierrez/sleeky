@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Generator.Metadata do
+defmodule Sleeky.Domain.Generator.Metadata do
   @moduledoc false
   @behaviour Diesel.Generator
 

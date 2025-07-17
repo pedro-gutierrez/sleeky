@@ -15,7 +15,7 @@ config :sleeky, Blogs.Repo,
 config :sleeky, Sleeky,
   repo: Blogs.Repo,
   endpoint: Blogs.Endpoint,
-  contexts: [
+  domains: [
     Blogs.Publishing,
     Blogs.Notifications,
     Blogs.Accounts

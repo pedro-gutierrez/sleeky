@@ -125,7 +125,7 @@ defmodule Sleeky.Migrations.Column do
   end
 
   defp maybe_encode_default(opts, col) do
-    if col.default do
+    if col.default != nil do
       Keyword.put(opts, :default, col.default)
     else
       opts

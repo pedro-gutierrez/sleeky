@@ -25,11 +25,11 @@ defmodule Sleeky.Model.Parser do
   end
 
   defp model(caller, attrs) do
-    context = context(caller)
+    domain = domain(caller)
 
     %Model{
-      context: context,
-      repo: repo(context),
+      domain: domain,
+      repo: repo(domain),
       name: name(caller),
       plural: plural(caller),
       module: caller,
@@ -80,7 +80,7 @@ defmodule Sleeky.Model.Parser do
     rels =
       for opts <- children_tags(definition, :belongs_to) do
         parent_module = Keyword.fetch!(opts, :name)
-        ensure_same_context!(model.module, parent_module, :belongs_to)
+        ensure_same_domain!(model.module, parent_module, :belongs_to)
         required = Keyword.get(opts, :required, true)
 
         name = name(parent_module)
@@ -117,7 +117,7 @@ defmodule Sleeky.Model.Parser do
   defp with_children(model, definition) do
     rels =
       for {:has_many, [], [child_module]} <- definition do
-        ensure_same_context!(model.module, child_module, :has_many)
+        ensure_same_domain!(model.module, child_module, :has_many)
 
         name = plural(child_module)
 
@@ -271,12 +271,12 @@ defmodule Sleeky.Model.Parser do
     %{model | primary_key: @primary_key, attributes: [@primary_key | model.attributes]}
   end
 
-  defp ensure_same_context!(from, to, kind) do
-    from_context = context(from)
-    to_context = context(to)
+  defp ensure_same_domain!(from, to, kind) do
+    from_domain = domain(from)
+    to_domain = domain(to)
 
-    if from_context != to_context do
-      raise "invalid relation of kind #{inspect(kind)} from #{inspect(from)} (in context #{inspect(from_context)}) to #{inspect(to)} (in context #{inspect(to_context)}). Both models must be in the same context."
+    if from_domain != to_domain do
+      raise "invalid relation of kind #{inspect(kind)} from #{inspect(from)} (in domain#{inspect(from_domain)}) to #{inspect(to)} (in domain #{inspect(to_domain)}). Both models must be in the same domain."
     end
   end
 
@@ -288,7 +288,7 @@ defmodule Sleeky.Model.Parser do
       name: name(module),
       table_name: table_name(module),
       plural: plural(module),
-      context: context(module)
+      domain: domain(module)
     }
   end
 

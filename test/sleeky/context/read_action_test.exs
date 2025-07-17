@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.ReadActionTest do
+defmodule Sleeky.Domain.ReadActionTest do
   use Sleeky.DataCase
 
   alias Blogs.{Accounts, Publishing}

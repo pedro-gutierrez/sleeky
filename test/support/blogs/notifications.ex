@@ -1,8 +1,8 @@
 defmodule Blogs.Notifications do
   @moduledoc false
-  use Sleeky.Context
+  use Sleeky.Domain
 
-  context do
+  domain do
     model Blogs.Notifications.Digest
   end
 end

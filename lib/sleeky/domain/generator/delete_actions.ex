@@ -1,10 +1,10 @@
-defmodule Sleeky.Context.Generator.DeleteActions do
+defmodule Sleeky.Domain.Generator.DeleteActions do
   @moduledoc false
 
   @behaviour Diesel.Generator
 
   import Sleeky.Naming
-  import Sleeky.Context.Ast
+  import Sleeky.Domain.Ast
 
   alias Sleeky.Model.Action
 

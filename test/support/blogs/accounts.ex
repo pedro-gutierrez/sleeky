@@ -1,9 +1,12 @@
 defmodule Blogs.Accounts do
   @moduledoc false
-  use Sleeky.Context
+  use Sleeky.Domain
 
-  context do
+  domain do
     model Blogs.Accounts.User
-    scopes(Blogs.Scopes)
+
+    scopes do
+      Blogs.Scopes
+    end
   end
 end

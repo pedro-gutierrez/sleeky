@@ -4,7 +4,7 @@ defmodule Sleeky.Api.Generator.ReadDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :read} <- model.actions() do
+    for domain <- api.domains, model <- domain.models(), %{name: :read} <- model.actions() do
       module_name = Module.concat(model, ApiReadDecoder)
       include_decoder = Module.concat(model, ApiIncludeDecoder)
 

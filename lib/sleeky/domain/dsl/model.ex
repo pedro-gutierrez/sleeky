@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Dsl.Scopes do
+defmodule Sleeky.Domain.Dsl.Model do
   @moduledoc false
   use Diesel.Tag
 

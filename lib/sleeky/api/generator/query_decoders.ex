@@ -4,7 +4,7 @@ defmodule Sleeky.Api.Generator.QueryDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models() do
+    for domain <- api.domains, model <- domain.models() do
       module_name = Module.concat(model, ApiQueryDecoder)
 
       quote do

@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.PathsTest do
+defmodule Sleeky.Domain.PathsTest do
   use ExUnit.Case
 
   alias Blogs.Publishing

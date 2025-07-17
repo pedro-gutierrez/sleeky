@@ -15,7 +15,7 @@ defmodule Sleeky.Migrations.Table do
   @timestamps [:inserted_at, :updated_at]
 
   def from_model(model) do
-    prefix = model.context().name()
+    prefix = model.domain().name()
     table_name = model.table_name()
 
     attribute_columns =

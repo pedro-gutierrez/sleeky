@@ -1,4 +1,4 @@
-defmodule Sleeky.Context.Generator.Graph do
+defmodule Sleeky.Domain.Generator.Graph do
   @moduledoc false
   @behaviour Diesel.Generator
 

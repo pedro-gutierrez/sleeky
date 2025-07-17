@@ -17,7 +17,7 @@ At the very least, create both a context and a model:
 ```elixir
 # lib/my_app/accounts.ex
 defmodule MyApp.Accounts do
-  use Sleeky.Context
+  use Sleeky.Domain
 
   context do
     model MyApp.Accounts.User
@@ -38,19 +38,19 @@ end
 
 ## Configure sleeky
 
-In your `config.exs`, let Sleeky know about your repo and your contexts:
+In your `config.exs`, let Sleeky know about your repo and your domains:
 
 ```elixir
 config :sleeky, Sleeky,
   repo: MyApp.Repo,
-  contexts: [
+  domains: [
     MyApp.Accounts
   ]
 ```
 
 ## Migrate your database
 
-Generate migrations for your contexts and models with:
+Generate migrations for your domains and models with:
 
 ```bash
 $ mix sleeky.gen.migrations

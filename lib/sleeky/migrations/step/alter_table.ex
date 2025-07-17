@@ -131,6 +131,7 @@ defmodule Sleeky.Migrations.Step.AlterTable do
     |> Enum.map(fn name ->
       old_column = Map.fetch!(old_table.columns, name)
       new_column = Map.fetch!(new_table.columns, name)
+
       Column.diff(old_column, new_column)
     end)
     |> Enum.reject(&ColumnChanges.empty?/1)

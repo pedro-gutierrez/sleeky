@@ -1,19 +1,19 @@
-defmodule Sleeky.Context.Parser do
+defmodule Sleeky.Domain.Parser do
   @moduledoc false
   @behaviour Diesel.Parser
 
-  alias Sleeky.Context
+  alias Sleeky.Domain
   import Sleeky.Naming
 
   @impl true
-  def parse({:context, _, children}, opts) do
+  def parse({:domain, _, children}, opts) do
     caller_module = Keyword.fetch!(opts, :caller_module)
 
-    %Context{
+    %Domain{
       name: name(caller_module),
       repo: repo(caller_module)
     }
-    |> with_authorization(children)
+    |> with_scopes(children)
     |> with_models(children)
   end
 
@@ -23,7 +23,7 @@ defmodule Sleeky.Context.Parser do
     %{context | models: models}
   end
 
-  defp with_authorization(context, children) do
+  defp with_scopes(context, children) do
     scopes = for {:scopes, _, [scopes]} <- children, do: scopes
     scopes = List.first(scopes)
 
