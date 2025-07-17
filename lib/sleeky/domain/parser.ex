@@ -18,7 +18,8 @@ defmodule Sleeky.Domain.Parser do
   end
 
   defp with_models(context, children) do
-    models = for {:model, _, [model]} <- children, do: model
+    models = for {:models, _, models} <- children, do: models
+    models = List.flatten(models)
 
     %{context | models: models}
   end
