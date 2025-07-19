@@ -3,11 +3,11 @@ defmodule Sleeky.Domain.Generator.Graph do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(context, _) do
+  def generate(domain, _) do
     graph = Graph.new()
 
     graph =
-      Enum.reduce(context.models, graph, fn model, g ->
+      Enum.reduce(domain.models, graph, fn model, g ->
         g
         |> with_model(model)
         |> with_attributes(model)
@@ -18,7 +18,7 @@ defmodule Sleeky.Domain.Generator.Graph do
       graph_function(graph),
       get_shortest_path_function(),
       get_paths_function(),
-      diagram_function(context, graph),
+      diagram_function(domain, graph),
       simple_path_function(),
       vertex_function()
     ]
@@ -96,9 +96,9 @@ defmodule Sleeky.Domain.Generator.Graph do
     end
   end
 
-  defp diagram_function(context, graph) do
+  defp diagram_function(domain, graph) do
     {:ok, dot} = Graph.to_dot(graph)
-    name = context.name
+    name = domain.name
 
     quote do
       @graph_dot unquote(dot)

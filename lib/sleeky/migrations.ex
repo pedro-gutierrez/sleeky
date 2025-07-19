@@ -42,8 +42,8 @@ defmodule Sleeky.Migrations do
     |> Enum.reduce(state, &state_with_model/2)
   end
 
-  defp state_with_schema(context, state) do
-    State.add_schema(state, context.name())
+  defp state_with_schema(domain, state) do
+    State.add_schema(state, domain.name())
   end
 
   defp state_with_model(model, state) do

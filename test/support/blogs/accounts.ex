@@ -3,7 +3,9 @@ defmodule Blogs.Accounts do
   use Sleeky.Domain
 
   domain do
-    model Blogs.Accounts.User
+    models do
+      Blogs.Accounts.User
+    end
 
     scopes do
       Blogs.Scopes

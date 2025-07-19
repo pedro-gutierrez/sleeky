@@ -45,9 +45,9 @@ defmodule Sleeky.Naming do
   end
 
   @doc false
-  def module(context, name) do
+  def module(domain, name) do
     name = name |> to_string() |> Macro.camelize()
-    Module.concat(context, name)
+    Module.concat(domain, name)
   end
 
   @doc false
@@ -61,8 +61,8 @@ defmodule Sleeky.Naming do
   end
 
   @doc false
-  def repo(context) do
-    context
+  def repo(domain) do
+    domain
     |> Module.split()
     |> Enum.drop(-1)
     |> Kernel.++([Repo])

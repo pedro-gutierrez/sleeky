@@ -17,17 +17,17 @@ defmodule Sleeky.Domain.Parser do
     |> with_models(children)
   end
 
-  defp with_models(context, children) do
+  defp with_models(domain, children) do
     models = for {:models, _, models} <- children, do: models
     models = List.flatten(models)
 
-    %{context | models: models}
+    %{domain | models: models}
   end
 
-  defp with_scopes(context, children) do
+  defp with_scopes(domain, children) do
     scopes = for {:scopes, _, [scopes]} <- children, do: scopes
     scopes = List.first(scopes)
 
-    %{context | scopes: scopes}
+    %{domain | scopes: scopes}
   end
 end

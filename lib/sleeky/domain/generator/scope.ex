@@ -6,14 +6,14 @@ defmodule Sleeky.Domain.Generator.Scope do
   alias Sleeky.Domain.Scopes
 
   @impl true
-  def generate(context, _) do
-    scope_funs(context) ++ [default_scope_fun()]
+  def generate(domain, _) do
+    scope_funs(domain) ++ [default_scope_fun()]
   end
 
-  defp scope_funs(context) do
-    scopes = Scopes.all(context)
+  defp scope_funs(domain) do
+    scopes = Scopes.all(domain)
 
-    for model <- context.models, %{kind: :list} = action <- model.actions() do
+    for model <- domain.models, %{kind: :list} = action <- model.actions() do
       model_name = model.name()
       policies = Policies.resolve!(model_name, action, scopes)
 
