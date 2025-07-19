@@ -9,7 +9,7 @@ defmodule Sleeky.Ui.Route.Parser do
     caller = Keyword.fetch!(opts, :caller_module)
     caller_module_name = caller |> Module.split() |> List.last()
     ui_prefix = caller |> Module.split() |> Enum.take(2) |> Module.concat()
-    method = Keyword.get(attrs, :method, :get)
+    method = attrs |> Keyword.get(:method, "get") |> String.to_atom()
     path = Keyword.fetch!(attrs, :name)
 
     model = for {:action, _, [module]} <- children, do: module
