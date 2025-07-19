@@ -18,8 +18,9 @@ defmodule Mix.Tasks.Sleeky.Gen.Migrations do
   def run(_) do
     config = Application.fetch_env!(:sleeky, Sleeky)
     repo = Keyword.fetch!(config, :repo)
+    app = Keyword.fetch!(config, :app)
     migrations_dir = Mix.EctoSQL.source_repo_priv(repo)
-    domains = Keyword.fetch!(config, :domains)
+    domains = app.domains()
 
     dir = Path.join([migrations_dir, "migrations"])
 
