@@ -10,17 +10,19 @@ def deps do
 end
 ```
 
-## Define a context, and a model
+## Define a domain, and a model
 
-At the very least, create both a context and a model:
+At the very least, create both a domainand a model:
 
 ```elixir
 # lib/my_app/accounts.ex
 defmodule MyApp.Accounts do
   use Sleeky.Domain
 
-  context do
-    model MyApp.Accounts.User
+  domain do
+    models do
+      MyApp.Accounts.User
+    end
   end
 end
 ```

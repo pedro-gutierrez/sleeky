@@ -7,10 +7,12 @@ defmodule Blogs.Publishing do
       Blogs.Scopes
     end
 
-    model Blogs.Publishing.Author
-    model Blogs.Publishing.Blog
-    model Blogs.Publishing.Comment
-    model Blogs.Publishing.Post
-    model Blogs.Publishing.Theme
+    models do
+      Blogs.Publishing.Author
+      Blogs.Publishing.Blog
+      Blogs.Publishing.Comment
+      Blogs.Publishing.Post
+      Blogs.Publishing.Theme
+    end
   end
 end

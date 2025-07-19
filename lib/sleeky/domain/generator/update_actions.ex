@@ -5,8 +5,8 @@ defmodule Sleeky.Domain.Generator.UpdateActions do
   import Sleeky.Naming
 
   @impl true
-  def generate(context, _) do
-    for model <- context.models, action when action.name == :update <- model.actions() do
+  def generate(domain, _) do
+    for model <- domain.models, action when action.name == :update <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("update_#{model_name}")
       do_action_fun_name = String.to_atom("do_update_#{model_name}")

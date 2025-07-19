@@ -1,10 +1,10 @@
 defmodule Sleeky.Domain.Scopes do
   @moduledoc false
 
-  @doc "Returns all the scopes defined for the given context module"
-  def all(context) do
-    if context.scopes do
-      context.scopes.scopes()
+  @doc "Returns all the scopes defined for the given domain"
+  def all(domain) do
+    if domain.scopes do
+      domain.scopes.scopes()
     else
       %{}
     end

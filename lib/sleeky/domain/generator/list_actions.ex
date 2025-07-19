@@ -6,8 +6,8 @@ defmodule Sleeky.Domain.Generator.ListActions do
   import Sleeky.Naming
 
   @impl true
-  def generate(context, _) do
-    for model <- context.models, %{name: :list} <- model.actions() do
+  def generate(domain, _) do
+    for model <- domain.models, %{name: :list} <- model.actions() do
       [default_list_fun(model), list_by_parent_funs(model), list_by_key_funs(model)]
     end
   end

@@ -1,6 +1,6 @@
 defmodule Sleeky.Domain.Generator.Allow do
   @moduledoc """
-  Generates authorization code for a context
+  Generates authorization code for a domain
   """
   @behaviour Diesel.Generator
 
@@ -8,10 +8,10 @@ defmodule Sleeky.Domain.Generator.Allow do
   alias Sleeky.Domain.Scopes
 
   @impl true
-  def generate(context, _) do
-    scopes = Scopes.all(context)
+  def generate(domain, _) do
+    scopes = Scopes.all(domain)
 
-    for model <- context.models, action <- model.actions() do
+    for model <- domain.models, action <- model.actions() do
       model = model.name()
       policies = Policies.resolve!(model, action, scopes)
 

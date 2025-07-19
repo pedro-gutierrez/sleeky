@@ -466,7 +466,9 @@ defmodule Mix.Tasks.Sleeky.New do
         <%= @mod %>.Authentication
       end
 
-      context <%= @mod %>.Accounts
+      domains do
+        <%= @mod %>.Accounts
+      end
     end
   end
   """)
@@ -507,9 +509,11 @@ defmodule Mix.Tasks.Sleeky.New do
     @moduledoc false
     use Sleeky.Domain
 
-    context do
+    domain do
       authorization <%= @mod %>.Authorization
-      model <%= @mod %>.Accounts.User
+      models do
+        <%= @mod %>.Accounts.User
+      end
     end
   end
   """)

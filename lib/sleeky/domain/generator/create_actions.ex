@@ -5,13 +5,13 @@ defmodule Sleeky.Domain.Generator.CreateActions do
   import Sleeky.Naming
 
   @impl true
-  def generate(context, _) do
-    create_funs(context) ++
-      do_create_funs(context) ++ bulk_create_funs(context) ++ create_children_funs(context)
+  def generate(domain, _) do
+    create_funs(domain) ++
+      do_create_funs(domain) ++ bulk_create_funs(domain) ++ create_children_funs(domain)
   end
 
-  defp create_funs(context) do
-    for model <- context.models, %{name: :create} = action <- model.actions() do
+  defp create_funs(domain) do
+    for model <- domain.models, %{name: :create} = action <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("create_#{model_name}")
       do_action_fun_name = String.to_atom("do_create_#{model_name}")
@@ -53,8 +53,8 @@ defmodule Sleeky.Domain.Generator.CreateActions do
     end
   end
 
-  defp do_create_funs(context) do
-    for model <- context.models, %{name: :create} = action <- model.actions() do
+  defp do_create_funs(domain) do
+    for model <- domain.models, %{name: :create} = action <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("do_create_#{model_name}")
 
@@ -90,8 +90,8 @@ defmodule Sleeky.Domain.Generator.CreateActions do
     end
   end
 
-  defp create_children_funs(context) do
-    for model <- context.models, %{name: :create} <- model.actions() do
+  defp create_children_funs(domain) do
+    for model <- domain.models, %{name: :create} <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("create_#{model_name}_children")
 
@@ -126,8 +126,8 @@ defmodule Sleeky.Domain.Generator.CreateActions do
     end
   end
 
-  defp bulk_create_funs(context) do
-    for model <- context.models, %{name: :create} <- model.actions() do
+  defp bulk_create_funs(domain) do
+    for model <- domain.models, %{name: :create} <- model.actions() do
       single_fun_name = String.to_atom("create_#{model.name()}")
       bulk_fun_name = String.to_atom("create_#{model.plural()}")
 

@@ -6,12 +6,12 @@ defmodule Sleeky.Domain.Generator.ReadActions do
   import Sleeky.Naming
 
   @impl true
-  def generate(context, _) do
-    fetch_by_id_functions(context) ++ fetch_by_unique_keys_functions(context)
+  def generate(domain, _) do
+    fetch_by_id_functions(domain) ++ fetch_by_unique_keys_functions(domain)
   end
 
-  defp fetch_by_id_functions(context) do
-    for model <- context.models, %{name: :read} = action <- model.actions() do
+  defp fetch_by_id_functions(domain) do
+    for model <- domain.models, %{name: :read} = action <- model.actions() do
       model_name = model.name()
       action_fun_name = String.to_atom("read_#{model_name}")
 
@@ -29,8 +29,8 @@ defmodule Sleeky.Domain.Generator.ReadActions do
     end
   end
 
-  defp fetch_by_unique_keys_functions(context) do
-    for model <- context.models,
+  defp fetch_by_unique_keys_functions(domain) do
+    for model <- domain.models,
         %{name: :read} = action <- model.actions(),
         %{unique?: true} = key <- model.keys() do
       model_name = model.name()

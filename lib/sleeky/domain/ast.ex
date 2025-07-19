@@ -1,6 +1,6 @@
 defmodule Sleeky.Domain.Ast do
   @moduledoc """
-  Context specific ast helpers
+  Domain specific ast helpers
   """
 
   import Sleeky.Naming

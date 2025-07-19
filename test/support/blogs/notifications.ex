@@ -3,6 +3,8 @@ defmodule Blogs.Notifications do
   use Sleeky.Domain
 
   domain do
-    model Blogs.Notifications.Digest
+    models do
+      Blogs.Notifications.Digest
+    end
   end
 end
