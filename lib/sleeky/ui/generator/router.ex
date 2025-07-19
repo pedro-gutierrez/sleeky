@@ -23,7 +23,7 @@ defmodule Sleeky.Ui.Generator.Router do
 
         @html "text/html"
 
-        plug Plug.Parsers, parsers: [:urlencoded, :multipart], pass: ["*/*"]
+        plug Plug.Parsers, parsers: [:urlencoded, :multipart], length: 20_000_000, pass: ["*/*"]
         plug Plug.MethodOverride
 
         plug(:match)
