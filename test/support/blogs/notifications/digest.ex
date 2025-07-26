@@ -3,7 +3,7 @@ defmodule Blogs.Notifications.Digest do
   use Sleeky.Model
 
   model virtual: true do
-    attribute(name: :text, kind: :string)
-    attribute(name: :section, kind: :string)
+    attribute name: :text, kind: :string
+    attribute name: :section, kind: :string
   end
 end

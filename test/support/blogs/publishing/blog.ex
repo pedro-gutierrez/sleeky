@@ -11,7 +11,7 @@ defmodule Blogs.Publishing.Blog do
     belongs_to Author
     belongs_to Theme, required: false
     has_many Post
-    key fields: [:author, :name], unique: true
+    unique fields: [:author, :name]
 
     action :read do
       role :user

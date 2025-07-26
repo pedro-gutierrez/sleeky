@@ -10,7 +10,8 @@ defmodule MigrationHelper do
 
   @doc false
   def generate_migrations(existing \\ []) do
-    domains = :sleeky |> Application.fetch_env!(Sleeky) |> Keyword.fetch!(:domains)
+    app = :sleeky |> Application.fetch_env!(Sleeky) |> Keyword.fetch!(:app)
+    domains = app.domains()
 
     existing
     |> Migrations.missing(domains)

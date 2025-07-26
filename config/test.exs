@@ -15,10 +15,6 @@ config :sleeky, Blogs.Repo,
 config :sleeky, Sleeky,
   repo: Blogs.Repo,
   endpoint: Blogs.Endpoint,
-  domains: [
-    Blogs.Publishing,
-    Blogs.Notifications,
-    Blogs.Accounts
-  ]
+  app: Blogs.App
 
 config :sleeky, Blogs.Endpoint, port: 80

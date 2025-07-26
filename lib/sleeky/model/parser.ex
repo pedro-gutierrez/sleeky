@@ -8,7 +8,9 @@ defmodule Sleeky.Model.Parser do
   alias Sleeky.Model.Key
   alias Sleeky.Model.Relation
   alias Sleeky.Model.Action
+  alias Sleeky.Model.OnConflict
   alias Sleeky.Model.Policy
+
   import Sleeky.Naming
 
   @impl true
@@ -172,10 +174,22 @@ defmodule Sleeky.Model.Parser do
       end
 
     unique_keys =
-      for {:unique, _, field_names} <- definition do
+      for {:unique, [fields: field_names], opts} <- definition do
         fields = fields!(model, field_names)
         name = field_names |> Enum.join("_") |> String.to_atom()
-        %Key{fields: fields, model: model.module, unique?: true, name: name}
+
+        on_conflict =
+          with %OnConflict{} = on_conflict <- on_conflict(opts) do
+            %{on_conflict | fields: fields}
+          end
+
+        %Key{
+          fields: fields,
+          model: model.module,
+          unique?: true,
+          name: name,
+          on_conflict: on_conflict
+        }
       end
 
     %{model | keys: Enum.uniq(keys ++ unique_keys)}
@@ -242,6 +256,18 @@ defmodule Sleeky.Model.Parser do
   end
 
   defp action_tasks(_), do: nil
+
+  defp on_conflict([{:on_conflict, opts, _}]) do
+    strategy = Keyword.fetch!(opts, :name)
+    except = Keyword.get(opts, :except, [:id])
+
+    %OnConflict{
+      strategy: strategy,
+      except: except
+    }
+  end
+
+  defp on_conflict(_), do: nil
 
   defp scope(name) when is_atom(name), do: name
   defp scope(scopes) when is_list(scopes), do: Enum.map(scopes, &scope/1)

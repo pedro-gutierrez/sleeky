@@ -13,6 +13,7 @@ defmodule Sleeky.Model.Generator.Changesets do
 
   defp insert_changeset(model) do
     primary_key_constraint = String.to_atom("#{model.plural}_pkey")
+    unique_constraints = unique_constraints(model)
     inclusion_validations = inclusion_validations(model)
     parents_contraints = parents_constraints(model)
 
@@ -24,6 +25,7 @@ defmodule Sleeky.Model.Generator.Changesets do
           |> validate_required(@required_fields)
           |> unique_constraint([:id], name: unquote(primary_key_constraint))
 
+        unquote_splicing(unique_constraints)
         unquote_splicing(inclusion_validations)
         unquote_splicing(parents_contraints)
       end
@@ -54,6 +56,19 @@ defmodule Sleeky.Model.Generator.Changesets do
       def delete_changeset(%__MODULE__{} = model) do
         changes = cast(model, %{}, [])
         unquote_splicing(children_constraints)
+      end
+    end
+  end
+
+  defp unique_constraints(model) do
+    for %{unique?: true} = key <- model.keys do
+      column_names = Enum.map(key.fields, & &1.column_name)
+      constraint_name_parts = [model.table_name] ++ column_names ++ ["idx"]
+      constraint_name = constraint_name_parts |> Enum.join("_") |> String.to_atom()
+      field_names = Enum.map(key.fields, & &1.name)
+
+      quote do
+        changes = unique_constraint(changes, unquote(field_names), name: unquote(constraint_name))
       end
     end
   end

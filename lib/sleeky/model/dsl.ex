@@ -15,6 +15,7 @@ defmodule Sleeky.Model.Dsl do
       Sleeky.Model.Dsl.One,
       Sleeky.Model.Dsl.All,
       Sleeky.Model.Dsl.Task,
-      Sleeky.Model.Dsl.On
+      Sleeky.Model.Dsl.On,
+      Sleeky.Model.Dsl.OnConflict
     ]
 end
