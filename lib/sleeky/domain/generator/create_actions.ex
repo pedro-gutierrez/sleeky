@@ -140,8 +140,11 @@ defmodule Sleeky.Domain.Generator.CreateActions do
                    items
                    |> Enum.reduce_while(nil, fn item, _ ->
                      case unquote(single_fun_name)(item, context) do
-                       {:ok, _} -> {:cont, :ok}
-                       {:error, _} = error -> {:halt, error}
+                       {:ok, _} ->
+                         {:cont, :ok}
+
+                       {:error, _} = error ->
+                         {:halt, error}
                      end
                    end)
                    |> then(fn

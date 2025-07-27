@@ -42,6 +42,7 @@ defmodule Sleeky.Model do
       :fields,
       :model,
       :name,
+      on_conflict: nil,
       unique?: false
     ]
   end
@@ -98,6 +99,16 @@ defmodule Sleeky.Model do
       :kind,
       policies: %{},
       tasks: []
+    ]
+  end
+
+  defmodule OnConflict do
+    @moduledoc false
+
+    defstruct [
+      :fields,
+      :strategy,
+      :except
     ]
   end
 

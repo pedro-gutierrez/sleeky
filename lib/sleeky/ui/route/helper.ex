@@ -44,7 +44,7 @@ defmodule Sleeky.Ui.Route.Helper do
   end
 
   def result({:error, reason}, conn, params, views) do
-    model = Map.put(params, "reason", reason)
+    model = Map.put(params, "reason", inspect(reason))
 
     render_view(views, "error", conn, model, 500)
   end

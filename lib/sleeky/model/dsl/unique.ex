@@ -4,6 +4,7 @@ defmodule Sleeky.Model.Dsl.Unique do
   use Diesel.Tag
 
   tag do
-    child kind: :atom, min: 1
+    attribute :fields, kind: :atoms, required: true
+    child :on_conflict, min: 0, max: 1
   end
 end

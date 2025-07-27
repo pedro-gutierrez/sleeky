@@ -4,7 +4,8 @@ defmodule Blogs.Accounts.User do
   model do
     attribute :email, kind: :string
     attribute :public, kind: :boolean, default: false
-    key fields: [:email], unique: true
+
+    unique fields: [:email]
 
     action :read do
       role :user, scope: :self
