@@ -5,7 +5,7 @@ defmodule Sleeky.Ui.Route.Dsl.Route do
   tag do
     attribute :method, kind: :string, default: "get", in: ["get", "post", "put", "delete"]
     attribute :name, kind: :string
-    child :action, min: 0, max: 1
+    attribute :action, kind: :module, required: false
     child :view, min: 0
   end
 end

@@ -3,7 +3,8 @@ defmodule Sleeky.Ui.Route.Dsl.View do
   use Diesel.Tag
 
   tag do
-    attribute :name, kind: :string, required: false, default: "default"
-    child kind: :module, min: 1, max: 1
+    attribute :name, kind: :module, required: false
+    attribute :for, kind: :string, required: false, default: "default"
+    child kind: :module, min: 0, max: 1
   end
 end

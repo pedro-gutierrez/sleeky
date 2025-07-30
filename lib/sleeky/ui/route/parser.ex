@@ -12,31 +12,29 @@ defmodule Sleeky.Ui.Route.Parser do
     method = attrs |> Keyword.get(:method, "get") |> String.to_atom()
     path = Keyword.fetch!(attrs, :name)
 
-    model = for {:action, _, [module]} <- children, do: module
-
     views =
-      for {:view, opts, [module]} <- children, into: [] do
-        name = Keyword.get(opts, :name, "default")
+      for {:view, opts, children} = view <- children, into: %{} do
+        module = Keyword.get(opts, :name) || List.first(children)
+        name = Keyword.get(opts, :for, "default")
+
+        if module == nil do
+          raise "Missing module for view in #{inspect(view)}"
+        end
 
         {name, module}
       end
 
-    {action, views} =
-      with {[], []} <- {model, views} do
-        action = [Module.concat([ui_prefix, Actions, caller_module_name])]
-        views = [{"default", Module.concat([ui_prefix, Views, caller_module_name])}]
-
-        {action, views}
+    action =
+      with nil <- Keyword.get(attrs, :action) do
+        Module.concat([ui_prefix, Actions, caller_module_name])
       end
 
-    action = List.first(action)
-
     default_views = %{
+      "default" => Module.concat([ui_prefix, Views, caller_module_name]),
       "not_found" => Module.concat(ui_prefix, Views.NotFound),
       "error" => Module.concat(ui_prefix, Views.Error)
     }
 
-    views = Map.new(views)
     views = Map.merge(default_views, views)
 
     %Route{

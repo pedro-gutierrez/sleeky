@@ -41,5 +41,15 @@ defmodule Sleeky.Domain.ListActionTest do
       assert [c] = page.entries
       assert c == context.comment1
     end
+
+    test "supports sorting", context do
+      params = Map.put(context.params, :sort, inserted_at: :asc)
+      assert page = Publishing.list_comments(params)
+      assert [c1, c2, c3] = page.entries
+
+      params = Map.put(context.params, :sort, inserted_at: :desc)
+      assert page = Publishing.list_comments(params)
+      assert [^c3, ^c2, ^c1] = page.entries
+    end
   end
 end
