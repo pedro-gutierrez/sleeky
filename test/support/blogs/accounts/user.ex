@@ -4,6 +4,7 @@ defmodule Blogs.Accounts.User do
   model do
     attribute :email, kind: :string
     attribute :public, kind: :boolean, default: false
+    attribute :external_id, kind: :id
 
     unique fields: [:email]
 

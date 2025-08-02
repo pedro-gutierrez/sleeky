@@ -41,7 +41,13 @@ defmodule Sleeky.Fixtures do
   end
 
   def comments(context) do
-    {:ok, user} = Accounts.User.create(id: Ecto.UUID.generate(), email: "foo@bar", public: true)
+    {:ok, user} =
+      Accounts.User.create(
+        id: Ecto.UUID.generate(),
+        email: "foo@bar",
+        public: true,
+        external_id: uuid()
+      )
 
     {:ok, author} = Publishing.Author.create(id: user.id, name: "foo")
 

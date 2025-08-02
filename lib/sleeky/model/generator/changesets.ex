@@ -16,6 +16,7 @@ defmodule Sleeky.Model.Generator.Changesets do
     unique_constraints = unique_constraints(model)
     inclusion_validations = inclusion_validations(model)
     parents_contraints = parents_constraints(model)
+    uuid_validations = uuid_validations(model)
 
     quote do
       def insert_changeset(%__MODULE__{} = model, attrs) do
@@ -25,6 +26,7 @@ defmodule Sleeky.Model.Generator.Changesets do
           |> validate_required(@required_fields)
           |> unique_constraint([:id], name: unquote(primary_key_constraint))
 
+        unquote_splicing(uuid_validations)
         unquote_splicing(unique_constraints)
         unquote_splicing(inclusion_validations)
         unquote_splicing(parents_contraints)
@@ -35,6 +37,7 @@ defmodule Sleeky.Model.Generator.Changesets do
   defp update_changeset(model) do
     inclusion_validations = inclusion_validations(model)
     parents_contraints = parents_constraints(model)
+    uuid_validations = uuid_validations(model)
 
     quote do
       def update_changeset(%__MODULE__{} = model, attrs) do
@@ -43,6 +46,7 @@ defmodule Sleeky.Model.Generator.Changesets do
           |> cast(attrs, @fields_on_update)
           |> validate_required(@required_fields)
 
+        unquote_splicing(uuid_validations)
         unquote_splicing(inclusion_validations)
         unquote_splicing(parents_contraints)
       end
@@ -106,6 +110,14 @@ defmodule Sleeky.Model.Generator.Changesets do
     for %{name: name, in: allowed_values} when allowed_values != [] <- model.attributes do
       quote do
         changes = validate_inclusion(changes, unquote(name), unquote(allowed_values))
+      end
+    end
+  end
+
+  defp uuid_validations(model) do
+    for %{name: name, ecto_type: :binary_id} <- model.attributes do
+      quote do
+        changes = validate_uuid(changes, unquote(name))
       end
     end
   end
