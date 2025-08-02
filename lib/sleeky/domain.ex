@@ -17,7 +17,8 @@ defmodule Sleeky.Domain do
       Sleeky.Domain.Generator.UpdateActions,
       Sleeky.Domain.Generator.ReadActions,
       Sleeky.Domain.Generator.DeleteActions,
-      Sleeky.Domain.Generator.ListActions
+      Sleeky.Domain.Generator.ListActions,
+      Sleeky.Domain.Generator.Transaction
     ]
 
   defstruct [:name, :scopes, :repo, models: []]
