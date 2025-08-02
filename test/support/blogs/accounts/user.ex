@@ -8,6 +8,10 @@ defmodule Blogs.Accounts.User do
 
     unique fields: [:email]
 
+    action :create do
+      role :admin
+    end
+
     action :read do
       role :user, scope: :self
     end
