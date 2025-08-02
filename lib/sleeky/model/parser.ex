@@ -280,13 +280,15 @@ defmodule Sleeky.Model.Parser do
   defp storage(:text), do: :text
   defp storage(kind), do: kind
 
-  defp ecto_type(:text), do: :string
+  defp ecto_type(:id), do: :binary_id
   defp ecto_type(:datetime), do: :utc_datetime
+  defp ecto_type(:text), do: :string
   defp ecto_type(kind), do: kind
 
   @primary_key %Attribute{
     name: :id,
     kind: :id,
+    ecto_type: :binary_id,
     storage: :binary_id,
     column_name: :id,
     primary_key?: true,
