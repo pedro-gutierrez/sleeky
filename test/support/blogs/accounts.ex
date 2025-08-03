@@ -1,8 +1,8 @@
 defmodule Blogs.Accounts do
   @moduledoc false
-  use Sleeky.Domain
+  use Sleeky.Context
 
-  domain do
+  context do
     models do
       Blogs.Accounts.User
     end

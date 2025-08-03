@@ -6,6 +6,6 @@ defmodule Sleeky.App.Dsl do
     tags: [
       Sleeky.App.Dsl.Repos,
       Sleeky.App.Dsl.Endpoints,
-      Sleeky.App.Dsl.Domains
+      Sleeky.App.Dsl.Contexts
     ]
 end

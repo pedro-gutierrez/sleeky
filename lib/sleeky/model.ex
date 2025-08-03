@@ -22,7 +22,7 @@ defmodule Sleeky.Model do
 
   defstruct [
     :module,
-    :domain,
+    :context,
     :repo,
     :name,
     :plural,

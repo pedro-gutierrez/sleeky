@@ -35,8 +35,8 @@ locals_without_parens = [
   dialog: :*,
   div: :*,
   dl: :*,
-  domain: :*,
-  domains: :*,
+  context: :*,
+  contexts: :*,
   dt: :*,
   each: :*,
   em: :*,
@@ -150,7 +150,7 @@ locals_without_parens = [
   var: :*,
   video: :*,
   view: :*,
-  wbr: :*,
+  wbr: :*
 ]
 
 [

@@ -1,15 +1,15 @@
 defmodule Sleeky do
   @moduledoc """
-  The `Sleeky` module aggregates and provides common utility functions for handling DSLs (Domain Specific Languages)
+  The `Sleeky` module aggregates and provides common utility functions for handling DSLs (Context Specific Languages)
   within the Sleeky application. It collects various DSL modules and offers functions to manage their local functions
   and tags.
   """
 
   @dsls [
     Sleeky.Scopes.Dsl,
-    Sleeky.Domain.Dsl,
+    Sleeky.Context.Dsl,
     Sleeky.Model.Dsl,
-    Sleeky.Domain.Dsl,
+    Sleeky.Context.Dsl,
     Sleeky.Api.Dsl,
     Sleeky.Endpoint.Dsl,
     Sleeky.Ui.Dsl,

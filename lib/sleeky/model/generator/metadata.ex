@@ -33,7 +33,7 @@ defmodule Sleeky.Model.Generator.Metadata do
       @keys unquote(Macro.escape(keys))
       @actions unquote(Macro.escape(actions))
 
-      def domain, do: unquote(model.domain)
+      def context, do: unquote(model.context)
       def name, do: unquote(model.name)
       def plural, do: unquote(model.plural)
       def table_name, do: unquote(model.table_name)

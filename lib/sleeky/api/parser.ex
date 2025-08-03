@@ -4,12 +4,12 @@ defmodule Sleeky.Api.Parser do
 
   @impl true
   def parse({:api, [], children}, _) do
-    domains = for {:domains, [], [module]} <- children, do: module
-    domains = List.flatten(domains)
+    contexts = for {:contexts, [], [module]} <- children, do: module
+    contexts = List.flatten(contexts)
 
     plugs = for {:plugs, [], plugs} <- children, do: plugs
     plugs = List.flatten(plugs)
 
-    %Sleeky.Api{plugs: plugs, domains: domains}
+    %Sleeky.Api{plugs: plugs, contexts: contexts}
   end
 end

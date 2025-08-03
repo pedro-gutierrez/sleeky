@@ -11,10 +11,10 @@ defmodule MigrationHelper do
   @doc false
   def generate_migrations(existing \\ []) do
     app = :sleeky |> Application.fetch_env!(Sleeky) |> Keyword.fetch!(:app)
-    domains = app.domains()
+    contexts = app.contexts()
 
     existing
-    |> Migrations.missing(domains)
+    |> Migrations.missing(contexts)
     |> Migration.encode()
     |> Migration.format()
     |> Enum.join("")

@@ -19,7 +19,7 @@ defmodule Sleeky.Migrations.Constraint do
 
     new(
       table: rel.model.table_name(),
-      prefix: rel.model.domain().name(),
+      prefix: rel.model.context().name(),
       column: rel.column_name,
       target: target_model.table_name(),
       type: target_model.primary_key().storage

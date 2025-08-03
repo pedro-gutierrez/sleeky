@@ -15,7 +15,7 @@ defmodule Sleeky.Model.Generator.EditFunction do
       def edit(model, attrs) when is_map(attrs) do
         model
         |> update_changeset(attrs)
-        |> unquote(model.domain).repo().update()
+        |> unquote(model.context).repo().update()
       end
     end
   end

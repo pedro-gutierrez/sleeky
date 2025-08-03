@@ -4,7 +4,7 @@ defmodule Sleeky.Api.Generator.SortDecoders do
 
   @impl true
   def generate(api, _) do
-    for domain <- api.domains, model <- domain.models() do
+    for context <- api.contexts, model <- context.models() do
       module_name = Module.concat(model, ApiSortDecoder)
 
       quote do

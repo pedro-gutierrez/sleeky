@@ -6,7 +6,7 @@ defmodule Sleeky.Api.Generator.CreateDecoders do
 
   @impl true
   def generate(api, _) do
-    for domain <- api.domains, model <- domain.models(), %{name: :create} <- model.actions() do
+    for context <- api.contexts, model <- context.models(), %{name: :create} <- model.actions() do
       module_name = Module.concat(model, ApiCreateDecoder)
 
       rules = %{"id" => [required: true, type: :string, uuid: true]}

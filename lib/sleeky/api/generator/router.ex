@@ -55,21 +55,21 @@ defmodule Sleeky.Api.Generator.Router do
   end
 
   defp default_routes(api) do
-    for domain <- api.domains,
-        model <- domain.models(),
+    for context <- api.contexts,
+        model <- context.models(),
         action when action.name in @supported_actions <- model.actions() do
-      route(domain, model, action.name)
+      route(context, model, action.name)
     end
   end
 
   defp list_by_parent_routes(api) do
-    for domain <- api.domains,
-        model <- domain.models(),
+    for context <- api.contexts,
+        model <- context.models(),
         action when action.name == :list <- model.actions(),
         rel <- model.parents() do
       handler = Macro.camelize("api_list_by_#{rel.name}_handler")
       handler = Module.concat(model, handler)
-      path = relation_path(domain, rel.target.module, rel.inverse)
+      path = relation_path(context, rel.target.module, rel.inverse)
 
       quote do
         get(unquote(path), to: unquote(handler))
@@ -77,10 +77,10 @@ defmodule Sleeky.Api.Generator.Router do
     end
   end
 
-  defp route(domain, model, action) do
+  defp route(context, model, action) do
     handler = handler_module(model, action)
     method = method(action)
-    path = path(domain, model, action)
+    path = path(context, model, action)
 
     quote do
       unquote(method)(unquote(path), to: unquote(handler))
@@ -99,20 +99,20 @@ defmodule Sleeky.Api.Generator.Router do
     Module.concat(model, module_name)
   end
 
-  defp path(domain, model, action) do
+  defp path(context, model, action) do
     case action do
-      :read -> item_path(domain, model)
-      :list -> collection_path(domain, model)
-      :create -> collection_path(domain, model)
-      :update -> item_path(domain, model)
-      :delete -> item_path(domain, model)
+      :read -> item_path(context, model)
+      :list -> collection_path(context, model)
+      :create -> collection_path(context, model)
+      :update -> item_path(context, model)
+      :delete -> item_path(context, model)
     end
   end
 
-  defp collection_path(domain, model), do: "/#{domain.name()}/#{model.plural()}"
+  defp collection_path(context, model), do: "/#{context.name()}/#{model.plural()}"
 
-  defp relation_path(domain, model, rel),
-    do: "/#{domain.name()}/#{model.plural()}/:id/#{rel.name}"
+  defp relation_path(context, model, rel),
+    do: "/#{context.name()}/#{model.plural()}/:id/#{rel.name}"
 
-  defp item_path(domain, model), do: collection_path(domain, model) <> "/:id"
+  defp item_path(context, model), do: collection_path(context, model) <> "/:id"
 end

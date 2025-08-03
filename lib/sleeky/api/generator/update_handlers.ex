@@ -4,12 +4,12 @@ defmodule Sleeky.Api.Generator.UpdateHandlers do
 
   @impl true
   def generate(api, _) do
-    for domain <- api.domains, model <- domain.models(), %{name: :update} <- model.actions() do
-      handler_module(domain, model)
+    for context <- api.contexts, model <- context.models(), %{name: :update} <- model.actions() do
+      handler_module(context, model)
     end
   end
 
-  defp handler_module(domain, model) do
+  defp handler_module(context, model) do
     handler_module = Module.concat(model, ApiUpdateHandler)
     decoder_module = Module.concat(model, ApiUpdateDecoder)
 
@@ -30,7 +30,7 @@ defmodule Sleeky.Api.Generator.UpdateHandlers do
         def execute(conn, _opts) do
           with {:ok, params} <- decode(conn.params),
                {:ok, model} <- unquote(model).fetch(params.id),
-               {:ok, model} <- unquote(domain).unquote(update_fun)(model, params, conn.assigns) do
+               {:ok, model} <- unquote(context).unquote(update_fun)(model, params, conn.assigns) do
             model
             |> encode()
             |> send_json(conn)

@@ -41,7 +41,7 @@ defmodule Sleeky.Model.Generator.EctoSchema do
   end
 
   def prefix(model) do
-    prefix = Naming.name(model.domain)
+    prefix = Naming.name(model.context)
 
     quote do
       @schema_prefix unquote(prefix)
