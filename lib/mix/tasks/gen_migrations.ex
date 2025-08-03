@@ -20,13 +20,13 @@ defmodule Mix.Tasks.Sleeky.Gen.Migrations do
     repo = Keyword.fetch!(config, :repo)
     app = Keyword.fetch!(config, :app)
     migrations_dir = Mix.EctoSQL.source_repo_priv(repo)
-    domains = app.domains()
+    features = app.features()
 
     dir = Path.join([migrations_dir, "migrations"])
 
     dir
     |> Migrations.existing()
-    |> Migrations.missing(domains)
+    |> Migrations.missing(features)
     |> case do
       %{steps: []} ->
         Mix.shell().info("No migrations to write")

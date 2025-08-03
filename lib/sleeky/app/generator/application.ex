@@ -14,11 +14,11 @@ defmodule Sleeky.App.Generator.Application do
       @otp_app unquote(otp_app)
       @repos unquote(app.repos)
       @endpoints unquote(app.endpoints)
-      @domains unquote(app.domains)
+      @features unquote(app.features)
       @migrate __MODULE__.Migrate
 
       def repos, do: @repos
-      def domains, do: @domains
+      def features, do: @features
 
       @impl true
       def start(_type, _args) do

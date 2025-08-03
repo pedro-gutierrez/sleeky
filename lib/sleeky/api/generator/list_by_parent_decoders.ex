@@ -4,8 +4,8 @@ defmodule Sleeky.Api.Generator.ListByParentDecoders do
 
   @impl true
   def generate(api, _) do
-    for domain <- api.domains,
-        model <- domain.models(),
+    for feature <- api.features,
+        model <- feature.models(),
         %{name: :list} <- model.actions(),
         rel <- model.parents() do
       module_name = Macro.camelize("api_list_by_#{rel.name}_decoder")

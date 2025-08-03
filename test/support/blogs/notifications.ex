@@ -1,8 +1,8 @@
 defmodule Blogs.Notifications do
   @moduledoc false
-  use Sleeky.Domain
+  use Sleeky.Feature
 
-  domain do
+  feature do
     models do
       Blogs.Notifications.Digest
     end

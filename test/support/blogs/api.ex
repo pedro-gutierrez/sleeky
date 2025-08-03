@@ -7,7 +7,7 @@ defmodule Blogs.Api do
       Blogs.FakeAuth
     end
 
-    domains do
+    features do
       Blogs.Publishing
     end
   end

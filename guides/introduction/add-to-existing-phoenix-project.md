@@ -10,16 +10,16 @@ def deps do
 end
 ```
 
-## Define a domain, and a model
+## Define a feature, and a model
 
-At the very least, create both a domainand a model:
+At the very least, create both a feature and a model:
 
 ```elixir
 # lib/my_app/accounts.ex
 defmodule MyApp.Accounts do
-  use Sleeky.Domain
+  use Sleeky.Feature
 
-  domain do
+  feature do
     models do
       MyApp.Accounts.User
     end
@@ -40,19 +40,19 @@ end
 
 ## Configure sleeky
 
-In your `config.exs`, let Sleeky know about your repo and your domains:
+In your `config.exs`, let Sleeky know about your repo and your features:
 
 ```elixir
 config :sleeky, Sleeky,
   repo: MyApp.Repo,
-  domains: [
+  features: [
     MyApp.Accounts
   ]
 ```
 
 ## Migrate your database
 
-Generate migrations for your domains and models with:
+Generate migrations for your features and models with:
 
 ```bash
 $ mix sleeky.gen.migrations
