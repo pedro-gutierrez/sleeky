@@ -10,7 +10,7 @@ defmodule Sleeky.Migrations.Index do
   def from_key(%Key{} = key) do
     table_name = key.model.table_name()
     column_names = Enum.map(key.fields, & &1.column_name)
-    prefix = key.model.domain().name()
+    prefix = key.model.feature().name()
 
     from_opts(unique: key.unique?, columns: column_names, table: table_name, prefix: prefix)
   end

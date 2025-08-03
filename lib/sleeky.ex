@@ -7,9 +7,8 @@ defmodule Sleeky do
 
   @dsls [
     Sleeky.Scopes.Dsl,
-    Sleeky.Domain.Dsl,
+    Sleeky.Feature.Dsl,
     Sleeky.Model.Dsl,
-    Sleeky.Domain.Dsl,
     Sleeky.Api.Dsl,
     Sleeky.Endpoint.Dsl,
     Sleeky.Ui.Dsl,

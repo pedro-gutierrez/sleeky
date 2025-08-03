@@ -1,6 +1,6 @@
 defmodule Sleeky.Api do
   @moduledoc """
-  Builds a json api for your domain
+  Builds a json api for your feature
   """
   use Diesel,
     otp_app: :sleeky,
@@ -28,5 +28,5 @@ defmodule Sleeky.Api do
       Sleeky.Api.Generator.Router
     ]
 
-  defstruct [:domains, :plugs]
+  defstruct [:features, :plugs]
 end

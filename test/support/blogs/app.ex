@@ -3,7 +3,7 @@ defmodule Blogs.App do
   use Sleeky.App, otp_app: :sleeky
 
   app do
-    domains do
+    features do
       Blogs.Accounts
       Blogs.Notifications
       Blogs.Publishing

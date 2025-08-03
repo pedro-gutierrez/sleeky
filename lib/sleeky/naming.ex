@@ -51,7 +51,7 @@ defmodule Sleeky.Naming do
   end
 
   @doc false
-  def domain(model) do
+  def feature(model) do
     model
     |> Module.split()
     |> Enum.reverse()

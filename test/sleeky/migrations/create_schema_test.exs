@@ -3,7 +3,7 @@ defmodule Sleeky.Migrations.CreateSchemaTest do
   import MigrationHelper
 
   describe "migrations" do
-    test "create schemas for new domains" do
+    test "create schemas for new features" do
       migration = generate_migrations()
       assert migration =~ "execute(\"CREATE SCHEMA accounts\")"
     end

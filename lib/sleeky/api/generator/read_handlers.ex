@@ -4,11 +4,11 @@ defmodule Sleeky.Api.Generator.ReadHandlers do
 
   @impl true
   def generate(api, _) do
-    for domain <- api.domains, model <- domain.models(), %{name: :read} <- model.actions() do
+    for feature <- api.features, model <- feature.models(), %{name: :read} <- model.actions() do
       handler_module = Module.concat(model, ApiReadHandler)
       decoder_module = Module.concat(model, ApiReadDecoder)
 
-      domain_fun = String.to_atom("read_#{model.name()}")
+      feature_fun = String.to_atom("read_#{model.name()}")
 
       quote do
         defmodule unquote(handler_module) do
@@ -26,7 +26,7 @@ defmodule Sleeky.Api.Generator.ReadHandlers do
             with {:ok, params} <- decode(conn.params),
                  params <- Map.merge(params, conn.assigns),
                  {:ok, model} <-
-                   unquote(domain).unquote(domain_fun)(params.id, params) do
+                   unquote(feature).unquote(feature_fun)(params.id, params) do
               model
               |> encode()
               |> send_json(conn)

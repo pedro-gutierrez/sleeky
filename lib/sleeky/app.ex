@@ -9,5 +9,5 @@ defmodule Sleeky.App do
       Sleeky.App.Generator.Application
     ]
 
-  defstruct [:name, :module, :repos, :endpoints, :domains]
+  defstruct [:name, :module, :repos, :endpoints, :features]
 end

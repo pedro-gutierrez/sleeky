@@ -4,11 +4,11 @@ defmodule Sleeky.Api.Generator.ListHandlers do
 
   @impl true
   def generate(api, _) do
-    for domain <- api.domains, model <- domain.models(), %{name: :list} <- model.actions() do
+    for feature <- api.features, model <- feature.models(), %{name: :list} <- model.actions() do
       handler_module = Module.concat(model, ApiListHandler)
       decoder_module = Module.concat(model, ApiListDecoder)
 
-      domain_fun = String.to_atom("list_#{model.plural()}")
+      feature_fun = String.to_atom("list_#{model.plural()}")
 
       quote do
         defmodule unquote(handler_module) do
@@ -26,7 +26,7 @@ defmodule Sleeky.Api.Generator.ListHandlers do
             with {:ok, params} <- decode(conn.params) do
               params
               |> Map.merge(conn.assigns)
-              |> unquote(domain).unquote(domain_fun)()
+              |> unquote(feature).unquote(feature_fun)()
               |> encode()
               |> send_json(conn)
             else

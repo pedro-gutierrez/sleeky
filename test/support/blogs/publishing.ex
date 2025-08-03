@@ -1,8 +1,8 @@
 defmodule Blogs.Publishing do
   @moduledoc false
-  use Sleeky.Domain
+  use Sleeky.Feature
 
-  domain do
+  feature do
     scopes do
       Blogs.Scopes
     end

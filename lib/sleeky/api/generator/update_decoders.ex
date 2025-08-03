@@ -6,7 +6,7 @@ defmodule Sleeky.Api.Generator.UpdateDecoders do
 
   @impl true
   def generate(api, _) do
-    for domain <- api.domains, model <- domain.models(), %{name: :update} <- model.actions() do
+    for feature <- api.features, model <- feature.models(), %{name: :update} <- model.actions() do
       module_name = Module.concat(model, ApiUpdateDecoder)
 
       rules = %{"id" => [required: true, type: :string, uuid: true]}

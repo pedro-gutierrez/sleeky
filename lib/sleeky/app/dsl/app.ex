@@ -5,6 +5,6 @@ defmodule Sleeky.App.Dsl.App do
   tag do
     child :repos, min: 0, max: 1
     child :endpoints, min: 0, max: 1
-    child :domains, min: 1, max: 1
+    child :features, min: 1, max: 1
   end
 end

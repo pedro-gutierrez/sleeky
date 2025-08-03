@@ -466,7 +466,7 @@ defmodule Mix.Tasks.Sleeky.New do
         <%= @mod %>.Authentication
       end
 
-      domains do
+      features do
         <%= @mod %>.Accounts
       end
     end
@@ -507,9 +507,9 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:lib_accounts, """
   defmodule <%= @mod %>.Accounts do
     @moduledoc false
-    use Sleeky.Domain
+    use Sleeky.Feature
 
-    domain do
+    feature do
       authorization <%= @mod %>.Authorization
       models do
         <%= @mod %>.Accounts.User
@@ -592,7 +592,7 @@ defmodule Mix.Tasks.Sleeky.New do
   config :sleeky, Sleeky,
     repo: <%= @mod %>.Repo,
     endpoint: <%= @mod %>.Endpoint,
-    domains: [
+    features: [
       <%= @mod %>.Accounts
     ]
 

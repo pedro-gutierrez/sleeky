@@ -27,11 +27,11 @@ defmodule Sleeky.Model.Parser do
   end
 
   defp model(caller, attrs) do
-    domain = domain(caller)
+    feature = feature(caller)
 
     %Model{
-      domain: domain,
-      repo: repo(domain),
+      feature: feature,
+      repo: repo(feature),
       name: name(caller),
       plural: plural(caller),
       module: caller,
@@ -82,7 +82,7 @@ defmodule Sleeky.Model.Parser do
     rels =
       for opts <- children_tags(definition, :belongs_to) do
         parent_module = Keyword.fetch!(opts, :name)
-        ensure_same_domain!(model.module, parent_module, :belongs_to)
+        ensure_same_feature!(model.module, parent_module, :belongs_to)
         required = Keyword.get(opts, :required, true)
 
         name = name(parent_module)
@@ -119,7 +119,7 @@ defmodule Sleeky.Model.Parser do
   defp with_children(model, definition) do
     rels =
       for {:has_many, [], [child_module]} <- definition do
-        ensure_same_domain!(model.module, child_module, :has_many)
+        ensure_same_feature!(model.module, child_module, :has_many)
 
         name = plural(child_module)
 
@@ -299,12 +299,12 @@ defmodule Sleeky.Model.Parser do
     %{model | primary_key: @primary_key, attributes: [@primary_key | model.attributes]}
   end
 
-  defp ensure_same_domain!(from, to, kind) do
-    from_domain = domain(from)
-    to_domain = domain(to)
+  defp ensure_same_feature!(from, to, kind) do
+    from_feature = feature(from)
+    to_feature = feature(to)
 
-    if from_domain != to_domain do
-      raise "invalid relation of kind #{inspect(kind)} from #{inspect(from)} (in domain#{inspect(from_domain)}) to #{inspect(to)} (in domain #{inspect(to_domain)}). Both models must be in the same domain."
+    if from_feature != to_feature do
+      raise "invalid relation of kind #{inspect(kind)} from #{inspect(from)} (in feature#{inspect(from_feature)}) to #{inspect(to)} (in feature #{inspect(to_feature)}). Both models must be in the same feature."
     end
   end
 
@@ -316,7 +316,7 @@ defmodule Sleeky.Model.Parser do
       name: name(module),
       table_name: table_name(module),
       plural: plural(module),
-      domain: domain(module)
+      feature: feature(module)
     }
   end
 

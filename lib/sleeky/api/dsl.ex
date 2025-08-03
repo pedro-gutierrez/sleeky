@@ -4,7 +4,7 @@ defmodule Sleeky.Api.Dsl do
     otp_app: :sleeky,
     root: Sleeky.Api.Dsl.Api,
     tags: [
-      Sleeky.Api.Dsl.Domains,
+      Sleeky.Api.Dsl.Features,
       Sleeky.Api.Dsl.Plugs
     ]
 end
