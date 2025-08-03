@@ -6,12 +6,12 @@ defmodule Sleeky.Context.DeleteActionTest do
   setup [:comments, :current_user]
 
   describe "delete action" do
-    test "does not models that have children", %{params: params, blog: blog} do
+    test "does not entities that have children", %{params: params, blog: blog} do
       assert {:error, changeset} = Publishing.delete_blog(blog, params)
       assert "has children" in errors_on(changeset).blog_id
     end
 
-    test "deletes models that have no children", %{
+    test "deletes entities that have no children", %{
       params: params,
       blog: blog,
       post: post,

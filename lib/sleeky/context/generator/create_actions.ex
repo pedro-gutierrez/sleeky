@@ -11,11 +11,11 @@ defmodule Sleeky.Context.Generator.CreateActions do
   end
 
   defp create_funs(context) do
-    for model <- context.models, %{name: :create} = action <- model.actions() do
-      model_name = model.name()
-      action_fun_name = String.to_atom("create_#{model_name}")
-      do_action_fun_name = String.to_atom("do_create_#{model_name}")
-      children_action_fun_name = String.to_atom("create_#{model_name}_children")
+    for entity <- context.entities, %{name: :create} = action <- entity.actions() do
+      entity_name = entity.name()
+      action_fun_name = String.to_atom("create_#{entity_name}")
+      do_action_fun_name = String.to_atom("do_create_#{entity_name}")
+      children_action_fun_name = String.to_atom("create_#{entity_name}_children")
       tasks = for task <- action.tasks, do: {task.module, task.if}
 
       fun_with_map_args =
@@ -27,11 +27,11 @@ defmodule Sleeky.Context.Generator.CreateActions do
             repo = repo()
 
             repo.transaction(fn ->
-              with {:ok, model} <- unquote(do_action_fun_name)(attrs, context),
-                   :ok <- unquote(children_action_fun_name)(model, attrs, context),
-                   tasks <- tasks_to_execute(unquote(tasks), model, context),
-                   :ok <- Sleeky.Job.schedule_all(model, :create, tasks) do
-                model
+              with {:ok, entity} <- unquote(do_action_fun_name)(attrs, context),
+                   :ok <- unquote(children_action_fun_name)(entity, attrs, context),
+                   tasks <- tasks_to_execute(unquote(tasks), entity, context),
+                   :ok <- Sleeky.Job.schedule_all(entity, :create, tasks) do
+                entity
               else
                 {:error, reason} ->
                   repo.rollback(reason)
@@ -54,21 +54,21 @@ defmodule Sleeky.Context.Generator.CreateActions do
   end
 
   defp do_create_funs(context) do
-    for model <- context.models, %{name: :create} = action <- model.actions() do
-      model_name = model.name()
-      action_fun_name = String.to_atom("do_create_#{model_name}")
+    for entity <- context.entities, %{name: :create} = action <- entity.actions() do
+      entity_name = entity.name()
+      action_fun_name = String.to_atom("do_create_#{entity_name}")
 
       attr_names =
-        for attr when not attr.computed? <- model.attributes(),
+        for attr when not attr.computed? <- entity.attributes(),
             do: attr.name
 
       parent_fields =
-        for rel when not rel.computed? <- model.parents(),
+        for rel when not rel.computed? <- entity.parents(),
             into: %{},
             do: {rel.name, rel.column_name}
 
       default_values =
-        for attr when not is_nil(attr.default) <- model.attributes(), into: %{} do
+        for attr when not is_nil(attr.default) <- entity.attributes(), into: %{} do
           {attr.name, attr.default}
         end
 
@@ -82,8 +82,8 @@ defmodule Sleeky.Context.Generator.CreateActions do
             |> string_keys()
             |> Map.put_new_lazy("id", &Ecto.UUID.generate/0)
 
-          with :ok <- allow(unquote(model_name), unquote(action.name), context) do
-            unquote(model).create(fields)
+          with :ok <- allow(unquote(entity_name), unquote(action.name), context) do
+            unquote(entity).create(fields)
           end
         end
       end
@@ -91,23 +91,23 @@ defmodule Sleeky.Context.Generator.CreateActions do
   end
 
   defp create_children_funs(context) do
-    for model <- context.models, %{name: :create} <- model.actions() do
-      model_name = model.name()
-      action_fun_name = String.to_atom("create_#{model_name}_children")
+    for entity <- context.entities, %{name: :create} <- entity.actions() do
+      entity_name = entity.name()
+      action_fun_name = String.to_atom("create_#{entity_name}_children")
 
       child_fields =
-        for rel when not rel.computed? <- model.children(),
+        for rel when not rel.computed? <- entity.children(),
             do: {rel.name, rel.inverse.name, String.to_atom("create_#{rel.target.name}")}
 
       quote do
-        defp unquote(action_fun_name)(model, attrs, context) do
-          context = Map.put(context, unquote(model_name), model)
+        defp unquote(action_fun_name)(entity, attrs, context) do
+          context = Map.put(context, unquote(entity_name), entity)
 
           unquote(Macro.escape(child_fields))
           |> Enum.reduce([], fn {child_name, inverse_name, create_fun_name}, acc ->
             case Map.get(attrs, child_name) do
               children when is_list(children) ->
-                Enum.map(children, &{Map.put(&1, inverse_name, model), create_fun_name})
+                Enum.map(children, &{Map.put(&1, inverse_name, entity), create_fun_name})
 
               nil ->
                 []
@@ -127,9 +127,9 @@ defmodule Sleeky.Context.Generator.CreateActions do
   end
 
   defp bulk_create_funs(context) do
-    for model <- context.models, %{name: :create} <- model.actions() do
-      single_fun_name = String.to_atom("create_#{model.name()}")
-      bulk_fun_name = String.to_atom("create_#{model.plural()}")
+    for entity <- context.entities, %{name: :create} <- entity.actions() do
+      single_fun_name = String.to_atom("create_#{entity.name()}")
+      bulk_fun_name = String.to_atom("create_#{entity.plural()}")
 
       quote do
         def unquote(bulk_fun_name)(items, context \\ %{}) when is_list(items) do

@@ -5,15 +5,15 @@ defmodule Sleeky.Api.Generator.ListByParentDecoders do
   @impl true
   def generate(api, _) do
     for context <- api.contexts,
-        model <- context.models(),
-        %{name: :list} <- model.actions(),
-        rel <- model.parents() do
+        entity <- context.entities(),
+        %{name: :list} <- entity.actions(),
+        rel <- entity.parents() do
       module_name = Macro.camelize("api_list_by_#{rel.name}_decoder")
-      module_name = Module.concat(model, module_name)
+      module_name = Module.concat(entity, module_name)
       parent_decoder = Module.concat(rel.target.module, ApiRelationDecoder)
-      include_decoder = Module.concat(model, ApiIncludeDecoder)
-      query_decoder = Module.concat(model, ApiQueryDecoder)
-      sort_decoder = Module.concat(model, ApiSortDecoder)
+      include_decoder = Module.concat(entity, ApiIncludeDecoder)
+      query_decoder = Module.concat(entity, ApiQueryDecoder)
+      sort_decoder = Module.concat(entity, ApiSortDecoder)
 
       rules = %{
         "id" => [

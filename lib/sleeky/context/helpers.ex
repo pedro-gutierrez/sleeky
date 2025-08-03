@@ -3,13 +3,13 @@ defmodule Sleeky.Context.Helpers do
 
   alias Sleeky.QueryBuilder
 
-  def maybe_filter(query, model, context) do
+  def maybe_filter(query, entity, context) do
     case Map.get(context, :query) do
       nil ->
         query
 
       filters ->
-        builder = QueryBuilder.from_simple_map(model, filters)
+        builder = QueryBuilder.from_simple_map(entity, filters)
 
         QueryBuilder.build(query, builder)
     end
@@ -47,24 +47,24 @@ defmodule Sleeky.Context.Helpers do
 
   def tasks_to_execute(_, _, %{skip_tasks: true}), do: []
 
-  def tasks_to_execute(tasks, model, _context) do
+  def tasks_to_execute(tasks, entity, _context) do
     tasks
     |> Enum.filter(fn
       {_module, nil} ->
         true
 
       {_module, conditions} when is_list(conditions) ->
-        Enum.all?(conditions, fn {field, value} -> Map.get(model, field) == value end)
+        Enum.all?(conditions, fn {field, value} -> Map.get(entity, field) == value end)
 
       {_module, condition} ->
-        condition.execute(model)
+        condition.execute(entity)
     end)
     |> Enum.map(fn {module, _} -> module end)
   end
 
   def tasks_to_execute(_, _, _, %{skip_tasks: true}), do: []
 
-  def tasks_to_execute(tasks, model, updated, _context) do
+  def tasks_to_execute(tasks, entity, updated, _context) do
     tasks
     |> Enum.filter(fn
       {_module, nil} ->
@@ -72,11 +72,11 @@ defmodule Sleeky.Context.Helpers do
 
       {_module, conditions} when is_list(conditions) ->
         Enum.all?(conditions, fn {field, value} ->
-          Map.get(updated, field) == value && Map.get(model, field) != value
+          Map.get(updated, field) == value && Map.get(entity, field) != value
         end)
 
       {_module, condition} ->
-        condition.execute(model, updated)
+        condition.execute(entity, updated)
     end)
     |> Enum.map(fn {module, _} -> module end)
   end

@@ -13,14 +13,14 @@ defmodule Sleeky.Context.Generator.Scope do
   defp scope_funs(context) do
     scopes = Scopes.all(context)
 
-    for model <- context.models, %{kind: :list} = action <- model.actions() do
-      model_name = model.name()
-      policies = Policies.resolve!(model_name, action, scopes)
+    for entity <- context.entities, %{kind: :list} = action <- entity.actions() do
+      entity_name = entity.name()
+      policies = Policies.resolve!(entity_name, action, scopes)
 
       quote location: :keep do
         def scope(
               %Ecto.Query{} = query,
-              unquote(model_name) = model,
+              unquote(entity_name) = entity,
               unquote(action.name) = action,
               params
             ) do
@@ -38,11 +38,11 @@ defmodule Sleeky.Context.Generator.Scope do
 
                 #{inspect(roles)}
 
-              when scoping action #{action} on model #{model}
+              when scoping action #{action} on entity #{entity}
               """
             else
               Sleeky.Scopes.Query.scope(
-                unquote(model),
+                unquote(entity),
                 query,
                 policy.scope,
                 params

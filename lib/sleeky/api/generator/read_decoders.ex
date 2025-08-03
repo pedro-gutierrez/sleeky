@@ -4,9 +4,11 @@ defmodule Sleeky.Api.Generator.ReadDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :read} <- model.actions() do
-      module_name = Module.concat(model, ApiReadDecoder)
-      include_decoder = Module.concat(model, ApiIncludeDecoder)
+    for context <- api.contexts,
+        entity <- context.entities(),
+        %{name: :read} <- entity.actions() do
+      module_name = Module.concat(entity, ApiReadDecoder)
+      include_decoder = Module.concat(entity, ApiIncludeDecoder)
 
       rules = %{
         "id" => [required: true, type: :string, uuid: true],

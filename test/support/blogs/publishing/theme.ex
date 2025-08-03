@@ -1,8 +1,8 @@
 defmodule Blogs.Publishing.Theme do
   @moduledoc false
-  use Sleeky.Model
+  use Sleeky.Entity
 
-  model do
+  entity do
     attribute :name, kind: :string, in: ["science", "finance"]
 
     unique fields: [:name] do

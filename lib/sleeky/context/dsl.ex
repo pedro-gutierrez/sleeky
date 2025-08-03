@@ -4,7 +4,7 @@ defmodule Sleeky.Context.Dsl do
     otp_app: :sleeky,
     root: Sleeky.Context.Dsl.Context,
     tags: [
-      Sleeky.Context.Dsl.Models,
+      Sleeky.Context.Dsl.Entities,
       Sleeky.Context.Dsl.Scopes
     ]
 end

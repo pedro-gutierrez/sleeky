@@ -1,13 +1,13 @@
 defmodule Sleeky.Evaluate do
   @moduledoc false
 
-  alias Sleeky.Model.{Attribute, Relation}
+  alias Sleeky.Entity.{Attribute, Relation}
 
   def evaluate(nil, _), do: nil
   def evaluate(context, {:path, []}), do: context
 
-  def evaluate(%{__struct__: model} = context, {:path, [field] = path}) do
-    case model.field(field) do
+  def evaluate(%{__struct__: entity} = context, {:path, [field] = path}) do
+    case entity.field(field) do
       {:ok, %Attribute{}} ->
         Map.fetch!(context, field)
 
@@ -21,13 +21,13 @@ defmodule Sleeky.Evaluate do
 
       {:error, :field_not_found} ->
         raise ArgumentError,
-              "no such field #{inspect(field)} in #{inspect(model)}, when evaluating path
+              "no such field #{inspect(field)} in #{inspect(entity)}, when evaluating path
           #{inspect(path)} on #{inspect(context)}"
     end
   end
 
-  def evaluate(%{__struct__: model} = context, {:path, [:**, ancestor | rest]}) do
-    case model.context().get_shortest_path(model.name(), ancestor) do
+  def evaluate(%{__struct__: entity} = context, {:path, [:**, ancestor | rest]}) do
+    case entity.context().get_shortest_path(entity.name(), ancestor) do
       [] ->
         nil
 
@@ -60,11 +60,11 @@ defmodule Sleeky.Evaluate do
   #  |> Enum.uniq()
   # end
 
-  def evaluate(%{__struct__: model} = context, {:path, [field | rest] = path}) do
-    case model.field(field) do
+  def evaluate(%{__struct__: entity} = context, {:path, [field | rest] = path}) do
+    case entity.field(field) do
       {:ok, %Attribute{}} ->
         raise ArgumentError,
-              "field #{inspect(field)} is not a relation of #{inspect(model)}, when evaluating
+              "field #{inspect(field)} is not a relation of #{inspect(entity)}, when evaluating
           path #{inspect(path)} on #{inspect(context)}"
 
       {:ok, %Relation{kind: :parent}} ->
@@ -82,7 +82,7 @@ defmodule Sleeky.Evaluate do
 
       {:error, :field_not_found} ->
         raise ArgumentError,
-              "no such field #{inspect(field)} in #{inspect(model)}, when evaluating path
+              "no such field #{inspect(field)} in #{inspect(entity)}, when evaluating path
           #{inspect(path)} on #{inspect(context)}"
     end
   end
@@ -99,13 +99,13 @@ defmodule Sleeky.Evaluate do
 
   def evaluate(_, {:value, v}), do: v
 
-  defp relation(%{__struct__: model, id: id} = context, field) do
+  defp relation(%{__struct__: entity, id: id} = context, field) do
     with rel when rel != nil <- Map.get(context, field) do
       if unloaded?(rel) do
         key = {id, field}
 
         with nil <- Process.get(key) do
-          rel = context |> model.context().repo().preload(field) |> Map.get(field)
+          rel = context |> entity.context().repo().preload(field) |> Map.get(field)
           Process.put(key, rel)
           rel
         end

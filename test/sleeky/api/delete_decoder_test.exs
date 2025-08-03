@@ -4,7 +4,7 @@ defmodule Sleeky.Api.DeleteDecoderTest do
   alias Blogs.Publishing.Post
 
   describe "delete api decoder" do
-    test "decodes the model id" do
+    test "decodes the entity id" do
       id = Ecto.UUID.generate()
       params = %{"id" => id}
 

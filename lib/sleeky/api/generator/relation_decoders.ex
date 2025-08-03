@@ -4,12 +4,12 @@ defmodule Sleeky.Api.Generator.RelationDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models() do
-      module_name = Module.concat(model, ApiRelationDecoder)
+    for context <- api.contexts, entity <- context.entities() do
+      module_name = Module.concat(entity, ApiRelationDecoder)
 
       quote do
         defmodule unquote(module_name) do
-          use Sleeky.Decoder.RelationDecoder, model: unquote(model)
+          use Sleeky.Decoder.RelationDecoder, entity: unquote(entity)
         end
       end
     end

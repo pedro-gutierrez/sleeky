@@ -4,13 +4,13 @@ defmodule Sleeky.Api.Generator.SortDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models() do
-      module_name = Module.concat(model, ApiSortDecoder)
+    for context <- api.contexts, entity <- context.entities() do
+      module_name = Module.concat(entity, ApiSortDecoder)
 
       quote do
         defmodule unquote(module_name) do
           use Sleeky.Decoder.SortDecoder,
-            model: unquote(model)
+            entity: unquote(entity)
         end
       end
     end

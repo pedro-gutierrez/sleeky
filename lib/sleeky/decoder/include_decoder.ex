@@ -4,7 +4,7 @@ defmodule Sleeky.Decoder.IncludeDecoder do
   """
 
   defmacro __using__(opts) do
-    model = Keyword.fetch!(opts, :model)
+    entity = Keyword.fetch!(opts, :entity)
 
     quote do
       import Validate.Validator
@@ -13,7 +13,7 @@ defmodule Sleeky.Decoder.IncludeDecoder do
         includes
         |> String.split(",")
         |> Enum.reduce_while([], fn field, acc ->
-          case unquote(model).field(field) do
+          case unquote(entity).field(field) do
             {:ok, field} -> {:cont, [field.name | acc]}
             {:error, _} -> {:halt, "no such field #{field}"}
           end

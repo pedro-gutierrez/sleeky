@@ -2,7 +2,7 @@ defmodule Sleeky.Migrations.Constraint do
   @moduledoc false
 
   # import Sleeky.Inspector
-  alias Sleeky.Model.Relation
+  alias Sleeky.Entity.Relation
 
   defstruct [
     :name,
@@ -15,14 +15,14 @@ defmodule Sleeky.Migrations.Constraint do
   ]
 
   def from_relation(%Relation{kind: :parent} = rel) do
-    target_model = rel.target.module
+    target_entity = rel.target.module
 
     new(
-      table: rel.model.table_name(),
-      prefix: rel.model.context().name(),
+      table: rel.entity.table_name(),
+      prefix: rel.entity.context().name(),
       column: rel.column_name,
-      target: target_model.table_name(),
-      type: target_model.primary_key().storage
+      target: target_entity.table_name(),
+      type: target_entity.primary_key().storage
     )
   end
 

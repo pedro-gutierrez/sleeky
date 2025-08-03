@@ -14,16 +14,16 @@ defmodule Sleeky.Migrations.Table do
 
   @timestamps [:inserted_at, :updated_at]
 
-  def from_model(model) do
-    prefix = model.context().name()
-    table_name = model.table_name()
+  def from_entity(entity) do
+    prefix = entity.context().name()
+    table_name = entity.table_name()
 
     attribute_columns =
-      model.attributes()
+      entity.attributes()
       |> Enum.reject(&(&1.column_name in @timestamps))
       |> Enum.map(&Column.new/1)
 
-    parent_columns = Enum.map(model.parents(), &Column.new/1)
+    parent_columns = Enum.map(entity.parents(), &Column.new/1)
 
     columns = indexed(attribute_columns ++ parent_columns)
 

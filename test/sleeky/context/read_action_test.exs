@@ -6,7 +6,7 @@ defmodule Sleeky.Context.ReadActionTest do
   setup [:comments, :current_user]
 
   describe "read by id action" do
-    test "returns models", %{params: params, blog: blog} do
+    test "returns entities", %{params: params, blog: blog} do
       assert {:ok, _blog} = Publishing.read_blog(blog.id, params)
     end
 
@@ -16,14 +16,14 @@ defmodule Sleeky.Context.ReadActionTest do
       assert {:error, :forbidden} = Publishing.read_blog(blog.id, params)
     end
 
-    test "returns model with preloaded relations", %{blog: blog, author: author} do
+    test "returns entity with preloaded relations", %{blog: blog, author: author} do
       assert {:ok, blog} = Publishing.read_blog(blog.id, %{preload: [:author]})
       assert blog.author == author
     end
   end
 
   describe "read by unique key" do
-    test "returns the model", %{params: params, user: user} do
+    test "returns the entity", %{params: params, user: user} do
       assert {:ok, user} == Accounts.read_user_by_email(user.email, params)
     end
 

@@ -4,16 +4,16 @@ defmodule Sleeky.Naming do
   """
 
   @doc false
-  def name(model) do
-    model
+  def name(entity) do
+    entity
     |> last_module()
     |> Macro.underscore()
     |> String.to_atom()
   end
 
   @doc false
-  def plural(model) do
-    model
+  def plural(entity) do
+    entity
     |> last_module()
     |> to_string()
     |> Macro.underscore()
@@ -22,17 +22,17 @@ defmodule Sleeky.Naming do
   end
 
   @doc false
-  def table_name(model) do
-    plural(model)
+  def table_name(entity) do
+    plural(entity)
   end
 
   @doc false
-  def column_name(model, alias \\ nil) do
+  def column_name(entity, alias \\ nil) do
     name =
       if alias do
         alias
       else
-        name(model)
+        name(entity)
       end
 
     String.to_atom("#{name}_id")
@@ -51,8 +51,8 @@ defmodule Sleeky.Naming do
   end
 
   @doc false
-  def context(model) do
-    model
+  def context(entity) do
+    entity
     |> Module.split()
     |> Enum.reverse()
     |> tl()

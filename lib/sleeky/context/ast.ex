@@ -6,10 +6,10 @@ defmodule Sleeky.Context.Ast do
   import Sleeky.Naming
 
   @doc """
-  Returns a list of pattern matched variables for each one of the parents of the given model
+  Returns a list of pattern matched variables for each one of the parents of the given entity
   """
-  def function_parent_args(model) do
-    for rel <- model.parents() do
+  def function_parent_args(entity) do
+    for rel <- entity.parents() do
       quote do
         %unquote(rel.target.module){} = unquote(var(rel.name))
       end
@@ -17,12 +17,12 @@ defmodule Sleeky.Context.Ast do
   end
 
   @doc """
-  Populate a context map with the values for the parent models of a given model
+  Populate a context map with the values for the parent entities of a given entity
   """
-  def context_with_parents(model) do
+  def context_with_parents(entity) do
     context = var(:context)
 
-    for rel <- model.parents() do
+    for rel <- entity.parents() do
       var = var(rel.name)
 
       quote do
@@ -44,25 +44,25 @@ defmodule Sleeky.Context.Ast do
   end
 
   @doc """
-  Populate a context map with a given model
+  Populate a context map with a given entity
   """
-  def context_with_model(model) do
-    model_name = model.name()
+  def context_with_entity(entity) do
+    entity_name = entity.name()
     context = var(:context)
-    model_var = var(model_name)
+    entity_var = var(entity_name)
 
     quote do
-      unquote(context) <- Map.put(unquote(context), unquote(model_name), unquote(model_var))
+      unquote(context) <- Map.put(unquote(context), unquote(entity_name), unquote(entity_var))
     end
   end
 
   @doc """
   Populates the map of attributes, with the ids from required parents
   """
-  def attrs_with_required_parents(model) do
+  def attrs_with_required_parents(entity) do
     attrs = var(:attrs)
 
-    for %{required?: true} = rel <- model.parents() do
+    for %{required?: true} = rel <- entity.parents() do
       column = rel.column_name
       var = var(rel.name)
 
@@ -75,10 +75,10 @@ defmodule Sleeky.Context.Ast do
   @doc """
   Populates the map of attributes, with the ids from optional parents
   """
-  def attrs_with_optional_parents(model) do
+  def attrs_with_optional_parents(entity) do
     attrs = var(:attrs)
 
-    for %{required?: false} = rel <- model.parents() do
+    for %{required?: false} = rel <- entity.parents() do
       column = rel.column_name
       var = var(rel.name)
 
@@ -91,11 +91,11 @@ defmodule Sleeky.Context.Ast do
   @doc """
   Collects computeed attributes values and sets them into the map of attributes
   """
-  def attrs_with_computed_attributes(model) do
+  def attrs_with_computed_attributes(entity) do
     attrs = var(:attrs)
     context = var(:context)
 
-    for %{computed?: true, using: mod} = attr <- model.attributes() do
+    for %{computed?: true, using: mod} = attr <- entity.attributes() do
       quote do
         unquote(attrs) <-
           compute_attribute(unquote(attrs), unquote(attr.name), unquote(mod), unquote(context))
@@ -115,27 +115,27 @@ defmodule Sleeky.Context.Ast do
     end
   end
 
-  def allowed?(model, action) do
+  def allowed?(entity, action) do
     action_name = action.name
-    model_name = model.name()
+    entity_name = entity.name()
     context = var(:context)
 
     quote do
-      :ok <- allow(unquote(model_name), unquote(action_name), unquote(context))
+      :ok <- allow(unquote(entity_name), unquote(action_name), unquote(context))
     end
   end
 
   @doc """
-  Generats the code that fetches the model and sets its as a variable inside a with clause
+  Generats the code that fetches the entity and sets its as a variable inside a with clause
   """
-  def fetch_model(model) do
-    model_name = model.name()
-    model_var = var(model_name)
+  def fetch_entity(entity) do
+    entity_name = entity.name()
+    entity_var = var(entity_name)
     id = var(:id)
     context = var(:context)
 
     quote do
-      {:ok, unquote(model_var)} <- unquote(model).fetch(unquote(id), unquote(context))
+      {:ok, unquote(entity_var)} <- unquote(entity).fetch(unquote(id), unquote(context))
     end
   end
 end

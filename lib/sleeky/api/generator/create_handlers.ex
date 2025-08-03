@@ -4,16 +4,18 @@ defmodule Sleeky.Api.Generator.CreateHandlers do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :create} <- model.actions() do
-      handler_module(context, model)
+    for context <- api.contexts,
+        entity <- context.entities(),
+        %{name: :create} <- entity.actions() do
+      handler_module(context, entity)
     end
   end
 
-  defp handler_module(context, model) do
-    handler_module = Module.concat(model, ApiCreateHandler)
-    decoder_module = Module.concat(model, ApiCreateDecoder)
+  defp handler_module(context, entity) do
+    handler_module = Module.concat(entity, ApiCreateHandler)
+    decoder_module = Module.concat(entity, ApiCreateDecoder)
 
-    create_fun = String.to_atom("create_#{model.name()}")
+    create_fun = String.to_atom("create_#{entity.name()}")
 
     quote do
       defmodule unquote(handler_module) do
@@ -29,8 +31,8 @@ defmodule Sleeky.Api.Generator.CreateHandlers do
 
         def execute(conn, _opts) do
           with {:ok, params} <- decode(conn.params),
-               {:ok, model} <- unquote(context).unquote(create_fun)(params, conn.assigns) do
-            model
+               {:ok, entity} <- unquote(context).unquote(create_fun)(params, conn.assigns) do
+            entity
             |> encode()
             |> send_json(conn, status: 201)
           else

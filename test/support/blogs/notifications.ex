@@ -3,7 +3,7 @@ defmodule Blogs.Notifications do
   use Sleeky.Context
 
   context do
-    models do
+    entities do
       Blogs.Notifications.Digest
     end
   end

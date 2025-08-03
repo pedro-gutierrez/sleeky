@@ -56,19 +56,19 @@ defmodule Sleeky.Api.Generator.Router do
 
   defp default_routes(api) do
     for context <- api.contexts,
-        model <- context.models(),
-        action when action.name in @supported_actions <- model.actions() do
-      route(context, model, action.name)
+        entity <- context.entities(),
+        action when action.name in @supported_actions <- entity.actions() do
+      route(context, entity, action.name)
     end
   end
 
   defp list_by_parent_routes(api) do
     for context <- api.contexts,
-        model <- context.models(),
-        action when action.name == :list <- model.actions(),
-        rel <- model.parents() do
+        entity <- context.entities(),
+        action when action.name == :list <- entity.actions(),
+        rel <- entity.parents() do
       handler = Macro.camelize("api_list_by_#{rel.name}_handler")
-      handler = Module.concat(model, handler)
+      handler = Module.concat(entity, handler)
       path = relation_path(context, rel.target.module, rel.inverse)
 
       quote do
@@ -77,10 +77,10 @@ defmodule Sleeky.Api.Generator.Router do
     end
   end
 
-  defp route(context, model, action) do
-    handler = handler_module(model, action)
+  defp route(context, entity, action) do
+    handler = handler_module(entity, action)
     method = method(action)
-    path = path(context, model, action)
+    path = path(context, entity, action)
 
     quote do
       unquote(method)(unquote(path), to: unquote(handler))
@@ -93,26 +93,26 @@ defmodule Sleeky.Api.Generator.Router do
   defp method(:update), do: :patch
   defp method(:delete), do: :delete
 
-  defp handler_module(model, action) do
+  defp handler_module(entity, action) do
     module_name = Macro.camelize("api_#{action}_handler")
 
-    Module.concat(model, module_name)
+    Module.concat(entity, module_name)
   end
 
-  defp path(context, model, action) do
+  defp path(context, entity, action) do
     case action do
-      :read -> item_path(context, model)
-      :list -> collection_path(context, model)
-      :create -> collection_path(context, model)
-      :update -> item_path(context, model)
-      :delete -> item_path(context, model)
+      :read -> item_path(context, entity)
+      :list -> collection_path(context, entity)
+      :create -> collection_path(context, entity)
+      :update -> item_path(context, entity)
+      :delete -> item_path(context, entity)
     end
   end
 
-  defp collection_path(context, model), do: "/#{context.name()}/#{model.plural()}"
+  defp collection_path(context, entity), do: "/#{context.name()}/#{entity.plural()}"
 
-  defp relation_path(context, model, rel),
-    do: "/#{context.name()}/#{model.plural()}/:id/#{rel.name}"
+  defp relation_path(context, entity, rel),
+    do: "/#{context.name()}/#{entity.plural()}/:id/#{rel.name}"
 
-  defp item_path(context, model), do: collection_path(context, model) <> "/:id"
+  defp item_path(context, entity), do: collection_path(context, entity) <> "/:id"
 end

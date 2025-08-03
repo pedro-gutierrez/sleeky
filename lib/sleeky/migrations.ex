@@ -37,37 +37,37 @@ defmodule Sleeky.Migrations do
     state = Enum.reduce(contexts, State.new(), &state_with_schema/2)
 
     contexts
-    |> Enum.flat_map(& &1.models())
+    |> Enum.flat_map(& &1.entities())
     |> Enum.reject(& &1.virtual?())
-    |> Enum.reduce(state, &state_with_model/2)
+    |> Enum.reduce(state, &state_with_entity/2)
   end
 
   defp state_with_schema(context, state) do
     State.add_schema(state, context.name())
   end
 
-  defp state_with_model(model, state) do
+  defp state_with_entity(entity, state) do
     state
-    |> state_with_table(model)
-    |> state_with_constraints(model)
-    |> state_with_indexes(model)
+    |> state_with_table(entity)
+    |> state_with_constraints(entity)
+    |> state_with_indexes(entity)
   end
 
-  defp state_with_table(state, model) do
-    table = Table.from_model(model)
+  defp state_with_table(state, entity) do
+    table = Table.from_entity(entity)
     State.add!(state, table.prefix, :tables, table)
   end
 
-  defp state_with_constraints(state, model) do
-    model.parents()
+  defp state_with_constraints(state, entity) do
+    entity.parents()
     |> Enum.map(&Constraint.from_relation/1)
     |> Enum.reduce(state, fn constraint, state ->
       State.add!(state, constraint.prefix, :constraints, constraint)
     end)
   end
 
-  defp state_with_indexes(state, model) do
-    model.keys()
+  defp state_with_indexes(state, entity) do
+    entity.keys()
     |> Enum.map(&Index.from_key/1)
     |> Enum.reduce(state, fn index, state ->
       State.add!(state, index.prefix, :indexes, index)

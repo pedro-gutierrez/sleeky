@@ -13,31 +13,31 @@ defmodule Sleeky.Api.Encoder do
     |> Map.put(:items, entries)
   end
 
-  def encode(model) when is_struct(model) do
-    model
+  def encode(entity) when is_struct(entity) do
+    entity
     |> extract_attributes()
-    |> extract_relations(model)
+    |> extract_relations(entity)
   end
 
-  def encode(models) when is_list(models), do: for(model <- models, do: encode(model))
+  def encode(entities) when is_list(entities), do: for(entity <- entities, do: encode(entity))
 
-  defp extract_attributes(model) do
-    attributes = model.__struct__.attributes()
+  defp extract_attributes(entity) do
+    attributes = entity.__struct__.attributes()
     names = for attr <- attributes, do: attr.name
 
-    Map.take(model, names)
+    Map.take(entity, names)
   end
 
-  defp extract_relations(data, model) do
-    parents = model.__struct__.parents()
+  defp extract_relations(data, entity) do
+    parents = entity.__struct__.parents()
 
     Enum.reduce(parents, data, fn rel, acc ->
-      case Map.get(model, rel.name) do
+      case Map.get(entity, rel.name) do
         nil ->
           acc
 
         %{__struct__: Ecto.Association.NotLoaded} ->
-          id = Map.get(model, rel.column_name)
+          id = Map.get(entity, rel.column_name)
           value = if not is_nil(id), do: %{id: id}
           Map.put(acc, rel.name, value)
 

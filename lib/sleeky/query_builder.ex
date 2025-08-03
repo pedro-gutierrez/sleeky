@@ -11,10 +11,10 @@ defmodule Sleeky.QueryBuilder do
   @doc """
   Build a new builder from a simple map
   """
-  def from_simple_map(model, map) do
+  def from_simple_map(entity, map) do
     filters =
       for {field, value} <- map do
-        {{model, field}, infer_op(value), value}
+        {{entity, field}, infer_op(value), value}
       end
 
     %__MODULE__{
@@ -128,7 +128,7 @@ defmodule Sleeky.QueryBuilder do
     joins
     |> Enum.uniq()
     |> Enum.reduce(query, fn
-      {join_type, {remote_model, remote_alias, remote_column}, {local_alias, local_column}},
+      {join_type, {remote_entity, remote_alias, remote_column}, {local_alias, local_column}},
       query ->
         join_type =
           case join_type do
@@ -136,7 +136,7 @@ defmodule Sleeky.QueryBuilder do
             :left_join -> :left
           end
 
-        join(query, join_type, [{^local_alias, x}], r in ^remote_model,
+        join(query, join_type, [{^local_alias, x}], r in ^remote_entity,
           as: ^remote_alias,
           on: field(x, ^local_column) == field(r, ^remote_column)
         )

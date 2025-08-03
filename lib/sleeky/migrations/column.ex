@@ -1,8 +1,8 @@
 defmodule Sleeky.Migrations.Column do
   @moduledoc false
   alias Sleeky.Migrations.ColumnChanges
-  alias Sleeky.Model.Attribute
-  alias Sleeky.Model.Relation
+  alias Sleeky.Entity.Attribute
+  alias Sleeky.Entity.Relation
 
   defstruct [
     :name,

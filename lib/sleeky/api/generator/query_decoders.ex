@@ -4,13 +4,13 @@ defmodule Sleeky.Api.Generator.QueryDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models() do
-      module_name = Module.concat(model, ApiQueryDecoder)
+    for context <- api.contexts, entity <- context.entities() do
+      module_name = Module.concat(entity, ApiQueryDecoder)
 
       quote do
         defmodule unquote(module_name) do
           use Sleeky.Decoder.QueryDecoder,
-            model: unquote(model)
+            entity: unquote(entity)
         end
       end
     end

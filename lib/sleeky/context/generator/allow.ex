@@ -11,12 +11,12 @@ defmodule Sleeky.Context.Generator.Allow do
   def generate(context, _) do
     scopes = Scopes.all(context)
 
-    for model <- context.models, action <- model.actions() do
-      model = model.name()
-      policies = Policies.resolve!(model, action, scopes)
+    for entity <- context.entities, action <- entity.actions() do
+      entity = entity.name()
+      policies = Policies.resolve!(entity, action, scopes)
 
       quote do
-        def allow(unquote(model), unquote(action.name), params) do
+        def allow(unquote(entity), unquote(action.name), params) do
           roles = roles(params) || []
 
           if roles == [] do
@@ -25,7 +25,7 @@ defmodule Sleeky.Context.Generator.Allow do
             policy = Policies.reduce(unquote(Macro.escape(policies)), roles)
 
             if Sleeky.Scopes.Action.allow?(
-                 unquote(model),
+                 unquote(entity),
                  unquote(action.name),
                  policy,
                  params

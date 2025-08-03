@@ -10,7 +10,7 @@ defmodule Sleeky.Ui.Route.Helper do
 
   Inputs supported:
 
-  * `{:render, view, model}` - Renders the specified view with the given model.
+  * `{:render, view, entity}` - Renders the specified view with the given entity.
   * `{:redirect, path}` - Redirects to the specified path.
   * `{:error, :not_found}` - Renders the "not_found" view.
   * `{:error, reason}` - Renders the "error" view with the given reason.
@@ -21,16 +21,16 @@ defmodule Sleeky.Ui.Route.Helper do
   * the params used as input to the action
   * the map of views available, indexed by view name
   """
-  def result({:ok, model}, conn, params, views),
-    do: result({:render, "default", model}, conn, params, views)
+  def result({:ok, entity}, conn, params, views),
+    do: result({:render, "default", entity}, conn, params, views)
 
-  def result(model, conn, params, views) when is_map(model),
-    do: result({:render, "default", model}, conn, params, views)
+  def result(entity, conn, params, views) when is_map(entity),
+    do: result({:render, "default", entity}, conn, params, views)
 
-  def result({:render, view, model}, conn, params, views) do
-    model = Map.merge(params, model)
+  def result({:render, view, entity}, conn, params, views) do
+    entity = Map.merge(params, entity)
 
-    render_view(views, view, conn, model, 200)
+    render_view(views, view, conn, entity, 200)
   end
 
   def result({:redirect, path}, conn, _params, _views) do
@@ -44,14 +44,14 @@ defmodule Sleeky.Ui.Route.Helper do
   end
 
   def result({:error, reason}, conn, params, views) do
-    model = Map.put(params, "reason", inspect(reason))
+    entity = Map.put(params, "reason", inspect(reason))
 
-    render_view(views, "error", conn, model, 500)
+    render_view(views, "error", conn, entity, 500)
   end
 
-  defp render_view(views, view, conn, model, status) do
+  defp render_view(views, view, conn, entity, status) do
     view = Map.fetch!(views, view)
-    html = view.render(model)
+    html = view.render(entity)
 
     conn
     |> put_resp_content_type("text/html")

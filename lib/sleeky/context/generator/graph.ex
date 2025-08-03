@@ -7,11 +7,11 @@ defmodule Sleeky.Context.Generator.Graph do
     graph = Graph.new()
 
     graph =
-      Enum.reduce(context.models, graph, fn model, g ->
+      Enum.reduce(context.entities, graph, fn entity, g ->
         g
-        |> with_model(model)
-        |> with_attributes(model)
-        |> with_parents(model)
+        |> with_entity(entity)
+        |> with_attributes(entity)
+        |> with_parents(entity)
       end)
 
     [
@@ -33,14 +33,14 @@ defmodule Sleeky.Context.Generator.Graph do
 
   defp get_shortest_path_function do
     quote do
-      def get_shortest_path(model_name, field) do
+      def get_shortest_path(entity_name, field) do
         case vertex(field) do
           nil ->
             []
 
           target ->
             @graph
-            |> Graph.get_shortest_path({:model, model_name}, target)
+            |> Graph.get_shortest_path({:entity, entity_name}, target)
             |> simple_path()
         end
       end
@@ -49,14 +49,14 @@ defmodule Sleeky.Context.Generator.Graph do
 
   defp get_paths_function do
     quote do
-      def get_paths(model_name, field) do
+      def get_paths(entity_name, field) do
         case vertex(field) do
           nil ->
             []
 
           target ->
             @graph
-            |> Graph.get_paths({:model, model_name}, target)
+            |> Graph.get_paths({:entity, entity_name}, target)
             |> Enum.map(&simple_path/1)
             |> Enum.sort_by(&length/1)
         end
@@ -69,7 +69,7 @@ defmodule Sleeky.Context.Generator.Graph do
       defp simple_path(path) do
         path
         |> Enum.map(fn
-          {:model, _} -> nil
+          {:entity, _} -> nil
           {_, field} -> field
         end)
         |> Enum.reject(&is_nil/1)
@@ -119,28 +119,28 @@ defmodule Sleeky.Context.Generator.Graph do
     end
   end
 
-  defp with_model(graph, model) do
-    Graph.add_vertex(graph, {:model, model.name()})
+  defp with_entity(graph, entity) do
+    Graph.add_vertex(graph, {:entity, entity.name()})
   end
 
-  defp with_attributes(graph, model) do
-    attrs = model.attributes()
+  defp with_attributes(graph, entity) do
+    attrs = entity.attributes()
 
     Enum.reduce(attrs, graph, fn attr, g ->
       g
       |> Graph.add_vertex({:attribute, attr.name})
-      |> Graph.add_edge({:model, model.name()}, {:attribute, attr.name})
+      |> Graph.add_edge({:entity, entity.name()}, {:attribute, attr.name})
     end)
   end
 
-  defp with_parents(graph, model) do
-    rels = model.parents()
+  defp with_parents(graph, entity) do
+    rels = entity.parents()
 
     Enum.reduce(rels, graph, fn rel, g ->
       g
       |> Graph.add_vertex({:parent, rel.name})
-      |> Graph.add_edge({:model, model.name()}, {:parent, rel.name})
-      |> Graph.add_edge({:parent, rel.name}, {:model, rel.target.module.name()})
+      |> Graph.add_edge({:entity, entity.name()}, {:parent, rel.name})
+      |> Graph.add_edge({:parent, rel.name}, {:entity, rel.target.module.name()})
     end)
   end
 end

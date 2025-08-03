@@ -54,7 +54,7 @@ defmodule Sleeky.Api.CreateHandlerTest do
       |> json_response!(201)
     end
 
-    test "creates top level models" do
+    test "creates top level entities" do
       id = Ecto.UUID.generate()
 
       params = %{
@@ -78,7 +78,7 @@ defmodule Sleeky.Api.CreateHandlerTest do
              } == resp
     end
 
-    test "creates child models", context do
+    test "creates child entities", context do
       id = Ecto.UUID.generate()
 
       params = %{

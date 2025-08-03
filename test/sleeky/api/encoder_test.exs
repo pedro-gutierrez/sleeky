@@ -6,8 +6,8 @@ defmodule Sleeky.Api.EncoderTest do
 
   setup [:comments, :post_api_params]
 
-  describe "json api model encoder" do
-    test "renders single models", context do
+  describe "json api entity encoder" do
+    test "renders single entities", context do
       post_id = context.post.id
       published_at = context.post.published_at
       blog_id = context.blog.id

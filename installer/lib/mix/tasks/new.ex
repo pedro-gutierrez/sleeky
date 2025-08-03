@@ -511,7 +511,7 @@ defmodule Mix.Tasks.Sleeky.New do
 
     context do
       authorization <%= @mod %>.Authorization
-      models do
+      entities do
         <%= @mod %>.Accounts.User
       end
     end
@@ -521,9 +521,9 @@ defmodule Mix.Tasks.Sleeky.New do
   embed_template(:lib_accounts_user, """
   defmodule <%= @mod %>.Accounts.User do
     @moduledoc false
-    use Sleeky.Model
+    use Sleeky.Entity
 
-    model do
+    entity do
       attribute :email, kind: :string
 
       action :list do

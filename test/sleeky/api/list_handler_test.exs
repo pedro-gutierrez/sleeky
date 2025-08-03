@@ -6,7 +6,7 @@ defmodule Sleeky.Api.ListHandlerTest do
   setup [:comments]
 
   describe "list handler" do
-    test "returns models", context do
+    test "returns entities", context do
       params = %{}
 
       user = %{id: context.author.id, roles: [:user]}

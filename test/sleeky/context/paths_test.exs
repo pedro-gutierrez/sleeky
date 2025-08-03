@@ -22,7 +22,7 @@ defmodule Sleeky.Context.PathsTest do
   end
 
   describe "paths/2" do
-    test "returns all paths between an model and an ancestor" do
+    test "returns all paths between an entity and an ancestor" do
       assert [[:author], [:post, :author], [:post, :blog, :author]] ==
                Publishing.get_paths(:comment, :author)
     end

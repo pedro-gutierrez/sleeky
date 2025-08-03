@@ -1,8 +1,8 @@
 defmodule Blogs.Notifications.Digest do
   @moduledoc false
-  use Sleeky.Model
+  use Sleeky.Entity
 
-  model virtual: true do
+  entity virtual: true do
     attribute name: :text, kind: :string
     attribute name: :section, kind: :string
   end

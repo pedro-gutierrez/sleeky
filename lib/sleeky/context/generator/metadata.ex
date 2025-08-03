@@ -10,7 +10,7 @@ defmodule Sleeky.Context.Generator.Metadata do
       @repo unquote(context.repo)
 
       def name, do: unquote(context.name)
-      def models, do: unquote(context.models)
+      def entities, do: unquote(context.entities)
       def repo, do: @repo
     end
   end

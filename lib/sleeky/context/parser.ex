@@ -14,14 +14,14 @@ defmodule Sleeky.Context.Parser do
       repo: repo(caller_module)
     }
     |> with_scopes(children)
-    |> with_models(children)
+    |> with_entities(children)
   end
 
-  defp with_models(context, children) do
-    models = for {:models, _, models} <- children, do: models
-    models = List.flatten(models)
+  defp with_entities(context, children) do
+    entities = for {:entities, _, entities} <- children, do: entities
+    entities = List.flatten(entities)
 
-    %{context | models: models}
+    %{context | entities: entities}
   end
 
   defp with_scopes(context, children) do

@@ -6,30 +6,30 @@ defmodule Sleeky.Context.Generator.DeleteActions do
   import Sleeky.Naming
   import Sleeky.Context.Ast
 
-  alias Sleeky.Model.Action
+  alias Sleeky.Entity.Action
 
   @impl true
   def generate(context, _) do
-    for model <- context.models, %Action{name: :delete} = action <- model.actions() do
-      model_name = model.name()
-      action_fun_name = String.to_atom("delete_#{model_name}")
+    for entity <- context.entities, %Action{name: :delete} = action <- entity.actions() do
+      entity_name = entity.name()
+      action_fun_name = String.to_atom("delete_#{entity_name}")
       context = var(:context)
-      model_var = var(model_name)
+      entity_var = var(entity_name)
 
       pre_reqs = [
-        context_with_model(model),
-        allowed?(model, action)
+        context_with_entity(entity),
+        allowed?(entity, action)
       ]
 
       quote do
-        def unquote(action_fun_name)(unquote(model_var), unquote(context) \\ %{})
+        def unquote(action_fun_name)(unquote(entity_var), unquote(context) \\ %{})
 
         def unquote(action_fun_name)(
-              unquote(model_var),
+              unquote(entity_var),
               unquote(context)
             ) do
           with unquote_splicing(flattened(pre_reqs)) do
-            unquote(model).delete(unquote(model_var))
+            unquote(entity).delete(unquote(entity_var))
           end
         end
       end

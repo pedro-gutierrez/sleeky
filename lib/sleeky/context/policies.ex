@@ -1,9 +1,9 @@
 defmodule Sleeky.Context.Policies do
   @moduledoc false
 
-  def resolve!(model, action, scopes) do
+  def resolve!(entity, action, scopes) do
     for {role, policy} <- action.policies, into: %{} do
-      {role, policy_with_scope!(model, action, role, policy, scopes)}
+      {role, policy_with_scope!(entity, action, role, policy, scopes)}
     end
   end
 
@@ -21,7 +21,7 @@ defmodule Sleeky.Context.Policies do
   def combine(policies, op) when op in [:one, :all] do
     args = for policy <- policies, do: policy.scope
 
-    %Sleeky.Model.Policy{
+    %Sleeky.Entity.Policy{
       scope: %Sleeky.Scopes.Scope{
         expression: %Sleeky.Scopes.Expression{
           op: op,
@@ -31,9 +31,9 @@ defmodule Sleeky.Context.Policies do
     }
   end
 
-  defp policy_with_scope!(_model, _action, _role, %{scope: nil} = policy, _), do: policy
+  defp policy_with_scope!(_entity, _action, _role, %{scope: nil} = policy, _), do: policy
 
-  defp policy_with_scope!(model, action, role, policy, all_scopes) do
+  defp policy_with_scope!(entity, action, role, policy, all_scopes) do
     case scope(all_scopes, policy.scope) do
       {:ok, scope} ->
         %{policy | scope: scope}
@@ -47,7 +47,7 @@ defmodule Sleeky.Context.Policies do
         in:
 
           * action: #{inspect(action.name)}
-          * model: #{inspect(model)}
+          * entity: #{inspect(entity)}
           * role: #{inspect(role)}
 
         Available scopes:

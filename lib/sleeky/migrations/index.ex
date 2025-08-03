@@ -1,16 +1,16 @@
 defmodule Sleeky.Migrations.Index do
   @moduledoc false
 
-  alias Sleeky.Model.Key
+  alias Sleeky.Entity.Key
 
   @type t() :: %__MODULE__{}
 
   defstruct [:name, :table, :prefix, columns: [], unique: false]
 
   def from_key(%Key{} = key) do
-    table_name = key.model.table_name()
+    table_name = key.entity.table_name()
     column_names = Enum.map(key.fields, & &1.column_name)
-    prefix = key.model.context().name()
+    prefix = key.entity.context().name()
 
     from_opts(unique: key.unique?, columns: column_names, table: table_name, prefix: prefix)
   end

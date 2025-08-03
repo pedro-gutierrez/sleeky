@@ -6,24 +6,26 @@ defmodule Sleeky.Api.Generator.UpdateDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :update} <- model.actions() do
-      module_name = Module.concat(model, ApiUpdateDecoder)
+    for context <- api.contexts,
+        entity <- context.entities(),
+        %{name: :update} <- entity.actions() do
+      module_name = Module.concat(entity, ApiUpdateDecoder)
 
       rules = %{"id" => [required: true, type: :string, uuid: true]}
 
       rules =
-        for attr when attr.name not in [:id] <- model.attributes(), into: rules do
+        for attr when attr.name not in [:id] <- entity.attributes(), into: rules do
           {to_string(attr.name), [] |> optional() |> attribute_type(attr)}
         end
 
       rules =
-        for rel <- model.parents(), into: rules do
+        for rel <- entity.parents(), into: rules do
           decoder = Module.concat(rel.target.module, ApiRelationDecoder)
 
           {to_string(rel.name), [] |> optional() |> relation_type(decoder)}
         end
 
-      mappings = default_mappings(model)
+      mappings = default_mappings(entity)
 
       quote do
         defmodule unquote(module_name) do

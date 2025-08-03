@@ -4,7 +4,7 @@ defmodule Sleeky.Decoder.RelationDecoder do
   """
 
   defmacro __using__(opts) do
-    model = Keyword.fetch!(opts, :model)
+    entity = Keyword.fetch!(opts, :entity)
 
     quote do
       import Validate.Validator
@@ -12,8 +12,8 @@ defmodule Sleeky.Decoder.RelationDecoder do
       def decode(%{value: id}) do
         case Ecto.UUID.cast(id) do
           {:ok, id} ->
-            case unquote(model).fetch(id) do
-              {:ok, model} -> success(model)
+            case unquote(entity).fetch(id) do
+              {:ok, entity} -> success(entity)
               {:error, :not_found} -> error("was not found")
             end
 

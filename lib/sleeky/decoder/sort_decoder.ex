@@ -6,8 +6,8 @@ defmodule Sleeky.Decoder.SortDecoder do
   @sort_rules [required: false, nullable: true, type: :string, in: ["asc", "desc"], cast: :atom]
 
   defmacro __using__(opts) do
-    model = Keyword.fetch!(opts, :model)
-    attrs = model.attributes() |> Enum.reject(&(&1.name in [:id]))
+    entity = Keyword.fetch!(opts, :entity)
+    attrs = entity.attributes() |> Enum.reject(&(&1.name in [:id]))
     rules = for attr <- attrs, into: %{}, do: {to_string(attr.name), @sort_rules}
 
     quote do

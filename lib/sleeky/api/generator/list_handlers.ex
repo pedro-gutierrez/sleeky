@@ -4,11 +4,13 @@ defmodule Sleeky.Api.Generator.ListHandlers do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :list} <- model.actions() do
-      handler_module = Module.concat(model, ApiListHandler)
-      decoder_module = Module.concat(model, ApiListDecoder)
+    for context <- api.contexts,
+        entity <- context.entities(),
+        %{name: :list} <- entity.actions() do
+      handler_module = Module.concat(entity, ApiListHandler)
+      decoder_module = Module.concat(entity, ApiListDecoder)
 
-      context_fun = String.to_atom("list_#{model.plural()}")
+      context_fun = String.to_atom("list_#{entity.plural()}")
 
       quote do
         defmodule unquote(handler_module) do

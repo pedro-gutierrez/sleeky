@@ -10,9 +10,9 @@ def deps do
 end
 ```
 
-## Define a context, and a model
+## Define a context, and a entity
 
-At the very least, create both a contextand a model:
+At the very least, create both a contextand a entity:
 
 ```elixir
 # lib/my_app/accounts.ex
@@ -20,7 +20,7 @@ defmodule MyApp.Accounts do
   use Sleeky.Context
 
   context do
-    models do
+    entities do
       MyApp.Accounts.User
     end
   end
@@ -30,9 +30,9 @@ end
 ```elixir
 # lib/my_app/accounts/user.ex
 defmodule MyApp.Accounts.User do
-  use Sleeky.Model
+  use Sleeky.Entity
 
-  model do
+  entity do
     attribute :email, kind: :string
   end
 end
@@ -52,7 +52,7 @@ config :sleeky, Sleeky,
 
 ## Migrate your database
 
-Generate migrations for your contexts and models with:
+Generate migrations for your contexts and entities with:
 
 ```bash
 $ mix sleeky.gen.migrations

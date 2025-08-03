@@ -2,19 +2,19 @@ defmodule Sleeky.Scopes.Query do
   @moduledoc false
 
   alias Sleeky.Evaluate
-  alias Sleeky.Model.Attribute
-  alias Sleeky.Model.Relation
+  alias Sleeky.Entity.Attribute
+  alias Sleeky.Entity.Relation
   alias Sleeky.QueryBuilder
 
   @doc """
-  Scopes a query that relates to a model.
+  Scopes a query that relates to a entity.
 
   If no scope is given, the query itself is returned
   """
-  def scope(_model, query, nil, _params), do: query
+  def scope(_entity, query, nil, _params), do: query
 
-  def scope(model, query, scope, params) do
-    qb = build(model, scope, params)
+  def scope(entity, query, scope, params) do
+    qb = build(entity, scope, params)
 
     QueryBuilder.build(query, qb)
   end
@@ -22,41 +22,41 @@ defmodule Sleeky.Scopes.Query do
   @doc """
   Transforms the given scope, into a query builder struct
   """
-  def build(model, scope, params \\ %{}) do
+  def build(entity, scope, params \\ %{}) do
     case scope.expression.op do
-      :one -> combine(model, scope.expression.args, params, :or)
-      :all -> combine(model, scope.expression.args, params, :and)
-      op -> filter(model, op, scope.expression.args, params)
+      :one -> combine(entity, scope.expression.args, params, :or)
+      :all -> combine(entity, scope.expression.args, params, :and)
+      op -> filter(entity, op, scope.expression.args, params)
     end
   end
 
-  defp combine(model, args, params, op) do
+  defp combine(entity, args, params, op) do
     args
-    |> Enum.map(&build(model, &1, params))
+    |> Enum.map(&build(entity, &1, params))
     |> QueryBuilder.combine(op)
   end
 
-  defp filter(model, op, [{:path, left}, right], params) do
+  defp filter(entity, op, [{:path, left}, right], params) do
     builder = %QueryBuilder{}
     value = Evaluate.evaluate(params, right)
 
-    binding = [model.name()]
+    binding = [entity.name()]
 
-    do_filter(model, binding, left, op, value, builder)
+    do_filter(entity, binding, left, op, value, builder)
   end
 
-  defp do_filter(model, binding, [:**, field | rest], op, value, builder) do
-    case model.context().get_shortest_path(model.name(), field) do
+  defp do_filter(entity, binding, [:**, field | rest], op, value, builder) do
+    case entity.context().get_shortest_path(entity.name(), field) do
       [] ->
-        raise ArgumentError, "no path to #{inspect(field)} in model #{inspect(model)}"
+        raise ArgumentError, "no path to #{inspect(field)} in entity #{inspect(entity)}"
 
       path ->
-        do_filter(model, binding, path ++ rest, op, value, builder)
+        do_filter(entity, binding, path ++ rest, op, value, builder)
     end
   end
 
-  defp do_filter(model, binding, [field], op, value, builder) do
-    case model.field(field) do
+  defp do_filter(entity, binding, [field], op, value, builder) do
+    case entity.field(field) do
       {:ok, %Attribute{} = attr} ->
         binding_alias = binding_alias(binding)
         filter = {{binding_alias, attr.column_name}, op, value}
@@ -85,35 +85,36 @@ defmodule Sleeky.Scopes.Query do
     end
   end
 
-  defp do_filter(model, binding, [field | rest], op, value, builder) do
-    case model.field(field) do
+  defp do_filter(entity, binding, [field | rest], op, value, builder) do
+    case entity.field(field) do
       {:ok, %Relation{kind: :parent} = rel} ->
         parent_binding = binding ++ [rel.name]
         parent_binding_alias = binding_alias(parent_binding)
         binding_alias = binding_alias(binding)
-        parent_model = rel.target.module
+        parent_entity = rel.target.module
         join_type = if rel.required?, do: :join, else: :left_join
 
         join =
-          {join_type, {parent_model, parent_binding_alias, :id}, {binding_alias, rel.column_name}}
+          {join_type, {parent_entity, parent_binding_alias, :id},
+           {binding_alias, rel.column_name}}
 
         builder = %{builder | joins: builder.joins ++ [join]}
 
-        do_filter(parent_model, parent_binding, rest, op, value, builder)
+        do_filter(parent_entity, parent_binding, rest, op, value, builder)
 
       {:ok, %Relation{kind: :child} = rel} ->
         parent_binding = binding
         parent_alias = binding_alias(parent_binding)
         child_binding = binding ++ [rel.name]
         child_alias = binding_alias(child_binding)
-        child_model = rel.target.module
+        child_entity = rel.target.module
 
         join =
-          {:left_join, {child_model, child_alias, rel.inverse.column_name}, {parent_alias, :id}}
+          {:left_join, {child_entity, child_alias, rel.inverse.column_name}, {parent_alias, :id}}
 
         builder = %{builder | joins: builder.joins ++ [join]}
 
-        do_filter(child_model, child_binding, rest, op, value, builder)
+        do_filter(child_entity, child_binding, rest, op, value, builder)
     end
   end
 

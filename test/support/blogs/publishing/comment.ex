@@ -1,10 +1,10 @@
 defmodule Blogs.Publishing.Comment do
   @moduledoc false
-  use Sleeky.Model
+  use Sleeky.Entity
 
   alias Blogs.Publishing.{Author, Post}
 
-  model do
+  entity do
     attribute :body, kind: :string
     belongs_to Post
     belongs_to Author

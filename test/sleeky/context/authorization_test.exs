@@ -17,13 +17,13 @@ defmodule Sleeky.Context.AuthorizationTest do
       assert {:error, :forbidden} == Accounts.allow(:user, :update, params)
     end
 
-    test "matches on a specific model", %{user: user, params: params} do
+    test "matches on a specific entity", %{user: user, params: params} do
       params = Map.put(params, :user, user)
 
       assert :ok == Accounts.allow(:user, :update, params)
     end
 
-    test "matches on a generic model", %{post: blog, params: params} do
+    test "matches on a generic entity", %{post: blog, params: params} do
       params = Map.put(params, :blog, blog)
 
       assert :ok == Publishing.allow(:blog, :update, params)
@@ -59,7 +59,7 @@ defmodule Sleeky.Context.AuthorizationTest do
       assert params == [true]
     end
 
-    test "filters on model ids", %{user: user, params: params} do
+    test "filters on entity ids", %{user: user, params: params} do
       q =
         Publishing.Blog.query()
         |> Publishing.scope(:blog, :list, params)

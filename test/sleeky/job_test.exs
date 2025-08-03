@@ -7,14 +7,20 @@ defmodule Sleeky.JobTest do
   setup [:comments]
 
   describe "perform/1" do
-    test "preloads models", %{blog: blog} do
+    test "preloads entities", %{blog: blog} do
       defmodule BlogTask do
         def execute(blog) do
           assert blog.author
         end
       end
 
-      args = %{"model" => Publishing.Blog, "id" => blog.id, "task" => BlogTask, "atomic" => false}
+      args = %{
+        "entity" => Publishing.Blog,
+        "id" => blog.id,
+        "task" => BlogTask,
+        "atomic" => false
+      }
+
       assert :ok == Job.perform(%Oban.Job{args: args})
     end
 
@@ -38,7 +44,7 @@ defmodule Sleeky.JobTest do
       end
 
       args = %{
-        "model" => Publishing.Blog,
+        "entity" => Publishing.Blog,
         "id" => blog.id,
         "task" => CreatePostTask,
         "atomic" => true

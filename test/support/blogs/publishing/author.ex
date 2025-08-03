@@ -1,10 +1,10 @@
 defmodule Blogs.Publishing.Author do
   @moduledoc false
-  use Sleeky.Model
+  use Sleeky.Entity
 
   alias Blogs.Publishing.Blog
 
-  model do
+  entity do
     attribute :name, kind: :string
     attribute :profile, kind: :string, default: "publisher"
     has_many Blog

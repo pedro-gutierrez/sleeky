@@ -1,11 +1,11 @@
 defmodule Sleeky.Decoder.QueryDecoder do
   @moduledoc """
-  A generic validator that parses model queries as hashmaps, using a dsl
+  A generic validator that parses entity queries as hashmaps, using a dsl
   """
 
   defmacro __using__(opts) do
-    model = Keyword.fetch!(opts, :model)
-    attrs = model.attributes() |> Enum.reject(&(&1.name in [:id, :inserted_at, :updated_at]))
+    entity = Keyword.fetch!(opts, :entity)
+    attrs = entity.attributes() |> Enum.reject(&(&1.name in [:id, :inserted_at, :updated_at]))
     rules = for attr <- attrs, into: %{}, do: {to_string(attr.name), attr_rule(attr)}
 
     quote do

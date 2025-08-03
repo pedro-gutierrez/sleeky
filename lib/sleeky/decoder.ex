@@ -40,15 +40,15 @@ defmodule Sleeky.Decoder do
     end
   end
 
-  def default_mappings(model) do
+  def default_mappings(entity) do
     mappings = %{id: ["id"]}
 
     mappings =
-      for attr when attr.name not in [:id] <- model.attributes(), into: mappings do
+      for attr when attr.name not in [:id] <- entity.attributes(), into: mappings do
         {attr.name, [to_string(attr.name)]}
       end
 
-    for rel <- model.parents(), into: mappings do
+    for rel <- entity.parents(), into: mappings do
       {rel.name, [to_string(rel.name), "id"]}
     end
   end

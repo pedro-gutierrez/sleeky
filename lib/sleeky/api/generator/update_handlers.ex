@@ -4,16 +4,18 @@ defmodule Sleeky.Api.Generator.UpdateHandlers do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :update} <- model.actions() do
-      handler_module(context, model)
+    for context <- api.contexts,
+        entity <- context.entities(),
+        %{name: :update} <- entity.actions() do
+      handler_module(context, entity)
     end
   end
 
-  defp handler_module(context, model) do
-    handler_module = Module.concat(model, ApiUpdateHandler)
-    decoder_module = Module.concat(model, ApiUpdateDecoder)
+  defp handler_module(context, entity) do
+    handler_module = Module.concat(entity, ApiUpdateHandler)
+    decoder_module = Module.concat(entity, ApiUpdateDecoder)
 
-    update_fun = String.to_atom("update_#{model.name()}")
+    update_fun = String.to_atom("update_#{entity.name()}")
 
     quote do
       defmodule unquote(handler_module) do
@@ -29,9 +31,9 @@ defmodule Sleeky.Api.Generator.UpdateHandlers do
 
         def execute(conn, _opts) do
           with {:ok, params} <- decode(conn.params),
-               {:ok, model} <- unquote(model).fetch(params.id),
-               {:ok, model} <- unquote(context).unquote(update_fun)(model, params, conn.assigns) do
-            model
+               {:ok, entity} <- unquote(entity).fetch(params.id),
+               {:ok, entity} <- unquote(context).unquote(update_fun)(entity, params, conn.assigns) do
+            entity
             |> encode()
             |> send_json(conn)
           else

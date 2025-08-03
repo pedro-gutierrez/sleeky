@@ -5,13 +5,13 @@ defmodule Sleeky.Api.Generator.ListByParentHandlers do
   @impl true
   def generate(api, _) do
     for context <- api.contexts,
-        model <- context.models(),
-        %{name: :list} <- model.actions(),
-        rel <- model.parents() do
+        entity <- context.entities(),
+        %{name: :list} <- entity.actions(),
+        rel <- entity.parents() do
       handler_module = Macro.camelize("api_list_by_#{rel.name}_handler")
       decoder_module = Macro.camelize("api_list_by_#{rel.name}_decoder")
-      handler_module = Module.concat(model, handler_module)
-      decoder_module = Module.concat(model, decoder_module)
+      handler_module = Module.concat(entity, handler_module)
+      decoder_module = Module.concat(entity, decoder_module)
       context_fun = String.to_atom("list_#{rel.inverse.name}_by_#{rel.name}")
 
       quote do

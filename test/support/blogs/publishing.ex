@@ -7,7 +7,7 @@ defmodule Blogs.Publishing do
       Blogs.Scopes
     end
 
-    models do
+    entities do
       Blogs.Publishing.Author
       Blogs.Publishing.Blog
       Blogs.Publishing.Comment

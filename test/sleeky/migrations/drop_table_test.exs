@@ -3,7 +3,7 @@ defmodule Sleeky.Migrations.DropTableTest do
   import MigrationHelper
 
   describe "migrations" do
-    test "drop tables when models are removed from contexts" do
+    test "drop tables when entities are removed from contexts" do
       existing = [
         """
         defmodule Sleeky.Migration.V1 do

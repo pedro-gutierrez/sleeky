@@ -4,11 +4,13 @@ defmodule Sleeky.Api.Generator.DeleteHandlers do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :delete} <- model.actions() do
-      handler_module = Module.concat(model, ApiDeleteHandler)
-      decoder_module = Module.concat(model, ApiDeleteDecoder)
+    for context <- api.contexts,
+        entity <- context.entities(),
+        %{name: :delete} <- entity.actions() do
+      handler_module = Module.concat(entity, ApiDeleteHandler)
+      decoder_module = Module.concat(entity, ApiDeleteDecoder)
 
-      context_fun = String.to_atom("delete_#{model.name()}")
+      context_fun = String.to_atom("delete_#{entity.name()}")
 
       quote do
         defmodule unquote(handler_module) do
@@ -24,8 +26,8 @@ defmodule Sleeky.Api.Generator.DeleteHandlers do
 
           def execute(conn, _opts) do
             with {:ok, params} <- decode(conn.params),
-                 {:ok, model} <- unquote(model).fetch(params.id),
-                 :ok <- unquote(context).unquote(context_fun)(model, conn.assigns) do
+                 {:ok, entity} <- unquote(entity).fetch(params.id),
+                 :ok <- unquote(context).unquote(context_fun)(entity, conn.assigns) do
               send_json(%{}, conn, status: 204)
             else
               {:error, errors} ->

@@ -3,7 +3,7 @@ defmodule Sleeky.Migrations.CreateIndexTest do
   import MigrationHelper
 
   describe "migrations" do
-    test "create indexes out of model keys" do
+    test "create indexes out of entity keys" do
       migration = generate_migrations()
 
       assert migration =~

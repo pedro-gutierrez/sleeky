@@ -34,7 +34,7 @@ defmodule Sleeky.Api.DeleteHandlerTest do
       |> json_response!(404)
     end
 
-    test "does not delete models with children", context do
+    test "does not delete entities with children", context do
       params = %{
         "id" => context.blog.id
       }
@@ -53,7 +53,7 @@ defmodule Sleeky.Api.DeleteHandlerTest do
              } == resp
     end
 
-    test "deletes models", context do
+    test "deletes entities", context do
       params = %{
         "id" => context.comment1.id
       }

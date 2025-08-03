@@ -4,8 +4,10 @@ defmodule Sleeky.Api.Generator.DeleteDecoders do
 
   @impl true
   def generate(api, _) do
-    for context <- api.contexts, model <- context.models(), %{name: :delete} <- model.actions() do
-      module_name = Module.concat(model, ApiDeleteDecoder)
+    for context <- api.contexts,
+        entity <- context.entities(),
+        %{name: :delete} <- entity.actions() do
+      module_name = Module.concat(entity, ApiDeleteDecoder)
 
       rules = %{
         "id" => [required: true, type: :string, uuid: true]

@@ -34,7 +34,7 @@ defmodule Sleeky.Api.ReadHandlerTest do
       |> json_response!(404)
     end
 
-    test "returns models", context do
+    test "returns entities", context do
       params = %{
         "id" => context.blog.id
       }
