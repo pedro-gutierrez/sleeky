@@ -1,0 +1,53 @@
+defmodule Sleeky.Query.Parser do
+  @moduledoc false
+  @behaviour Diesel.Parser
+
+  alias Sleeky.Query
+  alias Sleeky.Query.Policy
+
+  import Sleeky.Feature.Naming
+
+  def parse({:query, attrs, children}, opts) do
+    name = Keyword.fetch!(opts, :caller_module)
+    caller = Keyword.fetch!(opts, :caller_module)
+    feature = feature_module(caller)
+
+    params = Keyword.fetch!(attrs, :params)
+    returns = Keyword.fetch!(attrs, :returns)
+    limit = Keyword.get(attrs, :limit)
+    many = Keyword.get(attrs, :many, false)
+
+    policies =
+      for {:policy, attrs, _scopes} <- children do
+        role = Keyword.fetch!(attrs, :role)
+        scope = Keyword.get(attrs, :scope)
+
+        %Policy{role: role, scope: scope}
+      end
+
+    policies =
+      for policy <- policies, into: %{} do
+        {policy.role, policy}
+      end
+
+    handler =
+      caller
+      |> Module.split()
+      |> Enum.map(fn
+        "Queries" -> "Handlers"
+        name -> name
+      end)
+      |> Module.concat()
+
+    %Query{
+      name: name,
+      handler: handler,
+      feature: feature,
+      params: params,
+      returns: returns,
+      policies: policies,
+      limit: limit,
+      many: many
+    }
+  end
+end
