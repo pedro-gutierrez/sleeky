@@ -13,7 +13,7 @@ defmodule Sleeky.Query.Parser do
     feature = feature_module(caller)
 
     params = Keyword.fetch!(attrs, :params)
-    returns = Keyword.fetch!(attrs, :returns)
+    model = Keyword.fetch!(attrs, :returns)
     limit = Keyword.get(attrs, :limit)
     many = Keyword.get(attrs, :many, false)
 
@@ -44,7 +44,7 @@ defmodule Sleeky.Query.Parser do
       handler: handler,
       feature: feature,
       params: params,
-      returns: returns,
+      model: model,
       policies: policies,
       limit: limit,
       many: many

@@ -26,13 +26,18 @@ defmodule Sleeky.Scope.Parser do
 
   defp resolve_arg(a) when is_atom(a) do
     if is_module?(a) do
-      {:scope, a}
+      a.expression()
     else
       {:value, a}
     end
   end
 
   defp resolve_arg({:path, [], [path]}), do: {:path, path(path)}
+
+  defp resolve_arg({op, _, args}) when op in [:one, :all] do
+    %Expression{op: op, args: Enum.map(args, &resolve_arg/1)}
+  end
+
   defp resolve_arg(other), do: other
 
   defp path(path), do: path |> String.split(".") |> Enum.map(&String.to_atom/1)

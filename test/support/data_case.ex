@@ -18,6 +18,7 @@ defmodule Sleeky.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import Sleeky.ErrorsHelper
+      import Sleeky.SqlHelper
       import Sleeky.Fixtures
       import Plug.Test
       import Plug.Conn
@@ -122,35 +123,7 @@ defmodule Sleeky.DataCase do
       defp maybe_auth_header(headers, token),
         do: Map.put(headers, "authorization", "Bearer " <> token)
 
-      @doc """
-      Convert the given givne into its generated sql
-      """
-      def to_sql(query) do
-        {sql, _params} = @repo.to_sql(:all, query)
-        sql
-      end
-
-      @doc """
-      Asserts that the given query matches the given string
-      """
-      def assert_sql(sql, fragments) do
-        for fragment <- fragments do
-          assert sql =~ fragment
-        end
-
-        sql
-      end
-
-      @doc """
-      Asserts that the given query does not match the given string
-      """
-      def refute_sql(sql, fragments) do
-        for fragment <- fragments do
-          refute sql =~ fragment
-        end
-
-        sql
-      end
+      defp to_sql(query), do: to_sql(query, @repo)
     end
   end
 end
