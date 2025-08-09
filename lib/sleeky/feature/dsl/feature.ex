@@ -5,5 +5,7 @@ defmodule Sleeky.Feature.Dsl.Feature do
   tag do
     child :models, min: 1, max: 1
     child :scopes, min: 0, max: 1
+    child :commands, min: 0, max: 1
+    child :handlers, min: 0, max: 1
   end
 end

@@ -7,8 +7,13 @@ defmodule Blogs.Accounts do
       Blogs.Accounts.User
     end
 
+    commands do
+      Blogs.Accounts.Commands.RegisterUser
+      Blogs.Accounts.Commands.RemindPassword
+    end
+
     scopes do
-      Blogs.Scopes
+      Blogs.Accounts.Scopes.Self
     end
   end
 end

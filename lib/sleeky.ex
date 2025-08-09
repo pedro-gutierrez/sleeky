@@ -8,6 +8,8 @@ defmodule Sleeky do
   @dsls [
     Sleeky.Scopes.Dsl,
     Sleeky.Feature.Dsl,
+    Sleeky.Command.Dsl,
+    Sleeky.Handler.Dsl,
     Sleeky.Model.Dsl,
     Sleeky.Api.Dsl,
     Sleeky.Endpoint.Dsl,

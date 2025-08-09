@@ -18,8 +18,17 @@ defmodule Sleeky.Feature do
       Sleeky.Feature.Generator.ReadActions,
       Sleeky.Feature.Generator.DeleteActions,
       Sleeky.Feature.Generator.ListActions,
-      Sleeky.Feature.Generator.Transaction
+      Sleeky.Feature.Generator.Transaction,
+      Sleeky.Feature.Generator.Commands
     ]
 
-  defstruct [:name, :scopes, :repo, models: []]
+  defstruct [:app, :name, :repo, scopes: [], models: [], handlers: [], commands: []]
+
+  def allow(command, context) do
+    if command.allowed?(context) do
+      :ok
+    else
+      {:error, :unauthorized}
+    end
+  end
 end

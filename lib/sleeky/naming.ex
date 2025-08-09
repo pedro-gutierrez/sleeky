@@ -61,11 +61,20 @@ defmodule Sleeky.Naming do
   end
 
   @doc false
-  def repo(domain) do
-    domain
+  def repo(feature) do
+    feature
     |> Module.split()
     |> Enum.drop(-1)
     |> Kernel.++([Repo])
+    |> Module.concat()
+  end
+
+  @doc false
+  def app(feature) do
+    feature
+    |> Module.split()
+    |> Enum.drop(-1)
+    |> Kernel.++([App])
     |> Module.concat()
   end
 

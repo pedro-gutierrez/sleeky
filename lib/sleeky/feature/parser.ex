@@ -8,26 +8,21 @@ defmodule Sleeky.Feature.Parser do
   @impl true
   def parse({:feature, _, children}, opts) do
     caller_module = Keyword.fetch!(opts, :caller_module)
+    name = name(caller_module)
+    repo = repo(caller_module)
+    app = app(caller_module)
 
-    %Feature{
-      name: name(caller_module),
-      repo: repo(caller_module)
-    }
-    |> with_scopes(children)
-    |> with_models(children)
+    %Feature{name: name, repo: repo, app: app}
+    |> with_modules(children, :scopes)
+    |> with_modules(children, :models)
+    |> with_modules(children, :commands)
+    |> with_modules(children, :handlers)
   end
 
-  defp with_models(feature, children) do
-    models = for {:models, _, models} <- children, do: models
-    models = List.flatten(models)
+  defp with_modules(feature, children, kind) do
+    mods = for {^kind, _, mods} <- children, do: mods
+    mods = List.flatten(mods)
 
-    %{feature | models: models}
-  end
-
-  defp with_scopes(feature, children) do
-    scopes = for {:scopes, _, [scopes]} <- children, do: scopes
-    scopes = List.first(scopes)
-
-    %{feature | scopes: scopes}
+    Map.put(feature, kind, mods)
   end
 end

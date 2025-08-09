@@ -3,10 +3,10 @@ defmodule Sleeky.Scopes.Generator.Metadata do
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(auth, _) do
+  def generate(scopes, _) do
     quote do
-      def roles, do: unquote(auth.roles)
-      def scopes, do: unquote(Macro.escape(auth.scopes))
+      def roles, do: unquote(scopes.roles)
+      def scopes, do: unquote(Macro.escape(scopes.scopes))
     end
   end
 end

@@ -11,26 +11,25 @@ defmodule Sleeky.Feature.Generator.CreateActions do
   end
 
   defp create_funs(feature) do
-    for model <- feature.models, %{name: :create} = action <- model.actions() do
+    for model <- feature.models do
       model_name = model.name()
       action_fun_name = String.to_atom("create_#{model_name}")
       do_action_fun_name = String.to_atom("do_create_#{model_name}")
       children_action_fun_name = String.to_atom("create_#{model_name}_children")
-      tasks = for task <- action.tasks, do: {task.module, task.if}
+      # tasks = for task <- action.tasks, do: {task.module, task.if}
 
       fun_with_map_args =
         quote do
           def unquote(action_fun_name)(attrs, context \\ %{})
 
           def unquote(action_fun_name)(attrs, context) when is_map(attrs) do
-            context = Map.merge(attrs, context)
             repo = repo()
 
             repo.transaction(fn ->
               with {:ok, model} <- unquote(do_action_fun_name)(attrs, context),
-                   :ok <- unquote(children_action_fun_name)(model, attrs, context),
-                   tasks <- tasks_to_execute(unquote(tasks), model, context),
-                   :ok <- Sleeky.Job.schedule_all(model, :create, tasks) do
+                   :ok <- unquote(children_action_fun_name)(model, attrs, context) do
+                # tasks <- tasks_to_execute(unquote(tasks), model, context),
+                # :ok <- Sleeky.Job.schedule_all(model, :create, tasks) do
                 model
               else
                 {:error, reason} ->
@@ -54,7 +53,7 @@ defmodule Sleeky.Feature.Generator.CreateActions do
   end
 
   defp do_create_funs(feature) do
-    for model <- feature.models, %{name: :create} = action <- model.actions() do
+    for model <- feature.models do
       model_name = model.name()
       action_fun_name = String.to_atom("do_create_#{model_name}")
 
@@ -74,24 +73,20 @@ defmodule Sleeky.Feature.Generator.CreateActions do
 
       quote do
         defp unquote(action_fun_name)(attrs, context) do
-          fields =
-            attrs
-            |> Map.take(unquote(attr_names))
-            |> collect_ids(attrs, unquote(Macro.escape(parent_fields)))
-            |> Sleeky.Feature.Helpers.set_default_values(unquote(Macro.escape(default_values)))
-            |> string_keys()
-            |> Map.put_new_lazy("id", &Ecto.UUID.generate/0)
-
-          with :ok <- allow(unquote(model_name), unquote(action.name), context) do
-            unquote(model).create(fields)
-          end
+          attrs
+          |> Map.take(unquote(attr_names))
+          |> collect_ids(attrs, unquote(Macro.escape(parent_fields)))
+          |> Sleeky.Feature.Helpers.set_default_values(unquote(Macro.escape(default_values)))
+          |> string_keys()
+          |> Map.put_new_lazy("id", &Ecto.UUID.generate/0)
+          |> unquote(model).create()
         end
       end
     end
   end
 
   defp create_children_funs(feature) do
-    for model <- feature.models, %{name: :create} <- model.actions() do
+    for model <- feature.models do
       model_name = model.name()
       action_fun_name = String.to_atom("create_#{model_name}_children")
 
@@ -127,7 +122,7 @@ defmodule Sleeky.Feature.Generator.CreateActions do
   end
 
   defp bulk_create_funs(feature) do
-    for model <- feature.models, %{name: :create} <- model.actions() do
+    for model <- feature.models do
       single_fun_name = String.to_atom("create_#{model.name()}")
       bulk_fun_name = String.to_atom("create_#{model.plural()}")
 
