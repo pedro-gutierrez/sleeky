@@ -13,7 +13,6 @@ defmodule Sleeky.Feature.Generator.Queries do
   def query_fun(query, feature) do
     fun_name = Sleeky.Query.fun_name(query)
     params_module = query.params()
-    handler_module = query.handler()
     repo = feature.repo
 
     query_execution =
@@ -38,7 +37,7 @@ defmodule Sleeky.Feature.Generator.Queries do
             q =
               context
               |> unquote(query).scope()
-              |> unquote(handler_module).execute(params, context)
+              |> unquote(query).execute(params, context)
 
             unquote(query_execution)
           end
@@ -50,7 +49,7 @@ defmodule Sleeky.Feature.Generator.Queries do
           q =
             context
             |> unquote(query).scope()
-            |> unquote(handler_module).execute(context)
+            |> unquote(query).execute(context)
 
           unquote(query_execution)
         end

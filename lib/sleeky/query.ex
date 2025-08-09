@@ -9,7 +9,7 @@ defmodule Sleeky.Query do
       Sleeky.Query.Generator.Metadata
     ]
 
-  defstruct [:name, :feature, :params, :model, :policies, :handler, :limit, :many]
+  defstruct [:name, :feature, :params, :model, :policies, :limit, :many]
 
   defmodule Policy do
     @moduledoc false

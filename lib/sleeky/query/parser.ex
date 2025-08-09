@@ -30,18 +30,8 @@ defmodule Sleeky.Query.Parser do
         {policy.role, policy}
       end
 
-    handler =
-      caller
-      |> Module.split()
-      |> Enum.map(fn
-        "Queries" -> "Handlers"
-        name -> name
-      end)
-      |> Module.concat()
-
     %Query{
       name: name,
-      handler: handler,
       feature: feature,
       params: params,
       model: model,

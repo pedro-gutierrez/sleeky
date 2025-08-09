@@ -13,14 +13,13 @@ defmodule Sleeky.Feature.Generator.Commands do
   def command_fun(command, feature) do
     fun_name = Sleeky.Command.Helper.fun_name(command)
     params_module = command.params()
-    handler_module = command.handler()
 
-    handler_invocation =
+    command_invocation =
       if command.atomic?() do
         quote do
           with {:ok, :ok} <-
                  unquote(feature.repo).transaction(fn ->
-                   with {:error, reason} <- unquote(handler_module).execute(params, context) do
+                   with {:error, reason} <- unquote(command).execute(params, context) do
                      unquote(feature.repo).rollback(reason)
                    end
                  end),
@@ -28,7 +27,7 @@ defmodule Sleeky.Feature.Generator.Commands do
         end
       else
         quote do
-          unquote(handler_module).execute(params, context)
+          unquote(command).execute(params, context)
         end
       end
 
@@ -37,7 +36,7 @@ defmodule Sleeky.Feature.Generator.Commands do
         with {:ok, params} <- unquote(params_module).validate(params),
              context <- Map.put(context, :params, params),
              :ok <- Sleeky.Feature.allow(unquote(command), context) do
-          unquote(handler_invocation)
+          unquote(command_invocation)
         end
       end
     end

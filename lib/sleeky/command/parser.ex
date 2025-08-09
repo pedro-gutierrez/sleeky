@@ -27,20 +27,10 @@ defmodule Sleeky.Command.Parser do
         {policy.role, policy}
       end
 
-    handler =
-      caller
-      |> Module.split()
-      |> Enum.map(fn
-        "Commands" -> "Handlers"
-        name -> name
-      end)
-      |> Module.concat()
-
     atomic? = Keyword.get(attrs, :atomic, false)
 
     %Command{
       name: name,
-      handler: handler,
       feature: feature,
       params: params,
       policies: policies,

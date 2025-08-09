@@ -8,4 +8,8 @@ defmodule Blogs.Accounts.Queries.GetAllUsers do
   query returns: User, many: true do
     policy role: :guest, scope: IsPublic
   end
+
+  def execute(q, _context) do
+    q
+  end
 end

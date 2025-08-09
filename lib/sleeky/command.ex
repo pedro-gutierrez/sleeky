@@ -8,7 +8,7 @@ defmodule Sleeky.Command do
       Sleeky.Command.Generator.Metadata
     ]
 
-  defstruct [:name, :feature, :params, :policies, :handler, :atomic?]
+  defstruct [:name, :feature, :params, :policies, :atomic?]
 
   defmodule Policy do
     @moduledoc false
