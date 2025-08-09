@@ -9,16 +9,12 @@ defmodule Sleeky.Feature do
     generators: [
       Sleeky.Feature.Generator.Metadata,
       Sleeky.Feature.Generator.Roles,
-      Sleeky.Feature.Generator.Allow,
-      Sleeky.Feature.Generator.Scope,
       Sleeky.Feature.Generator.Graph,
       Sleeky.Feature.Generator.Helpers,
-      Sleeky.Feature.Generator.CreateActions,
+      Sleeky.Feature.Generator.CreateFunctions,
       Sleeky.Feature.Generator.UpdateActions,
       Sleeky.Feature.Generator.ReadActions,
       Sleeky.Feature.Generator.DeleteActions,
-      Sleeky.Feature.Generator.ListActions,
-      Sleeky.Feature.Generator.Transaction,
       Sleeky.Feature.Generator.Commands,
       Sleeky.Feature.Generator.Queries
     ]

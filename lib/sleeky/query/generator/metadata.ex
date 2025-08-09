@@ -7,7 +7,6 @@ defmodule Sleeky.Query.Generator.Metadata do
     quote do
       def params, do: unquote(query.params)
       def model, do: unquote(query.model)
-      def handler, do: unquote(query.handler)
       def feature, do: unquote(query.feature)
       def policies, do: unquote(Macro.escape(query.policies))
       def many?, do: unquote(query.many)

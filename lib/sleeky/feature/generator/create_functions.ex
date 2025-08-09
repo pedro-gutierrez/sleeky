@@ -1,4 +1,4 @@
-defmodule Sleeky.Feature.Generator.CreateActions do
+defmodule Sleeky.Feature.Generator.CreateFunctions do
   @moduledoc false
   @behaviour Diesel.Generator
 
