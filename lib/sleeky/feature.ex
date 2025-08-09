@@ -19,7 +19,8 @@ defmodule Sleeky.Feature do
       Sleeky.Feature.Generator.DeleteActions,
       Sleeky.Feature.Generator.ListActions,
       Sleeky.Feature.Generator.Transaction,
-      Sleeky.Feature.Generator.Commands
+      Sleeky.Feature.Generator.Commands,
+      Sleeky.Feature.Generator.Queries
     ]
 
   defstruct [:app, :name, :repo, scopes: [], models: [], handlers: [], commands: []]

@@ -12,6 +12,11 @@ defmodule Blogs.Accounts do
       Blogs.Accounts.Commands.RemindPassword
     end
 
+    queries do
+      Blogs.Accounts.Queries.GetAllUsers
+      Blogs.Accounts.Queries.GetUserByEmail
+    end
+
     scopes do
       Blogs.Accounts.Scopes.Self
     end

@@ -19,6 +19,17 @@ defmodule Sleeky.Query do
   import Ecto.Query
 
   @doc """
+  Returns the feature function name for a query
+  """
+  def fun_name(query) do
+    query
+    |> Module.split()
+    |> List.last()
+    |> Macro.underscore()
+    |> String.to_atom()
+  end
+
+  @doc """
   Builds a query based on the model of the given query
 
   The query is enhanced with filters derived from the policies and scopes of the query
