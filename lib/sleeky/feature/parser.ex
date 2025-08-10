@@ -18,6 +18,8 @@ defmodule Sleeky.Feature.Parser do
     |> with_modules(children, :commands)
     |> with_modules(children, :handlers)
     |> with_modules(children, :queries)
+    |> with_modules(children, :events)
+    |> with_modules(children, :subscriptions)
   end
 
   defp with_modules(feature, children, kind) do

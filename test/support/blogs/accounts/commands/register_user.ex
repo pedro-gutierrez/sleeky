@@ -4,18 +4,18 @@ defmodule Blogs.Accounts.Commands.RegisterUser do
   use Sleeky.Command
 
   alias Blogs.Accounts.User
+  alias Blogs.Accounts.Events.UserRegistered
+  alias Blogs.Accounts.Tasks.CreateUser
 
   command params: User, atomic: true do
     policy role: :guest
-  end
 
-  def execute(user, context) do
-    {:ok, user} = Blogs.Accounts.create_user(user, context)
+    step :registering do
+      task name: CreateUser
+    end
 
-    if user.email == "foo@bar.com" do
-      {:error, :invalid_email}
-    else
-      {:ok, user}
+    step :registered do
+      event(name: UserRegistered)
     end
   end
 end

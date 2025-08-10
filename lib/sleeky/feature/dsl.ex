@@ -8,6 +8,8 @@ defmodule Sleeky.Feature.Dsl do
       Sleeky.Feature.Dsl.Handlers,
       Sleeky.Feature.Dsl.Models,
       Sleeky.Feature.Dsl.Queries,
-      Sleeky.Feature.Dsl.Scopes
+      Sleeky.Feature.Dsl.Scopes,
+      Sleeky.Feature.Dsl.Events,
+      Sleeky.Feature.Dsl.Subscriptions
     ]
 end

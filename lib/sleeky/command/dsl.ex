@@ -4,6 +4,9 @@ defmodule Sleeky.Command.Dsl do
     otp_app: :sleeky,
     root: Sleeky.Command.Dsl.Command,
     tags: [
-      Sleeky.Command.Dsl.Policy
+      Sleeky.Command.Dsl.Policy,
+      Sleeky.Command.Dsl.Step,
+      Sleeky.Command.Dsl.Task,
+      Sleeky.Command.Dsl.Event
     ]
 end

@@ -1,4 +1,4 @@
-defmodule Sleeky.Value.Dsl.Field do
+defmodule Sleeky.Event.Dsl.Field do
   @moduledoc false
   use Diesel.Tag
 

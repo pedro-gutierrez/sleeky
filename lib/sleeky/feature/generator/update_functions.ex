@@ -1,4 +1,4 @@
-defmodule Sleeky.Feature.Generator.UpdateActions do
+defmodule Sleeky.Feature.Generator.UpdateFunctions do
   @moduledoc false
   @behaviour Diesel.Generator
 
@@ -6,11 +6,10 @@ defmodule Sleeky.Feature.Generator.UpdateActions do
 
   @impl true
   def generate(feature, _) do
-    for model <- feature.models, action when action.name == :update <- model.actions() do
+    for model <- feature.models do
       model_name = model.name()
       action_fun_name = String.to_atom("update_#{model_name}")
       do_action_fun_name = String.to_atom("do_update_#{model_name}")
-      tasks = for task <- action.tasks, do: {task.module, task.if}
 
       attr_names =
         for attr when attr.mutable? and not attr.computed? <- model.attributes(),
@@ -29,9 +28,7 @@ defmodule Sleeky.Feature.Generator.UpdateActions do
               |> Map.take(unquote(attr_names))
               |> collect_ids(attrs, unquote(Macro.escape(parent_fields)))
 
-            with :ok <- allow(unquote(model_name), unquote(action.name), context) do
-              unquote(model).edit(model, fields)
-            end
+            unquote(model).edit(model, fields)
           end
         end
 
@@ -42,17 +39,7 @@ defmodule Sleeky.Feature.Generator.UpdateActions do
           def unquote(action_fun_name)(model, attrs, context) when is_map(attrs) do
             context = attrs |> Map.merge(context) |> Map.put(unquote(model_name), model)
             repo = repo()
-
-            repo.transaction(fn ->
-              with {:ok, updated} <- unquote(do_action_fun_name)(model, attrs, context),
-                   tasks <- tasks_to_execute(unquote(tasks), model, updated, context),
-                   :ok <- Sleeky.Job.schedule_all(updated, :update, tasks) do
-                updated
-              else
-                {:error, reason} ->
-                  repo.rollback(reason)
-              end
-            end)
+            unquote(do_action_fun_name)(model, attrs, context)
           end
         end
 

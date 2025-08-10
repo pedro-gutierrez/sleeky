@@ -8,5 +8,7 @@ defmodule Sleeky.Feature.Dsl.Feature do
     child :commands, min: 0, max: 1
     child :queries, min: 0, max: 1
     child :handlers, min: 0, max: 1
+    child :events, min: 0, max: 1
+    child :subscriptions, min: 0, max: 1
   end
 end

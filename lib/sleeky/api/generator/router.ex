@@ -48,71 +48,71 @@ defmodule Sleeky.Api.Generator.Router do
     end
   end
 
-  @supported_actions [:create, :update, :read, :list, :delete]
+  # @supported_actions [:create, :update, :read, :list, :delete]
 
-  defp routes(api) do
-    default_routes(api) ++ list_by_parent_routes(api)
-  end
+  defp routes(_api), do: []
+  #   default_routes(api) ++ list_by_parent_routes(api)
+  # end
 
-  defp default_routes(api) do
-    for feature <- api.features,
-        model <- feature.models(),
-        action when action.name in @supported_actions <- model.actions() do
-      route(feature, model, action.name)
-    end
-  end
+  # defp default_routes(api) do
+  #   for feature <- api.features,
+  #       model <- feature.models(),
+  #       action when action.name in @supported_actions <- model.actions() do
+  #     route(feature, model, action.name)
+  #   end
+  # end
 
-  defp list_by_parent_routes(api) do
-    for feature <- api.features,
-        model <- feature.models(),
-        action when action.name == :list <- model.actions(),
-        rel <- model.parents() do
-      handler = Macro.camelize("api_list_by_#{rel.name}_handler")
-      handler = Module.concat(model, handler)
-      path = relation_path(feature, rel.target.module, rel.inverse)
+  # defp list_by_parent_routes(api) do
+  #   for feature <- api.features,
+  #       model <- feature.models(),
+  #       action when action.name == :list <- model.actions(),
+  #       rel <- model.parents() do
+  #     handler = Macro.camelize("api_list_by_#{rel.name}_handler")
+  #     handler = Module.concat(model, handler)
+  #     path = relation_path(feature, rel.target.module, rel.inverse)
 
-      quote do
-        get(unquote(path), to: unquote(handler))
-      end
-    end
-  end
+  #     quote do
+  #       get(unquote(path), to: unquote(handler))
+  #     end
+  #   end
+  # end
 
-  defp route(feature, model, action) do
-    handler = handler_module(model, action)
-    method = method(action)
-    path = path(feature, model, action)
+  # defp route(feature, model, action) do
+  #   handler = handler_module(model, action)
+  #   method = method(action)
+  #   path = path(feature, model, action)
 
-    quote do
-      unquote(method)(unquote(path), to: unquote(handler))
-    end
-  end
+  #   quote do
+  #     unquote(method)(unquote(path), to: unquote(handler))
+  #   end
+  # end
 
-  defp method(:read), do: :get
-  defp method(:list), do: :get
-  defp method(:create), do: :post
-  defp method(:update), do: :patch
-  defp method(:delete), do: :delete
+  # defp method(:read), do: :get
+  # defp method(:list), do: :get
+  # defp method(:create), do: :post
+  # defp method(:update), do: :patch
+  # defp method(:delete), do: :delete
 
-  defp handler_module(model, action) do
-    module_name = Macro.camelize("api_#{action}_handler")
+  # defp handler_module(model, action) do
+  #   module_name = Macro.camelize("api_#{action}_handler")
 
-    Module.concat(model, module_name)
-  end
+  #   Module.concat(model, module_name)
+  # end
 
-  defp path(feature, model, action) do
-    case action do
-      :read -> item_path(feature, model)
-      :list -> collection_path(feature, model)
-      :create -> collection_path(feature, model)
-      :update -> item_path(feature, model)
-      :delete -> item_path(feature, model)
-    end
-  end
+  # defp path(feature, model, action) do
+  #   case action do
+  #     :read -> item_path(feature, model)
+  #     :list -> collection_path(feature, model)
+  #     :create -> collection_path(feature, model)
+  #     :update -> item_path(feature, model)
+  #     :delete -> item_path(feature, model)
+  #   end
+  # end
 
-  defp collection_path(feature, model), do: "/#{feature.name()}/#{model.plural()}"
+  # defp collection_path(feature, model), do: "/#{feature.name()}/#{model.plural()}"
 
-  defp relation_path(feature, model, rel),
-    do: "/#{feature.name()}/#{model.plural()}/:id/#{rel.name}"
+  # defp relation_path(feature, model, rel),
+  #   do: "/#{feature.name()}/#{model.plural()}/:id/#{rel.name}"
 
-  defp item_path(feature, model), do: collection_path(feature, model) <> "/:id"
+  # defp item_path(feature, model), do: collection_path(feature, model) <> "/:id"
 end

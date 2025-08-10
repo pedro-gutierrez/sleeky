@@ -11,7 +11,7 @@ defmodule Sleeky.Feature.Generator.Commands do
   end
 
   def command_fun(command, feature) do
-    fun_name = Sleeky.Command.Helper.fun_name(command)
+    fun_name = Sleeky.Command.fun_name(command)
     params_module = command.params()
 
     command_invocation =

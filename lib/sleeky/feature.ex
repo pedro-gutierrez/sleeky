@@ -12,14 +12,25 @@ defmodule Sleeky.Feature do
       Sleeky.Feature.Generator.Graph,
       Sleeky.Feature.Generator.Helpers,
       Sleeky.Feature.Generator.CreateFunctions,
-      Sleeky.Feature.Generator.UpdateActions,
-      Sleeky.Feature.Generator.ReadActions,
-      Sleeky.Feature.Generator.DeleteActions,
+      Sleeky.Feature.Generator.UpdateFunctions,
       Sleeky.Feature.Generator.Commands,
-      Sleeky.Feature.Generator.Queries
+      Sleeky.Feature.Generator.Queries,
+      Sleeky.Feature.Generator.Events,
+      Sleeky.Feature.Generator.Subscriptions
     ]
 
-  defstruct [:app, :name, :repo, scopes: [], models: [], handlers: [], commands: []]
+  defstruct [
+    :app,
+    :name,
+    :repo,
+    scopes: [],
+    models: [],
+    handlers: [],
+    commands: [],
+    queries: [],
+    events: [],
+    subscriptions: []
+  ]
 
   def allow(command, context) do
     if command.allowed?(context) do

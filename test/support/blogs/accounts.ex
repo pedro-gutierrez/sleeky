@@ -20,5 +20,14 @@ defmodule Blogs.Accounts do
     scopes do
       Blogs.Accounts.Scopes.Self
     end
+
+    events do
+      Blogs.Accounts.Events.UserRegistered
+      Blogs.Accounts.Events.PasswordRemindedSent
+    end
+
+    subscriptions do
+      Blogs.Accounts.Subscriptions.RegisteredUsers
+    end
   end
 end

@@ -4,6 +4,9 @@ defmodule Sleeky.Command.Parser do
 
   alias Sleeky.Command
   alias Sleeky.Command.Policy
+  alias Sleeky.Command.Step
+  alias Sleeky.Command.Task
+  alias Sleeky.Command.Event
 
   import Sleeky.Feature.Naming
 
@@ -27,6 +30,25 @@ defmodule Sleeky.Command.Parser do
         {policy.role, policy}
       end
 
+    steps =
+      for {:step, step_attrs, step_children} <- children do
+        step_name = Keyword.fetch!(step_attrs, :name)
+
+        tasks =
+          for {:task, task_attrs, _} <- step_children do
+            task_module = Keyword.fetch!(task_attrs, :name)
+            %Task{module: task_module}
+          end
+
+        events =
+          for {:event, event_attrs, _} <- step_children do
+            event_module = Keyword.fetch!(event_attrs, :name)
+            %Event{module: event_module}
+          end
+
+        %Step{name: step_name, tasks: tasks, events: events}
+      end
+
     atomic? = Keyword.get(attrs, :atomic, false)
 
     %Command{
@@ -34,7 +56,8 @@ defmodule Sleeky.Command.Parser do
       feature: feature,
       params: params,
       policies: policies,
-      atomic?: atomic?
+      atomic?: atomic?,
+      steps: steps
     }
   end
 end

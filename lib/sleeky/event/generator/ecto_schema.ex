@@ -1,11 +1,11 @@
-defmodule Sleeky.Value.Generator.EctoSchema do
+defmodule Sleeky.Event.Generator.EctoSchema do
   @moduledoc false
   @behaviour Diesel.Generator
 
   @impl true
-  def generate(value, _opts) do
+  def generate(event, _opts) do
     fields =
-      for field <- value.fields do
+      for field <- event.fields do
         ecto_type = map_type(field.type)
 
         quote do
@@ -16,6 +16,7 @@ defmodule Sleeky.Value.Generator.EctoSchema do
     quote do
       use Ecto.Schema
 
+      @primary_key false
       embedded_schema do
         (unquote_splicing(fields))
       end
