@@ -3,8 +3,8 @@ defmodule Blogs.Accounts.Events.UserRegistered do
 
   use Sleeky.Event
 
-  event do
-    field :user_id, type: :id
-    field :registered_at, type: :datetime
+  event version: 1 do
+    field :user_id, type: :id, required: true
+    field :registered_at, type: :datetime, required: true
   end
 end

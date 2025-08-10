@@ -11,5 +11,10 @@ defmodule Sleeky.EvaluateTest do
 
       assert author == context.author
     end
+
+    test "supports string keys" do
+      context = %{ "foo" => %{ "bar" => 1}}
+      assert 1 == Evaluate.evaluate(context, {:path, [:foo, :bar]})
+    end
   end
 end

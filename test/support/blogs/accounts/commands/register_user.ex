@@ -15,7 +15,7 @@ defmodule Blogs.Accounts.Commands.RegisterUser do
     end
 
     step :registered do
-      event(name: UserRegistered)
+      event name: UserRegistered
     end
   end
 end

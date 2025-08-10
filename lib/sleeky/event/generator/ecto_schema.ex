@@ -4,6 +4,8 @@ defmodule Sleeky.Event.Generator.EctoSchema do
 
   @impl true
   def generate(event, _opts) do
+    field_names = Enum.map(event.fields, & &1.name)
+
     fields =
       for field <- event.fields do
         ecto_type = map_type(field.type)
@@ -14,6 +16,8 @@ defmodule Sleeky.Event.Generator.EctoSchema do
       end
 
     quote do
+      @derive {Jason.Encoder, only: unquote(field_names)}
+
       use Ecto.Schema
 
       @primary_key false

@@ -88,9 +88,9 @@ defmodule Sleeky.Evaluate do
   end
 
   def evaluate(context, {:path, [field | rest]}) do
-    context
-    |> Map.get(field)
-    |> evaluate({:path, rest})
+    context = Map.get(context, field) || Map.get(context, to_string(field))
+
+    evaluate( context, {:path, rest})
   end
 
   def evaluate(_, %{app: app, env: env, key: key}) do

@@ -1,7 +1,9 @@
 defmodule Sleeky.CommandTest do
-  use ExUnit.Case
+  use Sleeky.DataCase
 
   alias Blogs.Accounts.Commands.{RemindPassword, RegisterUser}
+  alias Blogs.Accounts.User
+  alias Blogs.Accounts.Events.UserRegistered
 
   describe "allowed?/1" do
     test "always allows if the command has no policies" do
@@ -38,6 +40,20 @@ defmodule Sleeky.CommandTest do
       }
 
       refute RemindPassword.allowed?(context)
+    end
+  end
+
+  describe "execute/2" do
+    test "returns a result and a list of events" do
+      params = %User{id: uuid(), email: "test@example.com", external_id: uuid()}
+      context = %{}
+
+      assert {:ok, user, events} = RegisterUser.execute(params, context)
+
+      assert user.id == params.id
+      assert user.email == params.email
+
+      assert [%UserRegistered{user_id: 1, registered_at: _}] = events
     end
   end
 end
