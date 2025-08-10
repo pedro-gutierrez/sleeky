@@ -13,6 +13,7 @@ defmodule Sleeky.DataCase do
       @router @endpoint.router()
 
       use ExUnit.Case, unquote(opts)
+      use Oban.Testing, repo: @repo
 
       import Ecto
       import Ecto.Changeset
@@ -30,6 +31,9 @@ defmodule Sleeky.DataCase do
         Application.ensure_all_started(:sleeky)
         start_supervised!(@repo)
         start_supervised!(@endpoint)
+
+        oban_config = Application.fetch_env!(:sleeky, Oban)
+        start_supervised!({Oban, oban_config})
 
         pid = Sandbox.start_owner!(@repo, shared: not tags[:async])
         on_exit(fn -> Sandbox.stop_owner(pid) end)
@@ -124,6 +128,11 @@ defmodule Sleeky.DataCase do
         do: Map.put(headers, "authorization", "Bearer " <> token)
 
       defp to_sql(query), do: to_sql(query, @repo)
+
+      defp assert_job_success do
+        assert_enqueued(worker: Sleeky.Job)
+        assert %{success: 1, failure: 0} = Oban.drain_queue(queue: :default)
+      end
     end
   end
 end

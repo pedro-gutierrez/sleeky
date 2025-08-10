@@ -52,8 +52,16 @@ defmodule Sleeky.Command.Parser do
 
     atomic? = Keyword.get(attrs, :atomic, false)
 
+    fun_name =
+    caller
+      |> Module.split()
+      |> List.last()
+      |> Macro.underscore()
+      |> String.to_atom()
+
     %Command{
       name: name,
+      fun_name: fun_name,
       feature: feature,
       params: params,
       policies: policies,

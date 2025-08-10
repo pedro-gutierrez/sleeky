@@ -8,8 +8,17 @@ defmodule Sleeky.Subscription do
     dsl: Sleeky.Subscription.Dsl,
     parser: Sleeky.Subscription.Parser,
     generators: [
-      Sleeky.Subscription.Generator.Metadata
+      Sleeky.Subscription.Generator.Metadata,
+      Sleeky.Subscription.Generator.Execute
     ]
 
-  defstruct [:name, :feature, :event, :commands]
+  defstruct [:name, :feature, :event, :command]
+
+  def execute(subscription, params) do
+    params = Map.from_struct(params)
+    feature = subscription.feature()
+    fun = subscription.command().fun_name()
+
+    apply(feature, fun, [params])
+  end
 end

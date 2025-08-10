@@ -4,6 +4,6 @@ defmodule Sleeky.Subscription.Dsl.Subscription do
 
   tag do
     attribute :to, kind: :module, required: true
-    child :command, min: 1
+    child :command, min: 1, max: 1
   end
 end

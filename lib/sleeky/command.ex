@@ -9,7 +9,7 @@ defmodule Sleeky.Command do
       Sleeky.Command.Generator.Execute
     ]
 
-  defstruct [:name, :feature, :params, :policies, :atomic?, :handler, :events]
+  defstruct [:name, :fun_name, :feature, :params, :policies, :atomic?, :handler, :events]
 
   defmodule Policy do
     @moduledoc false
@@ -19,14 +19,6 @@ defmodule Sleeky.Command do
   defmodule Event do
     @moduledoc false
     defstruct [:module, :source, :mapping]
-  end
-
-  def fun_name(command) do
-    command
-    |> Module.split()
-    |> List.last()
-    |> Macro.underscore()
-    |> String.to_atom()
   end
 
   def allowed?(command, context) do

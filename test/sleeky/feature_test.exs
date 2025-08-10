@@ -4,11 +4,12 @@ defmodule Sleeky.FeatureTest do
   alias Blogs.Accounts
 
   describe "command functions" do
-    test "invoke the handler if the command is allowed" do
+    test "invoke the handler if the command is allowed and schedules events" do
       params = %{email: "test@example.com", external_id: uuid(), id: uuid()}
       context = %{current_user: %{roles: [:guest]}}
 
       assert {:ok, _user} = Accounts.register_user(params, context)
+      assert_job_success()
     end
 
     test "do not call the handler if the command is not allowed" do

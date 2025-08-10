@@ -18,13 +18,13 @@ defmodule Sleeky.Subscription.Parser do
         command
       end
 
-    commands = List.flatten(commands)
+    command = commands |> List.flatten() |> List.first()
 
     %Subscription{
       name: name,
       feature: feature,
       event: event,
-      commands: commands
+      command: command
     }
   end
 end

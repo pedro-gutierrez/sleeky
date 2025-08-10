@@ -1,97 +1,56 @@
 defmodule Sleeky.Job do
   @moduledoc """
-  Generates function to schedule background jobs on different model actions
+  Generates function to schedule background jobs
   """
   use Oban.Worker, queue: :default, max_attempts: 3
 
   alias Sleeky.Job.Worker
 
-  def schedule_all(_model, _action, []), do: :ok
-
-  def schedule_all(model, action, jobs) do
-    with [_ | _] <-
-           jobs
-           |> Enum.map(
-             &new(%{
-               model: model.__struct__,
-               id: model.id,
-               action: action,
-               task: &1,
-               atomic: false
-             })
-           )
-           |> Oban.insert_all(),
-         do: :ok
-  end
-
   require Logger
+
+  def schedule_all(jobs) do
+    jobs = jobs |> Enum.map(&(&1 |> Map.new() |> new()))
+    with [_ | _] <- Oban.insert_all(jobs), do: :ok
+  end
 
   @impl Oban.Worker
   def perform(
-        %Oban.Job{args: %{"model" => model, "id" => id, "task" => task, "atomic" => atomic}} = job
+        %{args: %{"event" => event, "params" => params, "subscription" => subscription}} = job
       ) do
-    model = Module.concat([model])
-    task = Module.concat([task])
+    subscription = Module.concat([subscription])
+    event = Module.concat([event])
 
-    with {:ok, record} <- model.fetch(id, preload: model.parent_field_names()),
-         :ok <- do_perform(record, task, atomic) do
-      log_success(job, model, id, task)
-
+    with {:ok, event} <- event.decode(params),
+         {:ok, _} <- subscription.execute(event) do
+      handle_success(subscription)
       :ok
     else
-      {:error, reason} ->
-        log_error(job, model, id, task, reason)
-
-        {:error, reason}
+      {:error, reason} -> handle_error(reason, event, subscription, job)
     end
   rescue
     e ->
       reason = Exception.format(:error, e, __STACKTRACE__)
-      log_error(job, model, id, task, reason)
-
-      {:error, reason}
+      handle_error(reason, event, subscription, job)
   end
 
-  defp do_perform(%{__struct__: model} = record, task, true) do
-    repo = model.repo()
-
-    with {:ok, :ok} <-
-           repo.transaction(fn ->
-             with {:error, reason} <- do_perform(record, task) do
-               repo.rollback(reason)
-             end
-           end),
-         do: :ok
-  end
-
-  defp do_perform(record, task, false), do: do_perform(record, task)
-
-  defp do_perform(record, task) do
-    case task.execute(record) do
-      {:error, _} = error -> error
-      _ -> :ok
-    end
-  end
-
-  defp log_error(job, model, id, task, reason) do
+  defp handle_error(reason, event, subscription, job) do
     attempts_left = job.max_attempts - job.attempt
     level = if attempts_left == 0, do: :error, else: :warning
 
-    Logger.log(level, "task failed",
-      task: task,
-      model: model,
-      id: id,
-      queue: job.queue,
-      job: job.id,
+    Logger.log(level, "subscription failed",
+      event: event,
+      subscription: subscription,
       reason: format_error(reason),
       attempt: job.attempt,
       attempts_left: attempts_left
     )
+
+    {:error, reason}
   end
 
-  defp log_success(_job, _model, _id, task) do
-    Logger.debug("task succeeded",
-      task: task
+  defp handle_success(subscription) do
+    Logger.debug("subscription succeeded",
+      subscription: subscription
     )
   end
 
