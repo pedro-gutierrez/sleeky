@@ -25,13 +25,13 @@ defmodule Sleeky.Mapping do
   Applies the mapping to the given data
   """
   def map(mapping, data) do
-    fields = mapping.fields()
-    |> Enum.reduce(%{}, fn field, acc ->
-      value =  Evaluate.evaluate(data, field.expression)
+    target_module = mapping.to()
 
+    mapping.fields()
+    |> Enum.reduce(%{}, fn field, acc ->
+      value = Evaluate.evaluate(data, field.expression)
       Map.put(acc, field.name, value)
     end)
-
-    struct(mapping.to(), fields)
+    |> target_module.new()
   end
 end

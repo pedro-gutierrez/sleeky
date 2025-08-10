@@ -9,7 +9,8 @@ defmodule Sleeky.Command.Generator.Metadata do
       def params, do: unquote(command.params)
       def feature, do: unquote(command.feature)
       def policies, do: unquote(Macro.escape(command.policies))
-      def steps, do: unquote(Macro.escape(command.steps))
+      def handler, do: unquote(command.handler)
+      def events, do: unquote(Macro.escape(command.events))
     end
   end
 end

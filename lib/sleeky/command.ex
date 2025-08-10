@@ -9,26 +9,16 @@ defmodule Sleeky.Command do
       Sleeky.Command.Generator.Execute
     ]
 
-  defstruct [:name, :feature, :params, :policies, :atomic?, :steps]
+  defstruct [:name, :feature, :params, :policies, :atomic?, :handler, :events]
 
   defmodule Policy do
     @moduledoc false
     defstruct [:role, :scope]
   end
 
-  defmodule Step do
-    @moduledoc false
-    defstruct [:name, :tasks, :events]
-  end
-
-  defmodule Task do
-    @moduledoc false
-    defstruct [:module]
-  end
-
   defmodule Event do
     @moduledoc false
-    defstruct [:module]
+    defstruct [:module, :source, :mapping]
   end
 
   def fun_name(command) do
@@ -74,73 +64,30 @@ defmodule Sleeky.Command do
   @doc """
   Executes the given command
 
-  This function reduces over all the steps defined for the task, perform tasks and collects events
-  to be emitted later
-
-  This function returns one of the following results:
-
-  * `{:ok, term(), events()}` - The command was executed successfully and returned a result, and a list of events
+  * `{:ok, term(), [events]}` - The command was executed successfully and returned a result, and a list of events
   * `{:error, term()}` - The command failed to execute and the reason is provided.
   """
   def execute(command, params, context) do
-    case command.steps() do
-      [] ->
-        # No steps defined, return success without events
-        {:ok, nil}
-
-      steps ->
-        # Reduce over steps, executing tasks and collecting events
-        Enum.reduce_while(steps, {:ok, nil, []}, fn step, {:ok, _result, events} ->
-          case execute_step(step, params, context) do
-            {:ok, step_result, step_events} ->
-              {:cont, {:ok, step_result, events ++ step_events}}
-
-            {:error, reason} ->
-              {:halt, {:error, reason}}
-          end
-        end)
-        |> case do
-          {:ok, final_result, []} -> {:ok, final_result}
-          {:ok, final_result, events} -> {:ok, final_result, events}
-          {:error, reason} -> {:error, reason}
-        end
-    end
-  end
-
-  defp execute_step(step, params, context) do
-    # Execute all tasks in the step
-    task_result =
-      Enum.reduce_while(step.tasks, {:ok, nil}, fn task, {:ok, _} ->
-        case task.module.execute(params, context) do
-          {:ok, result} -> {:cont, {:ok, result}}
-          {:error, reason} -> {:halt, {:error, reason}}
-        end
-      end)
-
-    with {:ok, result} <- task_result,
-         {:ok, events} <- create_event_structs(step.events, result, params) do
+    with {:ok, result} <- command.handler().execute(params, context),
+         {:ok, events} <- maybe_create_events(command.events(), result, context) do
       {:ok, result, events}
-    else
-      {:error, reason} -> {:error, reason}
     end
   end
 
-  defp create_event_structs(event_definitions, result, params) do
-    Enum.reduce_while(event_definitions, {:ok, []}, fn event_def, {:ok, acc} ->
-      event_data = params |> Map.merge(result || %{}) |> to_plain_map()
+  defp maybe_create_events([], _result, _context), do: {:ok, []}
 
-      case event_def.module.new(event_data) do
-        {:ok, event_struct} ->
-          {:cont, {:ok, [event_struct | acc]}}
+  defp maybe_create_events(events, result, context) do
+    result = to_plain_map(result)
+    data = Map.merge(result, context)
 
-        {:error, reason} ->
-          {:halt, {:error, reason}}
-      end
-    end)
-    |> case do
-      {:ok, events} -> {:ok, Enum.reverse(events)}
-      {:error, reason} -> {:error, reason}
-    end
+    with events when is_list(events) <-
+           Enum.reduce_while(events, [], fn event, events ->
+             case event.mapping.map(data) do
+               {:ok, event} -> {:cont, [event | events]}
+               {:error, reason} -> {:halt, {:error, reason}}
+             end
+           end),
+         do: {:ok, Enum.reverse(events)}
   end
 
   defp to_plain_map(data) when is_struct(data), do: Map.from_struct(data)

@@ -14,9 +14,7 @@ defmodule Sleeky.Feature do
       Sleeky.Feature.Generator.CreateFunctions,
       Sleeky.Feature.Generator.UpdateFunctions,
       Sleeky.Feature.Generator.Commands,
-      Sleeky.Feature.Generator.Queries,
-      Sleeky.Feature.Generator.Events,
-      Sleeky.Feature.Generator.Subscriptions
+      Sleeky.Feature.Generator.Queries
     ]
 
   defstruct [
@@ -29,7 +27,8 @@ defmodule Sleeky.Feature do
     commands: [],
     queries: [],
     events: [],
-    subscriptions: []
+    subscriptions: [],
+    values: []
   ]
 
   def allow(command, context) do

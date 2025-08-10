@@ -33,10 +33,11 @@ defmodule Sleeky.Mapping.Parser do
   end
 
   defp expression(attrs) do
-    path = attrs
-    |> Keyword.fetch!(:path)
-    |> String.split(".")
-    |> Enum.map(&String.to_atom/1)
+    path =
+      attrs
+      |> Keyword.fetch!(:path)
+      |> String.split(".")
+      |> Enum.map(&String.to_atom/1)
 
     {:path, path}
   end

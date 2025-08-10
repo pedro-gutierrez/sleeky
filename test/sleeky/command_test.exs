@@ -48,12 +48,14 @@ defmodule Sleeky.CommandTest do
       params = %User{id: uuid(), email: "test@example.com", external_id: uuid()}
       context = %{}
 
-      assert {:ok, user, events} = RegisterUser.execute(params, context)
+      assert {:ok, user, [event]} = RegisterUser.execute(params, context)
 
       assert user.id == params.id
       assert user.email == params.email
 
-      assert [%UserRegistered{user_id: 1, registered_at: _}] = events
+      assert %UserRegistered{} = event
+      assert event.user_id == user.id
+      assert event.registered_at == user.inserted_at
     end
   end
 end

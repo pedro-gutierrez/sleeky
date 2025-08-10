@@ -4,8 +4,6 @@ defmodule Sleeky.Command.Parser do
 
   alias Sleeky.Command
   alias Sleeky.Command.Policy
-  alias Sleeky.Command.Step
-  alias Sleeky.Command.Task
   alias Sleeky.Command.Event
 
   import Sleeky.Feature.Naming
@@ -30,23 +28,26 @@ defmodule Sleeky.Command.Parser do
         {policy.role, policy}
       end
 
-    steps =
-      for {:step, step_attrs, step_children} <- children do
-        step_name = Keyword.fetch!(step_attrs, :name)
+    handler =
+      caller
+      |> Module.split()
+      |> Enum.map(fn
+        "Commands" -> "Handlers"
+        part -> part
+      end)
+      |> Module.concat()
 
-        tasks =
-          for {:task, task_attrs, _} <- step_children do
-            task_module = Keyword.fetch!(task_attrs, :name)
-            %Task{module: task_module}
-          end
+    events =
+      for {:publish, attrs, _} <- children do
+        module = Keyword.fetch!(attrs, :name)
+        source = Keyword.fetch!(attrs, :from)
 
-        events =
-          for {:event, event_attrs, _} <- step_children do
-            event_module = Keyword.fetch!(event_attrs, :name)
-            %Event{module: event_module}
-          end
+        module_last = module |> Module.split() |> List.last() |> Macro.underscore()
+        source_last = source |> Module.split() |> List.last() |> Macro.underscore()
+        mapping = Macro.camelize("#{module_last}_from_#{source_last}")
+        mapping = Module.concat([feature, "Mappings", mapping])
 
-        %Step{name: step_name, tasks: tasks, events: events}
+        %Event{module: module, mapping: mapping, source: source}
       end
 
     atomic? = Keyword.get(attrs, :atomic, false)
@@ -57,7 +58,8 @@ defmodule Sleeky.Command.Parser do
       params: params,
       policies: policies,
       atomic?: atomic?,
-      steps: steps
+      handler: handler,
+      events: events
     }
   end
 end

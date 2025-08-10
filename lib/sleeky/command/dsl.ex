@@ -5,8 +5,6 @@ defmodule Sleeky.Command.Dsl do
     root: Sleeky.Command.Dsl.Command,
     tags: [
       Sleeky.Command.Dsl.Policy,
-      Sleeky.Command.Dsl.Step,
-      Sleeky.Command.Dsl.Task,
-      Sleeky.Command.Dsl.Event
+      Sleeky.Command.Dsl.Publish
     ]
 end

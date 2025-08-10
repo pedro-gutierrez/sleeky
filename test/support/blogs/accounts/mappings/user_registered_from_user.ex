@@ -1,4 +1,4 @@
-defmodule Blogs.Accounts.Mappings.UserToRegisteredUser do
+defmodule Blogs.Accounts.Mappings.UserRegisteredFromUser do
   @moduledoc false
   use Sleeky.Mapping
 

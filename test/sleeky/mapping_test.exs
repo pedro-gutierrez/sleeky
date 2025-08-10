@@ -36,10 +36,10 @@ defmodule Sleeky.MappingTest do
       assert :registered_at in field_names
 
       # Check field paths
-      user_id_field = Enum.find(fields, & &1.name == :user_id)
+      user_id_field = Enum.find(fields, &(&1.name == :user_id))
       assert user_id_field.expression == {:path, [:id]}
 
-      registered_at_field = Enum.find(fields, & &1.name == :registered_at)
+      registered_at_field = Enum.find(fields, &(&1.name == :registered_at))
       assert registered_at_field.expression == {:path, [:inserted_at]}
     end
   end

@@ -27,6 +27,7 @@ defmodule Sleeky.Event.Generator.EctoSchema do
     end
   end
 
-  defp map_type(:datetime), do: :utc_datetime
+  defp map_type(:datetime), do: :utc_datetime_usec
+  defp map_type(:id), do: :binary_id
   defp map_type(type), do: type
 end
