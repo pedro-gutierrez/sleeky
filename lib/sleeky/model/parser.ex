@@ -326,7 +326,6 @@ defmodule Sleeky.Model.Parser do
     %{model | attributes: attributes}
   end
 
-
   defp ensure_same_feature!(from, to, kind) do
     from_feature = feature(from)
     to_feature = feature(to)

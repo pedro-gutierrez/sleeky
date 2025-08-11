@@ -11,7 +11,7 @@ defmodule Sleeky.MappingTest do
 
       data = %{
         "id" => Ecto.UUID.generate(),
-        "inserted_at" => now,
+        "inserted_at" => now
       }
 
       assert {:ok, result} = UserRegisteredFromUser.map(data)

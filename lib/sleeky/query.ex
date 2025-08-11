@@ -9,7 +9,7 @@ defmodule Sleeky.Query do
       Sleeky.Query.Generator.Metadata
     ]
 
-  defstruct [:name, :feature, :params, :model, :policies, :limit, :many]
+  defstruct [:name, :feature, :params, :model, :policies, :limit, :many, :custom]
 
   defmodule Policy do
     @moduledoc false
@@ -71,4 +71,48 @@ defmodule Sleeky.Query do
   end
 
   defp nothing(model), do: where(model, false)
+
+  @doc """
+  Executes the query with the given parameters and context
+  """
+  def execute(query, params, context) do
+    with {:ok, params} <- query.params().validate(params),
+         context <- Map.put(context, :params, params) do
+      if query.custom?() do
+        query.execute(params, context)
+      else
+        context
+        |> query.scope()
+        |> query.execute(params, context)
+        |> execute_query(query, context)
+      end
+    end
+  end
+
+  @doc """
+  Executes the query that has no params
+  """
+  def execute(query, context) do
+    if query.custom?() do
+      query.execute(context)
+    else
+      context
+      |> query.scope()
+      |> query.execute(context)
+      |> execute_query(query, context)
+    end
+  end
+
+  defp execute_query(queriable, query, _context) do
+    repo = query.feature().repo()
+
+    if query.many?() do
+      repo.all(queriable)
+    else
+      case repo.one(queriable) do
+        nil -> {:error, :not_found}
+        item -> {:ok, item}
+      end
+    end
+  end
 end

@@ -10,7 +10,9 @@ defmodule Sleeky.Feature.Generator.Commands do
 
       quote do
         def unquote(fun_name)(params), do: Sleeky.Feature.execute(unquote(command), params)
-        def unquote(fun_name)(params, context), do: Sleeky.Feature.execute(unquote(command), params, context)
+
+        def unquote(fun_name)(params, context),
+          do: Sleeky.Feature.execute(unquote(command), params, context)
       end
     end
   end

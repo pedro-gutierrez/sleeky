@@ -53,7 +53,7 @@ defmodule Sleeky.Command.Parser do
     atomic? = Keyword.get(attrs, :atomic, false)
 
     fun_name =
-    caller
+      caller
       |> Module.split()
       |> List.last()
       |> Macro.underscore()

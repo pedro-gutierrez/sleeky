@@ -7,6 +7,7 @@ defmodule Sleeky.Query.Dsl.Query do
     attribute :returns, kind: :module, required: true
     attribute :limit, kind: :integer, required: false
     attribute :many, kind: :boolean, required: false, default: false
+    attribute :custom, kind: :boolean, required: false, default: false
     child :policy, min: 0
   end
 end

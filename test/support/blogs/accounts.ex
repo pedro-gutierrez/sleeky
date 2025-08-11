@@ -15,6 +15,7 @@ defmodule Blogs.Accounts do
     queries do
       Blogs.Accounts.Queries.GetAllUsers
       Blogs.Accounts.Queries.GetUserByEmail
+      Blogs.Accounts.Queries.GetUserIds
     end
 
     scopes do

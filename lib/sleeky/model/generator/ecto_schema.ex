@@ -51,7 +51,7 @@ defmodule Sleeky.Model.Generator.EctoSchema do
   defp attributes(model) do
     attrs =
       model.attributes
-      |> Enum.reject(& &1.primary_key? || &1.name in [:inserted_at, :updated_at])
+      |> Enum.reject(&(&1.primary_key? || &1.name in [:inserted_at, :updated_at]))
 
     for attr <- attrs do
       name = attr.name

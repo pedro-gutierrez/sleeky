@@ -107,5 +107,10 @@ defmodule Sleeky.FeatureTest do
 
       assert {:error, :not_found} = Accounts.get_user_by_email(params, context)
     end
+
+    test "can execute custom queries on read models" do
+      assert [item] = Accounts.get_user_ids()
+      assert item.user_id
+    end
   end
 end

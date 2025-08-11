@@ -3,7 +3,8 @@ defmodule Sleeky.QueryTest do
 
   alias Blogs.Accounts.Queries.{
     GetAllUsers,
-    GetUserByEmail
+    GetUserByEmail,
+    GetUserIds
   }
 
   describe "scope/1" do
@@ -46,6 +47,14 @@ defmodule Sleeky.QueryTest do
 
       assert sql =~ "WHERE (u0.\"public\" = $1)"
       refute sql =~ "WHERE (FALSE)"
+    end
+  end
+
+  describe "execute/1" do
+    test "is used when queries have no params" do
+      context = %{}
+      assert [item] = GetUserIds.execute(context)
+      assert item.user_id
     end
   end
 end

@@ -11,6 +11,7 @@ defmodule Sleeky.Query.Generator.Metadata do
       def policies, do: unquote(Macro.escape(query.policies))
       def many?, do: unquote(query.many)
       def limit, do: unquote(query.limit)
+      def custom?, do: unquote(query.custom)
     end
   end
 end

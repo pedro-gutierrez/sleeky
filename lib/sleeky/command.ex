@@ -9,7 +9,17 @@ defmodule Sleeky.Command do
       Sleeky.Command.Generator.Execute
     ]
 
-  defstruct [:name, :fun_name, :feature, :params, :returns, :policies, :atomic?, :handler, :events]
+  defstruct [
+    :name,
+    :fun_name,
+    :feature,
+    :params,
+    :returns,
+    :policies,
+    :atomic?,
+    :handler,
+    :events
+  ]
 
   defmodule Policy do
     @moduledoc false

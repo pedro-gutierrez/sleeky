@@ -16,6 +16,7 @@ defmodule Sleeky.Query.Parser do
     model = Keyword.fetch!(attrs, :returns)
     limit = Keyword.get(attrs, :limit)
     many = Keyword.get(attrs, :many, false)
+    custom = Keyword.get(attrs, :custom, false)
 
     policies =
       for {:policy, attrs, _scopes} <- children do
@@ -37,7 +38,8 @@ defmodule Sleeky.Query.Parser do
       model: model,
       policies: policies,
       limit: limit,
-      many: many
+      many: many,
+      custom: custom
     }
   end
 end

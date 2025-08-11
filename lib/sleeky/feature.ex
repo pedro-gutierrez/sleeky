@@ -50,7 +50,6 @@ defmodule Sleeky.Feature do
     end
   end
 
-
   @doc """
   Executes a command, publishes events, and returns a result
 
