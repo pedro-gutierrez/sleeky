@@ -9,6 +9,6 @@ defmodule Blogs.Accounts.Commands.RegisterUser do
   command params: User, atomic: true do
     policy role: :guest
 
-    publish(UserRegistered, from: User)
+    publish event: UserRegistered
   end
 end

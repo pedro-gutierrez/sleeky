@@ -9,7 +9,7 @@ defmodule Sleeky.Command do
       Sleeky.Command.Generator.Execute
     ]
 
-  defstruct [:name, :fun_name, :feature, :params, :policies, :atomic?, :handler, :events]
+  defstruct [:name, :fun_name, :feature, :params, :returns, :policies, :atomic?, :handler, :events]
 
   defmodule Policy do
     @moduledoc false
@@ -60,9 +60,15 @@ defmodule Sleeky.Command do
   * `{:error, term()}` - The command failed to execute and the reason is provided.
   """
   def execute(command, params, context) do
-    with {:ok, result} <- command.handler().execute(params, context),
+    with {:ok, result} <- execute_command(command, params, context),
          {:ok, events} <- maybe_create_events(command.events(), result, context) do
       {:ok, result, events}
+    end
+  end
+
+  defp execute_command(command, params, context) do
+    with :ok <- command.handler().execute(params, context) do
+      {:ok, params}
     end
   end
 

@@ -24,6 +24,7 @@ defmodule Sleeky.Model.Parser do
     |> with_keys(definition)
     |> with_actions(definition)
     |> with_primary_key()
+    |> with_timestamps()
   end
 
   defp model(caller, attrs) do
@@ -295,9 +296,36 @@ defmodule Sleeky.Model.Parser do
     mutable?: false
   }
 
+  @inserted_at %Attribute{
+    name: :inserted_at,
+    kind: :datetime,
+    ecto_type: :utc_datetime,
+    storage: :utc_datetime,
+    column_name: :inserted_at,
+    primary_key?: false,
+    mutable?: false
+  }
+
+  @updated_at %Attribute{
+    name: :updated_at,
+    kind: :datetime,
+    ecto_type: :utc_datetime,
+    storage: :utc_datetime,
+    column_name: :updated_at,
+    primary_key?: false,
+    mutable?: true
+  }
+
   defp with_primary_key(model) do
     %{model | primary_key: @primary_key, attributes: [@primary_key | model.attributes]}
   end
+
+  defp with_timestamps(model) do
+    attributes = model.attributes ++ [@inserted_at, @updated_at]
+
+    %{model | attributes: attributes}
+  end
+
 
   defp ensure_same_feature!(from, to, kind) do
     from_feature = feature(from)

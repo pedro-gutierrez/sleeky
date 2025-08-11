@@ -14,6 +14,7 @@ defmodule Sleeky.Command.Parser do
     feature = feature_module(caller)
 
     params = Keyword.fetch!(attrs, :params)
+    returns = attrs[:returns] || params
 
     policies =
       for {:policy, attrs, _scopes} <- children do
@@ -39,9 +40,8 @@ defmodule Sleeky.Command.Parser do
 
     events =
       for {:publish, attrs, _} <- children do
-        module = Keyword.fetch!(attrs, :name)
-        source = Keyword.fetch!(attrs, :from)
-
+        module = Keyword.fetch!(attrs, :event)
+        source = attrs[:from] || returns
         module_last = module |> Module.split() |> List.last() |> Macro.underscore()
         source_last = source |> Module.split() |> List.last() |> Macro.underscore()
         mapping = Macro.camelize("#{module_last}_from_#{source_last}")
@@ -64,6 +64,7 @@ defmodule Sleeky.Command.Parser do
       fun_name: fun_name,
       feature: feature,
       params: params,
+      returns: returns,
       policies: policies,
       atomic?: atomic?,
       handler: handler,

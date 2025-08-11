@@ -3,6 +3,7 @@ defmodule Sleeky.CommandTest do
 
   alias Blogs.Accounts.Commands.{RemindPassword, RegisterUser}
   alias Blogs.Accounts.User
+  alias Blogs.Accounts.Values.UserId
   alias Blogs.Accounts.Events.UserRegistered
 
   describe "allowed?/1" do
@@ -56,6 +57,15 @@ defmodule Sleeky.CommandTest do
       assert %UserRegistered{} = event
       assert event.user_id == user.id
       assert event.registered_at == user.inserted_at
+    end
+
+    test "returns the input params by default" do
+      params = %UserId{user_id: uuid()}
+      context = %{}
+
+      assert {:ok, result, events} = RemindPassword.execute(params, context)
+      assert result == params
+      assert events == []
     end
   end
 end

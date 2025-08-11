@@ -3,7 +3,7 @@ defmodule Sleeky.Command.Dsl.Publish do
   use Diesel.Tag
 
   tag do
-    attribute :name, kind: :module, required: true
-    attribute :from, kind: :module, required: true
+    attribute :event, kind: :module, required: true
+    attribute :from, kind: :module, required: false
   end
 end
