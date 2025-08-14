@@ -4,8 +4,10 @@ defmodule Sleeky.Feature.Generator.Helpers do
 
   @impl true
   def generate(_, _) do
-    quote do
+    quote location: :keep do
       import Sleeky.Feature.Helpers
+
+      def mapping!(from, to), do: Sleeky.Feature.mapping!(__MODULE__, from, to)
     end
   end
 end

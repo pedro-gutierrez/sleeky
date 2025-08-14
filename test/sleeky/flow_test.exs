@@ -11,7 +11,12 @@ defmodule Sleeky.FlowTest do
       assert {:ok, onboarding} = Onboarding.execute(params)
       assert onboarding.user_id == params.user_id
       assert onboarding.steps_pending == 2
+
+      # Assert the flow did complete
       assert_job_success(2)
+
+      # Assert the flow did publish its event on completion
+      assert_job_success(1)
     end
   end
 end

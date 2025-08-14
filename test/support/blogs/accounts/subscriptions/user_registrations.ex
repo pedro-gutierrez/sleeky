@@ -1,4 +1,4 @@
-defmodule Blogs.Accounts.Subscriptions.RegisteredUsers do
+defmodule Blogs.Accounts.Subscriptions.UserRegistrations do
   @moduledoc false
   use Sleeky.Subscription
 

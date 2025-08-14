@@ -11,6 +11,9 @@ defmodule Blogs.Accounts do
     commands do
       Blogs.Accounts.Commands.RegisterUser
       Blogs.Accounts.Commands.RemindPassword
+      Blogs.Accounts.Commands.EnableUser
+      Blogs.Accounts.Commands.SendWelcomeEmail
+      Blogs.Accounts.Commands.RequestFeedback
     end
 
     queries do
@@ -26,6 +29,7 @@ defmodule Blogs.Accounts do
     events do
       Blogs.Accounts.Events.UserRegistered
       Blogs.Accounts.Events.PasswordRemindedSent
+      Blogs.Accounts.Events.UserOnboarded
     end
 
     flows do
@@ -33,7 +37,13 @@ defmodule Blogs.Accounts do
     end
 
     subscriptions do
-      Blogs.Accounts.Subscriptions.RegisteredUsers
+      Blogs.Accounts.Subscriptions.UserRegistrations
+      Blogs.Accounts.Subscriptions.UserOnboardings
+    end
+
+    mappings do
+      Blogs.Accounts.Mappings.UserRegisteredFromUser
+      Blogs.Accounts.Mappings.UserOnboardedFromOnboarding
     end
   end
 end

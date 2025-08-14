@@ -36,6 +36,17 @@ defmodule Sleeky.Feature do
   require Logger
 
   @doc """
+  Finds a mapping between two models
+  """
+  def mapping!(feature, from, to) do
+    with nil <-
+           feature.mappings()
+           |> Enum.find(&(&1.from() == from && &1.to() == to)) do
+      raise "No mapping from #{inspect(from)} to #{inspect(to)} in feature #{inspect(feature)}"
+    end
+  end
+
+  @doc """
   Executes a command and publishes events
 
   This function does not take a context, which will disable permission checks
@@ -86,7 +97,7 @@ defmodule Sleeky.Feature do
          context <- Map.put(context, :params, params),
          :ok <- allow(command, context),
          {:ok, result, events} <- command.execute(params, context),
-         :ok <- publish_events(events, command) do
+         :ok <- publish_events(events, command.feature()) do
       {:ok, result}
     end
   end
@@ -103,10 +114,15 @@ defmodule Sleeky.Feature do
     end
   end
 
-  defp publish_events([], _command), do: :ok
+  @doc """
+  Publish the given list of events
 
-  defp publish_events(events, command) do
-    app = command.feature().app()
+  Events are only published if there are subscriptions for them.
+  """
+  def publish_events([], _command), do: :ok
+
+  def publish_events(events, feature) do
+    app = feature.app()
 
     events
     |> Enum.flat_map(&jobs(&1, app))

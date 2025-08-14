@@ -23,7 +23,6 @@ defmodule Sleeky.Job do
     with {:ok, event} <- event.decode(params),
          {:ok, _} <- subscription.execute(event) do
       handle_success(subscription: subscription)
-      :ok
     else
       {:error, reason} ->
         handle_error(job, reason, event: event, subscription: subscription)
@@ -35,26 +34,26 @@ defmodule Sleeky.Job do
   end
 
   def perform(%{
-        args: %{"command" => step, "params" => params, "flow" => flow} = job
+        args: %{"command" => command, "params" => params, "flow" => flow, "id" => id} = job
       }) do
     flow = Module.concat([flow])
-    step = Module.concat([step])
+    command = Module.concat([command])
+    feature = command.feature()
 
-    IO.inspect(command: flow, step: step, params: params)
-    handle_success(flow: flow)
-    :ok
-
-    # with {:ok, params} <- flow.decode(params),
-    #      {:ok, _} <- step.execute(step) do
-    #   handle_success(flow)
-    #   :ok
-    # else
-    #   {:error, reason} -> handle_error(reason, step, flow, job)
-    # end
+    with {:ok, params} <- Jason.decode(params),
+         {:ok, _} <- apply(feature, command.fun_name(), [params]),
+         :ok <- flow.step_completed(id, command) do
+      handle_success(flow: flow)
+    else
+      {:error, reason} ->
+        IO.inspect(reason)
+        handle_error(job, reason, command: command, flow: flow)
+    end
   rescue
     e ->
+      IO.inspect(e)
       reason = Exception.format(:error, e, __STACKTRACE__)
-      handle_error(job, reason, step: step, flow: flow)
+      handle_error(job, reason, command: command, flow: flow)
   end
 
   defp handle_error(job, reason, meta) do
