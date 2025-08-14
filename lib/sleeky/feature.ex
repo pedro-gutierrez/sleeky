@@ -14,7 +14,8 @@ defmodule Sleeky.Feature do
       Sleeky.Feature.Generator.CreateFunctions,
       Sleeky.Feature.Generator.UpdateFunctions,
       Sleeky.Feature.Generator.Commands,
-      Sleeky.Feature.Generator.Queries
+      Sleeky.Feature.Generator.Queries,
+      Sleeky.Feature.Generator.Flows
     ]
 
   defstruct [
@@ -27,9 +28,12 @@ defmodule Sleeky.Feature do
     commands: [],
     queries: [],
     events: [],
+    flows: [],
     subscriptions: [],
     values: []
   ]
+
+  require Logger
 
   @doc """
   Executes a command and publishes events
@@ -70,7 +74,7 @@ defmodule Sleeky.Feature do
   end
 
   defp do_execute(command, params) do
-    with {:ok, params} <- command.params().validate(params),
+    with {:ok, params} <- params |> to_plain_map() |> command.params().validate(),
          {:ok, result, events} <- command.execute(params),
          :ok <- publish_events(events, command) do
       {:ok, result}
@@ -78,7 +82,7 @@ defmodule Sleeky.Feature do
   end
 
   defp do_execute(command, params, context) do
-    with {:ok, params} <- command.params().validate(params),
+    with {:ok, params} <- params |> to_plain_map() |> command.params().validate(),
          context <- Map.put(context, :params, params),
          :ok <- allow(command, context),
          {:ok, result, events} <- command.execute(params, context),
@@ -86,6 +90,10 @@ defmodule Sleeky.Feature do
       {:ok, result}
     end
   end
+
+  defp to_plain_map(data) when is_struct(data), do: Map.from_struct(data)
+  defp to_plain_map(data) when is_map(data), do: data
+  defp to_plain_map(data) when is_list(data), do: Map.new(data)
 
   defp allow(command, context) do
     if command.allowed?(context) do
@@ -108,9 +116,16 @@ defmodule Sleeky.Feature do
   end
 
   defp jobs(event, app) do
-    app.features()
-    |> Enum.flat_map(& &1.subscriptions())
-    |> Enum.filter(&(&1.event() == event.__struct__))
-    |> Enum.map(&[event: event.__struct__, params: Jason.encode!(event), subscription: &1])
+    jobs =
+      app.features()
+      |> Enum.flat_map(& &1.subscriptions())
+      |> Enum.filter(&(&1.event() == event.__struct__))
+      |> Enum.map(&[event: event.__struct__, params: Jason.encode!(event), subscription: &1])
+
+    if jobs == [] do
+      Logger.warning("No subscriptions found for event", event: event.__struct__)
+    end
+
+    jobs
   end
 end

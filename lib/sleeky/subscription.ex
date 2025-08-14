@@ -12,12 +12,12 @@ defmodule Sleeky.Subscription do
       Sleeky.Subscription.Generator.Execute
     ]
 
-  defstruct [:name, :feature, :event, :command]
+  defstruct [:name, :feature, :event, :action]
 
   def execute(subscription, params) do
     params = Map.from_struct(params)
     feature = subscription.feature()
-    fun = subscription.command().fun_name()
+    fun = subscription.action().fun_name()
 
     apply(feature, fun, [params])
   end

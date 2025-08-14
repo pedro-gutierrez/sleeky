@@ -6,7 +6,7 @@ defmodule Sleeky.Subscription.Generator.Metadata do
   def generate(subscription, _opts) do
     quote do
       def event, do: unquote(subscription.event)
-      def command, do: unquote(subscription.command)
+      def action, do: unquote(subscription.action)
       def feature, do: unquote(subscription.feature)
       def name, do: unquote(subscription.name)
     end

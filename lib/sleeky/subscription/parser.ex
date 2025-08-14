@@ -6,25 +6,19 @@ defmodule Sleeky.Subscription.Parser do
 
   import Sleeky.Feature.Naming
 
-  def parse({:subscription, attrs, children}, opts) do
+  def parse({:subscription, attrs, _children}, opts) do
     name = Keyword.fetch!(opts, :caller_module)
     caller = Keyword.fetch!(opts, :caller_module)
     feature = feature_module(caller)
 
-    event = Keyword.fetch!(attrs, :to)
-
-    commands =
-      for {:command, _, [command]} <- children do
-        command
-      end
-
-    command = commands |> List.flatten() |> List.first()
+    event = Keyword.fetch!(attrs, :on)
+    action = Keyword.get(attrs, :perform)
 
     %Subscription{
       name: name,
       feature: feature,
       event: event,
-      command: command
+      action: action
     }
   end
 end

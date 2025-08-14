@@ -129,9 +129,9 @@ defmodule Sleeky.DataCase do
 
       defp to_sql(query), do: to_sql(query, @repo)
 
-      defp assert_job_success do
+      defp assert_job_success(count \\ 1) do
         assert_enqueued(worker: Sleeky.Job)
-        assert %{success: 1, failure: 0} = Oban.drain_queue(queue: :default)
+        assert %{success: ^count} = Oban.drain_queue(queue: :default)
       end
     end
   end

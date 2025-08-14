@@ -16,7 +16,6 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
       action_fun_name = String.to_atom("create_#{model_name}")
       do_action_fun_name = String.to_atom("do_create_#{model_name}")
       children_action_fun_name = String.to_atom("create_#{model_name}_children")
-      # tasks = for task <- action.tasks, do: {task.module, task.if}
 
       fun_with_map_args =
         quote do
@@ -28,8 +27,6 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
             repo.transaction(fn ->
               with {:ok, model} <- unquote(do_action_fun_name)(attrs, context),
                    :ok <- unquote(children_action_fun_name)(model, attrs, context) do
-                # tasks <- tasks_to_execute(unquote(tasks), model, context),
-                # :ok <- Sleeky.Job.schedule_all(model, :create, tasks) do
                 model
               else
                 {:error, reason} ->

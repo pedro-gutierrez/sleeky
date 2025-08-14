@@ -5,6 +5,7 @@ defmodule Blogs.Accounts do
   feature do
     models do
       Blogs.Accounts.User
+      Blogs.Accounts.Onboarding
     end
 
     commands do
@@ -25,6 +26,10 @@ defmodule Blogs.Accounts do
     events do
       Blogs.Accounts.Events.UserRegistered
       Blogs.Accounts.Events.PasswordRemindedSent
+    end
+
+    flows do
+      Blogs.Accounts.Flows.Onboarding
     end
 
     subscriptions do

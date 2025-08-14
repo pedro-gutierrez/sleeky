@@ -4,6 +4,23 @@ defmodule Sleeky.ValueTest do
 
   alias Blogs.Accounts.Values.UserId
 
+  describe "values" do
+    test "don't have an id" do
+      value = %UserId{user_id: "123"}
+      refute Map.has_key?(value, :id)
+    end
+
+    test "can be encoded as json" do
+      value = %UserId{user_id: "123"}
+      assert %{"user_id" => "123"} == value |> Jason.encode!() |> Jason.decode!()
+    end
+
+    test "can be decoded from json" do
+      assert {:ok, value} = UserId.decode("{ \"user_id\": \"123\"}")
+      assert value == %UserId{user_id: "123"}
+    end
+  end
+
   describe "validate/1" do
     test "validates a value" do
       params = %{"user_id" => "123"}

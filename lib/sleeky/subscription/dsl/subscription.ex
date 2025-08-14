@@ -3,7 +3,7 @@ defmodule Sleeky.Subscription.Dsl.Subscription do
   use Diesel.Tag
 
   tag do
-    attribute :to, kind: :module, required: true
-    child :command, min: 1, max: 1
+    attribute :on, kind: :module, required: true
+    attribute :perform, kind: :module, required: true
   end
 end

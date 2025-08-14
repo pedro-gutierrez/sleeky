@@ -1,12 +1,9 @@
 defmodule Blogs.Accounts.Subscriptions.RegisteredUsers do
   @moduledoc false
-
   use Sleeky.Subscription
 
-  alias Blogs.Accounts.Events.UserRegistered
-  alias Blogs.Accounts.Commands.RemindPassword
-
-  subscription to: UserRegistered do
-    command RemindPassword
-  end
+  subscription(
+    on: Blogs.Accounts.Events.UserRegistered,
+    perform: Blogs.Accounts.Flows.Onboarding
+  )
 end

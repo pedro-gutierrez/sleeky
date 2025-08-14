@@ -10,6 +10,8 @@ defmodule Sleeky.Feature.Dsl do
       Sleeky.Feature.Dsl.Queries,
       Sleeky.Feature.Dsl.Scopes,
       Sleeky.Feature.Dsl.Events,
-      Sleeky.Feature.Dsl.Subscriptions
+      Sleeky.Feature.Dsl.Subscriptions,
+      Sleeky.Feature.Dsl.Flows,
+      Sleeky.Feature.Dsl.Mappings
     ]
 end

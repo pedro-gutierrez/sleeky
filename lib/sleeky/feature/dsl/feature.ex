@@ -11,5 +11,6 @@ defmodule Sleeky.Feature.Dsl.Feature do
     child :events, min: 0, max: 1
     child :subscriptions, min: 0, max: 1
     child :mappings, min: 0, max: 1
+    child :flows, min: 0, max: 1
   end
 end

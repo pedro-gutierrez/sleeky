@@ -4,7 +4,7 @@ defmodule Sleeky.Job do
   """
   use Oban.Worker, queue: :default, max_attempts: 3
 
-  alias Sleeky.Job.Worker
+  alias Sleeky.Error
 
   require Logger
 
@@ -22,49 +22,56 @@ defmodule Sleeky.Job do
 
     with {:ok, event} <- event.decode(params),
          {:ok, _} <- subscription.execute(event) do
-      handle_success(subscription)
+      handle_success(subscription: subscription)
       :ok
     else
-      {:error, reason} -> handle_error(reason, event, subscription, job)
+      {:error, reason} ->
+        handle_error(job, reason, event: event, subscription: subscription)
     end
   rescue
     e ->
       reason = Exception.format(:error, e, __STACKTRACE__)
-      handle_error(reason, event, subscription, job)
+      handle_error(job, reason, event: event, subscription: subscription)
   end
 
-  defp handle_error(reason, event, subscription, job) do
+  def perform(%{
+        args: %{"command" => step, "params" => params, "flow" => flow} = job
+      }) do
+    flow = Module.concat([flow])
+    step = Module.concat([step])
+
+    IO.inspect(command: flow, step: step, params: params)
+    handle_success(flow: flow)
+    :ok
+
+    # with {:ok, params} <- flow.decode(params),
+    #      {:ok, _} <- step.execute(step) do
+    #   handle_success(flow)
+    #   :ok
+    # else
+    #   {:error, reason} -> handle_error(reason, step, flow, job)
+    # end
+  rescue
+    e ->
+      reason = Exception.format(:error, e, __STACKTRACE__)
+      handle_error(job, reason, step: step, flow: flow)
+  end
+
+  defp handle_error(job, reason, meta) do
     attempts_left = job.max_attempts - job.attempt
     level = if attempts_left == 0, do: :error, else: :warning
 
-    Logger.log(level, "subscription failed",
-      event: event,
-      subscription: subscription,
-      reason: format_error(reason),
-      attempt: job.attempt,
-      attempts_left: attempts_left
-    )
+    meta =
+      Keyword.merge(meta,
+        reason: Error.format(reason),
+        attempt: job.attempt,
+        attempts_left: attempts_left
+      )
+
+    Logger.log(level, "job failed", meta)
 
     {:error, reason}
   end
 
-  defp handle_success(subscription) do
-    Logger.debug("subscription succeeded",
-      subscription: subscription
-    )
-  end
-
-  defp format_error(%Ecto.Changeset{} = changeset) do
-    changeset
-    |> Ecto.Changeset.traverse_errors(fn {message, opts} ->
-      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
-        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-      end)
-    end)
-    |> format_error()
-  end
-
-  defp format_error(error) when is_atom(error), do: to_string(error)
-  defp format_error(error) when is_binary(error), do: error
-  defp format_error(error), do: inspect(error)
+  defp handle_success(meta), do: Logger.debug("job succeeded", meta)
 end

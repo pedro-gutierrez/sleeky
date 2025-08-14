@@ -2,10 +2,27 @@ defmodule Sleeky.FeatureTest do
   use Sleeky.DataCase
 
   alias Blogs.Accounts
+  alias Blogs.Accounts.User
 
   describe "command functions" do
     test "invoke the handler if the command is allowed and schedules events" do
       params = %{email: "test@example.com", external_id: uuid(), id: uuid()}
+      context = %{current_user: %{roles: [:guest]}}
+
+      assert {:ok, _user} = Accounts.register_user(params, context)
+      assert_job_success()
+    end
+
+    test "accepts value structs as parameters" do
+      params = %User{email: "test@example.com", external_id: uuid(), id: uuid()}
+      context = %{current_user: %{roles: [:guest]}}
+
+      assert {:ok, _user} = Accounts.register_user(params, context)
+      assert_job_success()
+    end
+
+    test "accepts keyword lists as parameters" do
+      params = [email: "test@example.com", external_id: uuid(), id: uuid()]
       context = %{current_user: %{roles: [:guest]}}
 
       assert {:ok, _user} = Accounts.register_user(params, context)

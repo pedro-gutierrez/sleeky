@@ -71,7 +71,8 @@ defmodule Sleeky.Command do
   """
   def execute(command, params, context) do
     with {:ok, result} <- execute_command(command, params, context),
-         {:ok, events} <- maybe_create_events(command.events(), result, context) do
+         {:ok, events} <-
+           maybe_create_events(command.events(), result, context) do
       {:ok, result, events}
     end
   end

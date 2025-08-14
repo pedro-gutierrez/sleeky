@@ -51,6 +51,14 @@ defmodule Sleeky.Naming do
   end
 
   @doc false
+  def module_fun_name(module) do
+    module
+    |> last_module()
+    |> Macro.underscore()
+    |> String.to_atom()
+  end
+
+  @doc false
   def feature(model) do
     model
     |> Module.split()
@@ -58,6 +66,26 @@ defmodule Sleeky.Naming do
     |> tl()
     |> Enum.reverse()
     |> Module.concat()
+  end
+
+  @doc false
+  def feature_module(caller) do
+    case caller |> Module.split() |> Enum.reverse() do
+      [_, kind | rest]
+      when kind in [
+             "Commands",
+             "Handlers",
+             "Queries",
+             "Events",
+             "Subscriptions",
+             "Mappings",
+             "Flows"
+           ] ->
+        rest |> Enum.reverse() |> Module.concat()
+
+      other ->
+        raise "Invalid module name #{inspect(caller)}: #{inspect(other)}"
+    end
   end
 
   @doc false
@@ -118,5 +146,16 @@ defmodule Sleeky.Naming do
     end
 
     ast
+  end
+
+  @doc """
+  Raises if the given module does not exist
+  """
+  def ensure_module_exists!(module) do
+    if Code.ensure_loaded?(module) do
+      module
+    else
+      raise ArgumentError, "module #{inspect(module)} does not exist"
+    end
   end
 end

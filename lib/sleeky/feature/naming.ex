@@ -4,7 +4,15 @@ defmodule Sleeky.Feature.Naming do
   def feature_module(caller) do
     case caller |> Module.split() |> Enum.reverse() do
       [_, kind | rest]
-      when kind in ["Commands", "Handlers", "Queries", "Events", "Subscriptions", "Mappings"] ->
+      when kind in [
+             "Commands",
+             "Handlers",
+             "Queries",
+             "Events",
+             "Subscriptions",
+             "Mappings",
+             "Flows"
+           ] ->
         rest |> Enum.reverse() |> Module.concat()
 
       other ->
