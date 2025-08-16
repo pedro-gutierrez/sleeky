@@ -9,4 +9,6 @@ defmodule Blogs.Accounts.Commands.RemindPassword do
   command params: UserId do
     policy role: :user, scope: SelfAndNotLocked
   end
+
+  def handle(_params, _context), do: :ok
 end

@@ -7,21 +7,5 @@ defmodule Blogs.Accounts.User do
     attribute :external_id, kind: :id
 
     unique fields: [:email]
-
-    action :create do
-      role :admin
-    end
-
-    action :read do
-      role :user, scope: :self
-    end
-
-    action :update do
-      role :user, scope: :self
-    end
-
-    action :list do
-      role :user, scope: :is_public
-    end
   end
 end

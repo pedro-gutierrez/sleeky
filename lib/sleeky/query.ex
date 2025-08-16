@@ -6,14 +6,34 @@ defmodule Sleeky.Query do
     parser: Sleeky.Query.Parser,
     generators: [
       Sleeky.Query.Generator.Scope,
-      Sleeky.Query.Generator.Metadata
+      Sleeky.Query.Generator.Metadata,
+      Sleeky.Query.Generator.Execute,
+      Sleeky.Query.Generator.Apply
     ]
 
-  defstruct [:name, :feature, :params, :model, :policies, :limit, :many, :custom]
+  alias Sleeky.QueryBuilder
+
+  defstruct [
+    :name,
+    :feature,
+    :params,
+    :sorting,
+    :model,
+    :policies,
+    :limit,
+    :many,
+    :custom,
+    :debug
+  ]
 
   defmodule Policy do
     @moduledoc false
     defstruct [:role, :scope]
+  end
+
+  defmodule Sort do
+    @moduledoc false
+    defstruct [:field, :direction]
   end
 
   import Ecto.Query
@@ -32,20 +52,18 @@ defmodule Sleeky.Query do
   @doc """
   Builds a query based on the model of the given query
 
-  The query is enhanced with filters derived from the policies and scopes of the query
+  The query is enhanced with filters derived from the policies and scopes of the query. If however the query does not define any policy, then scoping is skipped.
   """
   def scope(query, context) do
     model = query.model()
 
-    case query.feature().app().roles_from_context(context) do
-      {:ok, []} ->
-        model
-
-      {:ok, roles} ->
-        scope(model, roles, query.policies(), context)
-
-      {:error, :no_such_roles_path} ->
-        nothing(model)
+    with false <- Enum.empty?(query.policies()),
+         {:ok, [_ | _] = roles} <- query.feature().app().roles_from_context(context) do
+      scope(model, roles, query.policies(), context)
+    else
+      true -> model
+      {:ok, []} -> model
+      {:error, :no_such_roles_path} -> nothing(model)
     end
   end
 
@@ -76,6 +94,8 @@ defmodule Sleeky.Query do
   Executes the query with the given parameters and context
   """
   def execute(query, params, context) do
+    params = Map.new(params)
+
     with {:ok, params} <- query.params().validate(params),
          context <- Map.put(context, :params, params) do
       if query.custom?() do
@@ -83,6 +103,8 @@ defmodule Sleeky.Query do
       else
         context
         |> query.scope()
+        |> query.apply_filters(params)
+        |> query.apply_sorting()
         |> query.execute(params, context)
         |> execute_query(query, context)
       end
@@ -98,6 +120,7 @@ defmodule Sleeky.Query do
     else
       context
       |> query.scope()
+      |> query.apply_sorting()
       |> query.execute(context)
       |> execute_query(query, context)
     end
@@ -105,6 +128,10 @@ defmodule Sleeky.Query do
 
   defp execute_query(queriable, query, _context) do
     repo = query.feature().repo()
+
+    if query.debug?() do
+      IO.inspect(query: query, computed: queriable)
+    end
 
     if query.many?() do
       repo.all(queriable)
@@ -114,5 +141,29 @@ defmodule Sleeky.Query do
         item -> {:ok, item}
       end
     end
+  end
+
+  @doc """
+  Builds a query by taking the parameters and adding them as filters
+  """
+  def apply_filters(_query, q, params) do
+    filters =
+      for {field, value} <- Map.from_struct(params) do
+        {field, :eq, value}
+      end
+
+    Sleeky.QueryBuilder.filter(q, filters)
+  end
+
+  @doc """
+  Applies sorting to the query
+  """
+  def apply_sorting(query, q) do
+    sorting =
+      for %{field: field, direction: direction} <- query.sorting() do
+        {field, direction}
+      end
+
+    QueryBuilder.sort(q, sorting)
   end
 end

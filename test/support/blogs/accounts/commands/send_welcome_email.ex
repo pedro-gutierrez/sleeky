@@ -4,5 +4,8 @@ defmodule Blogs.Accounts.Commands.SendWelcomeEmail do
 
   alias Blogs.Accounts.Values.UserId
 
-  command(params: UserId)
+  command params: UserId do
+  end
+
+  def handle(_user, _context), do: :ok
 end

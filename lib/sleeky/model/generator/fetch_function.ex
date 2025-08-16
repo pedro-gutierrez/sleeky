@@ -39,8 +39,7 @@ defmodule Sleeky.Model.Generator.FetchFunction do
   end
 
   defp fetch_by_unique_key_functions(model) do
-    for %{name: :read} <- model.actions,
-        %{unique?: true} = key <- model.keys do
+    for %{unique?: true} = key <- model.keys do
       fun_name = String.to_atom("fetch_by_#{key.name}")
       arg_names = Enum.map(key.fields, & &1.name)
       args = Enum.map(arg_names, &var(&1))

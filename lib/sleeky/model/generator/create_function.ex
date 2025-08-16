@@ -46,13 +46,17 @@ defmodule Sleeky.Model.Generator.CreateFunction do
   end
 
   defp batch_fun(model) do
+    conflict_opts = on_conflict_opts(model) || []
+
     quote do
       def create_many(items, opts \\ []) when is_list(items) do
+        opts = Keyword.merge(unquote(conflict_opts), opts)
         now = DateTime.utc_now()
 
         items =
           for item <- items do
             item
+            |> Map.new()
             |> atom_keys()
             |> Map.put_new_lazy(:id, &Ecto.UUID.generate/0)
             |> Map.put_new(:inserted_at, now)

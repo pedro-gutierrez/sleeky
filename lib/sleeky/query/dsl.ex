@@ -4,6 +4,7 @@ defmodule Sleeky.Query.Dsl do
     otp_app: :sleeky,
     root: Sleeky.Query.Dsl.Query,
     tags: [
-      Sleeky.Query.Dsl.Policy
+      Sleeky.Query.Dsl.Policy,
+      Sleeky.Query.Dsl.Sort
     ]
 end

@@ -33,9 +33,11 @@ defmodule Sleeky.Job do
       handle_error(job, reason, event: event, subscription: subscription)
   end
 
-  def perform(%{
-        args: %{"command" => command, "params" => params, "flow" => flow, "id" => id} = job
-      }) do
+  def perform(
+        %{
+          args: %{"command" => command, "params" => params, "flow" => flow, "id" => id}
+        } = job
+      ) do
     flow = Module.concat([flow])
     command = Module.concat([command])
     feature = command.feature()
@@ -46,12 +48,10 @@ defmodule Sleeky.Job do
       handle_success(flow: flow)
     else
       {:error, reason} ->
-        IO.inspect(reason)
         handle_error(job, reason, command: command, flow: flow)
     end
   rescue
     e ->
-      IO.inspect(e)
       reason = Exception.format(:error, e, __STACKTRACE__)
       handle_error(job, reason, command: command, flow: flow)
   end

@@ -3,6 +3,6 @@ defmodule Blogs.Accounts.Values.UserEmail do
   use Sleeky.Value
 
   value do
-    field :user_email, type: :string
+    field :email, type: :string
   end
 end

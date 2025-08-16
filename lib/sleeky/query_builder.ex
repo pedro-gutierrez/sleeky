@@ -80,8 +80,14 @@ defmodule Sleeky.QueryBuilder do
     dynamic([{^binding, x}], is_nil(field(x, ^column)))
   end
 
+  defp filter({column, :eq, nil}), do: dynamic([x], is_nil(field(x, ^column)))
+
   defp filter({{binding, column}, :eq, value}) do
     dynamic([{^binding, x}], field(x, ^column) == ^value)
+  end
+
+  defp filter({column, :eq, value}) do
+    dynamic([x], field(x, ^column) == ^value)
   end
 
   defp filter({{binding, column}, :like, value}) do
@@ -90,32 +96,66 @@ defmodule Sleeky.QueryBuilder do
     dynamic([{^binding, x}], ilike(field(x, ^column), ^value))
   end
 
+  defp filter({column, :like, value}) do
+    value = "%#{value}%"
+
+    dynamic([x], ilike(field(x, ^column), ^value))
+  end
+
   defp filter({{binding, column}, :neq, nil}) do
     dynamic([{^binding, x}], not is_nil(field(x, ^column)))
+  end
+
+  defp filter({column, :neq, nil}) do
+    dynamic([x], not is_nil(field(x, ^column)))
   end
 
   defp filter({{binding, column}, :neq, value}) do
     dynamic([{^binding, x}], field(x, ^column) != ^value)
   end
 
+  defp filter({column, :neq, value}) do
+    dynamic([x], field(x, ^column) != ^value)
+  end
+
   defp filter({{binding, column}, :gt, value}) do
     dynamic([{^binding, x}], field(x, ^column) > ^value)
+  end
+
+  defp filter({column, :gt, value}) do
+    dynamic([x], field(x, ^column) > ^value)
   end
 
   defp filter({{binding, column}, :gte, value}) do
     dynamic([{^binding, x}], field(x, ^column) >= ^value)
   end
 
+  defp filter({column, :gte, value}) do
+    dynamic([x], field(x, ^column) >= ^value)
+  end
+
   defp filter({{binding, column}, :lt, value}) do
     dynamic([{^binding, x}], field(x, ^column) < ^value)
+  end
+
+  defp filter({column, :lt, value}) do
+    dynamic([x], field(x, ^column) < ^value)
   end
 
   defp filter({{binding, column}, :lte, value}) do
     dynamic([{^binding, x}], field(x, ^column) <= ^value)
   end
 
+  defp filter({column, :lte, value}) do
+    dynamic([x], field(x, ^column) <= ^value)
+  end
+
   defp filter({{binding, column}, :in, values}) when is_list(values) do
     dynamic([{^binding, x}], field(x, ^column) in ^values)
+  end
+
+  defp filter({column, :in, values}) when is_list(values) do
+    dynamic([x], field(x, ^column) in ^values)
   end
 
   @doc """
@@ -155,4 +195,22 @@ defmodule Sleeky.QueryBuilder do
 
   defp infer_op(str) when is_binary(str), do: :like
   defp infer_op(_), do: :eq
+
+  @doc """
+  Sort a query
+  """
+  def sort(query, []), do: query
+
+  def sort(query, sorts) do
+    clauses =
+      Enum.map(sorts, fn
+        {{binding, column}, direction} ->
+          {direction, dynamic([{^binding, x}], field(x, ^column))}
+
+        {column, direction} ->
+          {direction, dynamic([x], field(x, ^column))}
+      end)
+
+    order_by(query, [], ^clauses)
+  end
 end

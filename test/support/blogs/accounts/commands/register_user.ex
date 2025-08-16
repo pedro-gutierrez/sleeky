@@ -11,4 +11,7 @@ defmodule Blogs.Accounts.Commands.RegisterUser do
 
     publish(event: UserRegistered)
   end
+
+  def handle(%{email: "foo@bar.com"}, _context), do: {:error, :invalid_email}
+  def handle(user, context), do: Blogs.Accounts.create_user(user, context)
 end

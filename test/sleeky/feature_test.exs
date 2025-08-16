@@ -3,6 +3,7 @@ defmodule Sleeky.FeatureTest do
 
   alias Blogs.Accounts
   alias Blogs.Accounts.User
+  alias Blogs.Accounts.Onboarding
 
   describe "command functions" do
     test "invoke the handler if the command is allowed and schedules events" do
@@ -56,7 +57,7 @@ defmodule Sleeky.FeatureTest do
           external_id: uuid()
         )
 
-      assert [] == Accounts.get_all_users()
+      assert [] == Accounts.get_users()
     end
 
     test "applies scopes" do
@@ -77,14 +78,14 @@ defmodule Sleeky.FeatureTest do
         )
 
       context = %{current_user: %{roles: [:guest]}}
-      assert [^foo] = Accounts.get_all_users(context)
+      assert [^foo] = Accounts.get_users(context)
     end
 
     test "return validation errors on parameters" do
       params = %{}
       assert {:error, errors} = Accounts.get_user_by_email(params)
 
-      assert errors_on(errors) == %{user_email: ["can't be blank"]}
+      assert errors_on(errors) == %{email: ["can't be blank"]}
     end
 
     test "can returns a single item" do
@@ -104,23 +105,22 @@ defmodule Sleeky.FeatureTest do
           external_id: uuid()
         )
 
-      params = %{"user_email" => foo.email}
+      params = %{"email" => foo.email}
       context = %{current_user: %{roles: [:user]}}
 
       assert {:ok, ^foo} = Accounts.get_user_by_email(params, context)
     end
 
     test "returns an error if the item is not found" do
-      {:ok, _} =
-        Accounts.User.create(
-          id: uuid(),
-          email: "foo@bar",
-          public: true,
-          external_id: uuid()
-        )
-
-      params = %{"user_email" => "bar@bar"}
+      params = %{"email" => "bar@bar"}
       context = %{current_user: %{roles: [:user]}}
+
+      assert {:error, :not_found} = Accounts.get_user_by_email(params, context)
+    end
+
+    test "accept keyword lists as parameters" do
+      context = %{current_user: %{roles: [:user]}}
+      params = [email: "bar@bar"]
 
       assert {:error, :not_found} = Accounts.get_user_by_email(params, context)
     end
@@ -128,6 +128,13 @@ defmodule Sleeky.FeatureTest do
     test "can execute custom queries on read models" do
       assert [item] = Accounts.get_user_ids()
       assert item.user_id
+    end
+
+    test "sorts results" do
+      assert {:ok, o1} = Onboarding.create(id: uuid(), user_id: uuid(), steps_pending: 1)
+      assert {:ok, o2} = Onboarding.create(id: uuid(), user_id: uuid(), steps_pending: 3)
+
+      assert [^o2, ^o1] = Accounts.get_onboardings()
     end
   end
 end

@@ -29,15 +29,6 @@ defmodule Sleeky.Command.Parser do
         {policy.role, policy}
       end
 
-    handler =
-      caller
-      |> Module.split()
-      |> Enum.map(fn
-        "Commands" -> "Handlers"
-        part -> part
-      end)
-      |> Module.concat()
-
     events =
       for {:publish, attrs, _} <- children do
         module = Keyword.fetch!(attrs, :event)
@@ -67,7 +58,6 @@ defmodule Sleeky.Command.Parser do
       returns: returns,
       policies: policies,
       atomic?: atomic?,
-      handler: handler,
       events: events
     }
   end

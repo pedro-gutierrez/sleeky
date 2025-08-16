@@ -6,4 +6,6 @@ defmodule Blogs.Accounts.Commands.EnableUser do
 
   command params: UserId do
   end
+
+  def handle(_user, _context), do: :ok
 end

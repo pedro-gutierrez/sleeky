@@ -17,7 +17,8 @@ defmodule Blogs.Accounts do
     end
 
     queries do
-      Blogs.Accounts.Queries.GetAllUsers
+      Blogs.Accounts.Queries.GetOnboardings
+      Blogs.Accounts.Queries.GetUsers
       Blogs.Accounts.Queries.GetUserByEmail
       Blogs.Accounts.Queries.GetUserIds
     end

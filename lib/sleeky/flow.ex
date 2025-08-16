@@ -35,6 +35,9 @@ defmodule Sleeky.Flow do
       |> Sleeky.Job.schedule_all()
 
       {:ok, model}
+    else
+      {:error, _} = error -> error
+      other -> {:error, {:invalid_result, other}}
     end
   end
 

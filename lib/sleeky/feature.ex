@@ -87,7 +87,7 @@ defmodule Sleeky.Feature do
   defp do_execute(command, params) do
     with {:ok, params} <- params |> to_plain_map() |> command.params().validate(),
          {:ok, result, events} <- command.execute(params),
-         :ok <- publish_events(events, command) do
+         :ok <- publish_events(events, command.feature()) do
       {:ok, result}
     end
   end

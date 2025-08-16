@@ -78,7 +78,7 @@ defmodule Sleeky.Command do
   end
 
   defp execute_command(command, params, context) do
-    with :ok <- command.handler().execute(params, context) do
+    with :ok <- command.handle(params, context) do
       {:ok, params}
     end
   end

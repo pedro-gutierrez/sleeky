@@ -5,4 +5,6 @@ defmodule Blogs.Accounts.Commands.RequestFeedback do
 
   command params: UserId do
   end
+
+  def handle(_user, _context), do: :ok
 end

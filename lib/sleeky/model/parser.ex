@@ -180,7 +180,7 @@ defmodule Sleeky.Model.Parser do
         name = field_names |> Enum.join("_") |> String.to_atom()
 
         on_conflict =
-          with %OnConflict{} = on_conflict <- on_conflict(opts) do
+          with %OnConflict{} = on_conflict <- on_conflict(opts, field_names) do
             %{on_conflict | fields: fields}
           end
 
@@ -258,9 +258,9 @@ defmodule Sleeky.Model.Parser do
 
   defp action_tasks(_), do: nil
 
-  defp on_conflict([{:on_conflict, opts, _}]) do
-    strategy = Keyword.fetch!(opts, :name)
-    except = Keyword.get(opts, :except, [:id])
+  defp on_conflict([{:on_conflict, opts, _}], field_names) do
+    strategy = Keyword.fetch!(opts, :strategy)
+    except = opts[:except] || [:id | field_names]
 
     %OnConflict{
       strategy: strategy,
@@ -268,7 +268,7 @@ defmodule Sleeky.Model.Parser do
     }
   end
 
-  defp on_conflict(_), do: nil
+  defp on_conflict(_, _), do: nil
 
   defp scope(name) when is_atom(name), do: name
   defp scope(scopes) when is_list(scopes), do: Enum.map(scopes, &scope/1)

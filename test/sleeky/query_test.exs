@@ -1,16 +1,27 @@
 defmodule Sleeky.QueryTest do
   use Sleeky.DataCase
 
+  alias Blogs.Accounts.Onboarding
+
   alias Blogs.Accounts.Queries.{
-    GetAllUsers,
+    GetOnboardings,
+    GetUsers,
     GetUserByEmail,
     GetUserIds
   }
 
   describe "scope/1" do
+    test "does not scope the query, if no policies are defined" do
+      context = %{}
+      query = GetOnboardings.scope(context)
+      sql = to_sql(query)
+
+      refute sql =~ "WHERE (FALSE)"
+    end
+
     test "returns nothing, if the context does not have the expected roles path" do
       context = %{}
-      query = GetAllUsers.scope(context)
+      query = GetUsers.scope(context)
       sql = to_sql(query)
 
       assert sql =~ "WHERE (FALSE)"
@@ -18,7 +29,7 @@ defmodule Sleeky.QueryTest do
 
     test "returns the original query, if no roles are defined in the context" do
       context = %{current_user: %{roles: []}}
-      query = GetAllUsers.scope(context)
+      query = GetUsers.scope(context)
       sql = to_sql(query)
 
       refute sql =~ "WHERE"
@@ -26,7 +37,7 @@ defmodule Sleeky.QueryTest do
 
     test "returns nothing if roles are found in the context, but none match any of the policies" do
       context = %{current_user: %{roles: [:foo]}}
-      query = GetAllUsers.scope(context)
+      query = GetUsers.scope(context)
       sql = to_sql(query)
 
       assert sql =~ "WHERE (FALSE)"
@@ -42,7 +53,7 @@ defmodule Sleeky.QueryTest do
 
     test "applies extra filters to queries according to scopes" do
       context = %{current_user: %{roles: [:guest]}}
-      query = GetAllUsers.scope(context)
+      query = GetUsers.scope(context)
       sql = to_sql(query)
 
       assert sql =~ "WHERE (u0.\"public\" = $1)"

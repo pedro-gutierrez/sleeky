@@ -4,6 +4,7 @@ defmodule Sleeky.Query.Parser do
 
   alias Sleeky.Query
   alias Sleeky.Query.Policy
+  alias Sleeky.Query.Sort
 
   import Sleeky.Feature.Naming
 
@@ -16,6 +17,7 @@ defmodule Sleeky.Query.Parser do
     model = Keyword.fetch!(attrs, :returns)
     limit = Keyword.get(attrs, :limit)
     many = Keyword.get(attrs, :many, false)
+    debug = Keyword.get(attrs, :debug, false)
     custom = Keyword.get(attrs, :custom, false)
 
     policies =
@@ -31,15 +33,25 @@ defmodule Sleeky.Query.Parser do
         {policy.role, policy}
       end
 
+    sorting =
+      for {:sort, opts, _} <- children do
+        field = Keyword.fetch!(opts, :by)
+        direction = opts[:direction] || :asc
+
+        %Sort{field: field, direction: direction}
+      end
+
     %Query{
       name: name,
+      debug: debug,
       feature: feature,
       params: params,
       model: model,
       policies: policies,
       limit: limit,
       many: many,
-      custom: custom
+      custom: custom,
+      sorting: sorting
     }
   end
 end

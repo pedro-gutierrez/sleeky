@@ -6,7 +6,7 @@ defmodule Blogs.Publishing.Theme do
     attribute :name, kind: :string, in: ["science", "finance"]
 
     unique fields: [:name] do
-      on_conflict :merge, except: [:id]
+      on_conflict strategy: :merge
     end
 
     action :create do

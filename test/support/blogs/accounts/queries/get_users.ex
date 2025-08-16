@@ -1,4 +1,4 @@
-defmodule Blogs.Accounts.Queries.GetAllUsers do
+defmodule Blogs.Accounts.Queries.GetUsers do
   @moduledoc false
   use Sleeky.Query
 
@@ -7,9 +7,5 @@ defmodule Blogs.Accounts.Queries.GetAllUsers do
 
   query returns: User, many: true do
     policy role: :guest, scope: IsPublic
-  end
-
-  def execute(q, _context) do
-    q
   end
 end
