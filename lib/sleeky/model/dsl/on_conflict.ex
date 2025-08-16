@@ -4,7 +4,7 @@ defmodule Sleeky.Model.Dsl.OnConflict do
   use Diesel.Tag
 
   tag do
-    attribute :name, kind: :atom, in: [:merge, :ignore, :raise], required: true
-    attribute :except, kind: :atoms, required: false, default: [:id]
+    attribute :strategy, kind: :atom, in: [:merge, :ignore, :raise], required: true
+    attribute :except, kind: :atoms, required: false
   end
 end

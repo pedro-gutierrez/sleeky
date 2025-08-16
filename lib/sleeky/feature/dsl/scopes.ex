@@ -3,6 +3,6 @@ defmodule Sleeky.Feature.Dsl.Scopes do
   use Diesel.Tag
 
   tag do
-    child kind: :module, min: 1, max: 1
+    child kind: :module, min: 1
   end
 end

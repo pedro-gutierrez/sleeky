@@ -9,6 +9,7 @@ defmodule Sleeky.Model do
       Sleeky.Model.Generator.Metadata,
       Sleeky.Model.Generator.Cast,
       Sleeky.Model.Generator.EctoSchema,
+      Sleeky.Model.Generator.Validate,
       Sleeky.Model.Generator.Helpers,
       Sleeky.Model.Generator.FieldNames,
       Sleeky.Model.Generator.Changesets,

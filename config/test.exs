@@ -18,3 +18,9 @@ config :sleeky, Sleeky,
   app: Blogs.App
 
 config :sleeky, Blogs.Endpoint, port: 80
+
+config :sleeky, Oban,
+  testing: :manual,
+  engine: Oban.Engines.Basic,
+  queues: [default: 1],
+  repo: Blogs.Repo

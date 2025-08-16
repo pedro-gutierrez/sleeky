@@ -6,9 +6,13 @@ defmodule Sleeky do
   """
 
   @dsls [
-    Sleeky.Scopes.Dsl,
     Sleeky.Feature.Dsl,
+    Sleeky.Command.Dsl,
     Sleeky.Model.Dsl,
+    Sleeky.Query.Dsl,
+    Sleeky.Value.Dsl,
+    Sleeky.Mapping.Dsl,
+    Sleeky.Event.Dsl,
     Sleeky.Api.Dsl,
     Sleeky.Endpoint.Dsl,
     Sleeky.Ui.Dsl,

@@ -6,8 +6,9 @@ defmodule Sleeky.App do
     parser: Sleeky.App.Parser,
     generators: [
       Sleeky.App.Generator.Migrate,
-      Sleeky.App.Generator.Application
+      Sleeky.App.Generator.Application,
+      Sleeky.App.Generator.Roles
     ]
 
-  defstruct [:name, :module, :repos, :endpoints, :features]
+  defstruct [:name, :roles, :module, :repos, :endpoints, :features]
 end

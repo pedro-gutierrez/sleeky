@@ -5,8 +5,14 @@ defmodule Sleeky.App.Parser do
   alias Sleeky.App
 
   @impl true
-  def parse({:app, _, children}, opts) do
+  def parse({:app, attrs, children}, opts) do
     caller_module = Keyword.fetch!(opts, :caller_module)
+
+    roles =
+      attrs
+      |> Keyword.fetch!(:roles)
+      |> String.split(".")
+      |> Enum.map(&String.to_atom/1)
 
     repos = for {:repos, _, repos} <- children, do: repos
     endpoints = for {:endpoints, _, endpoints} <- children, do: endpoints
@@ -23,6 +29,7 @@ defmodule Sleeky.App.Parser do
 
     %App{
       name: name,
+      roles: roles,
       module: caller_module,
       repos: repos,
       endpoints: endpoints,

@@ -1,111 +1,76 @@
 defmodule Sleeky.Job do
   @moduledoc """
-  Generates function to schedule background jobs on different model actions
+  Generates function to schedule background jobs
   """
   use Oban.Worker, queue: :default, max_attempts: 3
 
-  alias Sleeky.Job.Worker
-
-  def schedule_all(_model, _action, []), do: :ok
-
-  def schedule_all(model, action, jobs) do
-    with [_ | _] <-
-           jobs
-           |> Enum.map(
-             &new(%{
-               model: model.__struct__,
-               id: model.id,
-               action: action,
-               task: &1,
-               atomic: false
-             })
-           )
-           |> Oban.insert_all(),
-         do: :ok
-  end
+  alias Sleeky.Error
 
   require Logger
 
+  def schedule_all(jobs) do
+    jobs = jobs |> Enum.map(&(&1 |> Map.new() |> new()))
+    with [_ | _] <- Oban.insert_all(jobs), do: :ok
+  end
+
   @impl Oban.Worker
   def perform(
-        %Oban.Job{args: %{"model" => model, "id" => id, "task" => task, "atomic" => atomic}} = job
+        %{args: %{"event" => event, "params" => params, "subscription" => subscription}} = job
       ) do
-    model = Module.concat([model])
-    task = Module.concat([task])
+    subscription = Module.concat([subscription])
+    event = Module.concat([event])
 
-    with {:ok, record} <- model.fetch(id, preload: model.parent_field_names()),
-         :ok <- do_perform(record, task, atomic) do
-      log_success(job, model, id, task)
-
-      :ok
+    with {:ok, event} <- event.decode(params),
+         {:ok, _} <- subscription.execute(event) do
+      handle_success(subscription: subscription)
     else
       {:error, reason} ->
-        log_error(job, model, id, task, reason)
-
-        {:error, reason}
+        handle_error(job, reason, event: event, subscription: subscription)
     end
   rescue
     e ->
       reason = Exception.format(:error, e, __STACKTRACE__)
-      log_error(job, model, id, task, reason)
-
-      {:error, reason}
+      handle_error(job, reason, event: event, subscription: subscription)
   end
 
-  defp do_perform(%{__struct__: model} = record, task, true) do
-    repo = model.repo()
+  def perform(
+        %{
+          args: %{"command" => command, "params" => params, "flow" => flow, "id" => id}
+        } = job
+      ) do
+    flow = Module.concat([flow])
+    command = Module.concat([command])
+    feature = command.feature()
 
-    with {:ok, :ok} <-
-           repo.transaction(fn ->
-             with {:error, reason} <- do_perform(record, task) do
-               repo.rollback(reason)
-             end
-           end),
-         do: :ok
-  end
-
-  defp do_perform(record, task, false), do: do_perform(record, task)
-
-  defp do_perform(record, task) do
-    case task.execute(record) do
-      {:error, _} = error -> error
-      _ -> :ok
+    with {:ok, params} <- Jason.decode(params),
+         {:ok, _} <- apply(feature, command.fun_name(), [params]),
+         :ok <- flow.step_completed(id, command) do
+      handle_success(flow: flow)
+    else
+      {:error, reason} ->
+        handle_error(job, reason, command: command, flow: flow)
     end
+  rescue
+    e ->
+      reason = Exception.format(:error, e, __STACKTRACE__)
+      handle_error(job, reason, command: command, flow: flow)
   end
 
-  defp log_error(job, model, id, task, reason) do
+  defp handle_error(job, reason, meta) do
     attempts_left = job.max_attempts - job.attempt
     level = if attempts_left == 0, do: :error, else: :warning
 
-    Logger.log(level, "task failed",
-      task: task,
-      model: model,
-      id: id,
-      queue: job.queue,
-      job: job.id,
-      reason: format_error(reason),
-      attempt: job.attempt,
-      attempts_left: attempts_left
-    )
+    meta =
+      Keyword.merge(meta,
+        reason: Error.format(reason),
+        attempt: job.attempt,
+        attempts_left: attempts_left
+      )
+
+    Logger.log(level, "job failed", meta)
+
+    {:error, reason}
   end
 
-  defp log_success(_job, _model, _id, task) do
-    Logger.debug("task succeeded",
-      task: task
-    )
-  end
-
-  defp format_error(%Ecto.Changeset{} = changeset) do
-    changeset
-    |> Ecto.Changeset.traverse_errors(fn {message, opts} ->
-      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
-        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-      end)
-    end)
-    |> format_error()
-  end
-
-  defp format_error(error) when is_atom(error), do: to_string(error)
-  defp format_error(error) when is_binary(error), do: error
-  defp format_error(error), do: inspect(error)
+  defp handle_success(meta), do: Logger.debug("job succeeded", meta)
 end

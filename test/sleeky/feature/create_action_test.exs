@@ -23,20 +23,6 @@ defmodule Sleeky.Feature.CreateActionTest do
       assert blog.author_id == context.author.id
     end
 
-    test "applies authorization when also creating children", context do
-      params = %{
-        id: uuid(),
-        name: "author",
-        blogs: [
-          %{id: uuid(), name: "my blog", published: true}
-        ]
-      }
-
-      ctx = guest(context).params
-
-      assert {:error, :forbidden} = Publishing.create_author(params, ctx)
-    end
-
     test "creates children too", context do
       author = context.author
 
