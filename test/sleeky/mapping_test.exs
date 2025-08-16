@@ -21,6 +21,25 @@ defmodule Sleeky.MappingTest do
       assert result.registered_at == data["inserted_at"]
     end
 
+    test "maps lists of values" do
+      now = DateTime.utc_now()
+
+      item = %{
+        "id" => Ecto.UUID.generate(),
+        "inserted_at" => now
+      }
+
+      assert {:ok, events} = UserRegisteredFromUser.map([item, item])
+      assert is_list(events)
+      assert length(events) == 2
+
+      assert Enum.all?(events, fn event ->
+               assert %UserRegistered{} = event
+               assert event.user_id
+               assert event.registered_at
+             end)
+    end
+
     test "handles atom keys in source data" do
       now = DateTime.utc_now()
 

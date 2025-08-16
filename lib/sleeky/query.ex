@@ -99,14 +99,16 @@ defmodule Sleeky.Query do
     with {:ok, params} <- query.params().validate(params),
          context <- Map.put(context, :params, params) do
       if query.custom?() do
-        query.execute(params, context)
+        params
+        |> query.execute(context)
+        |> maybe_map_result(query)
       else
         context
         |> query.scope()
         |> query.apply_filters(params)
         |> query.apply_sorting()
         |> query.execute(params, context)
-        |> execute_query(query, context)
+        |> call_repo(query, context)
       end
     end
   end
@@ -116,17 +118,19 @@ defmodule Sleeky.Query do
   """
   def execute(query, context) do
     if query.custom?() do
-      query.execute(context)
+      context
+      |> query.execute()
+      |> maybe_map_result(query)
     else
       context
       |> query.scope()
       |> query.apply_sorting()
       |> query.execute(context)
-      |> execute_query(query, context)
+      |> call_repo(query, context)
     end
   end
 
-  defp execute_query(queriable, query, _context) do
+  defp call_repo(queriable, query, _context) do
     repo = query.feature().repo()
 
     if query.debug?() do
@@ -134,13 +138,26 @@ defmodule Sleeky.Query do
     end
 
     if query.many?() do
-      repo.all(queriable)
+      queriable |> repo.all()
     else
       case repo.one(queriable) do
         nil -> {:error, :not_found}
         item -> {:ok, item}
       end
     end
+  end
+
+  defp maybe_map_result(item, query) do
+    case query.model() do
+      nil -> item
+      model -> map_result(item, query, model)
+    end
+  end
+
+  defp map_result(item, query, model) do
+    mapping = query.feature().mapping!(Map, model)
+
+    mapping.map(item)
   end
 
   @doc """

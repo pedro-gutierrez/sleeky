@@ -23,13 +23,32 @@ defmodule Sleeky.Mapping do
 
   @doc """
   Applies the mapping to the given data
+
+  Works on single items and lists too
   """
   def map(mapping, data) do
     target_module = mapping.to()
+    fields = mapping.fields()
 
-    mapping.fields()
+    map(data, fields, target_module)
+  end
+
+  defp map(items, fields, target_module) when is_list(items) do
+    with items when is_list(items) <-
+           items
+           |> Enum.reduce_while([], fn item, acc ->
+             case map(item, fields, target_module) do
+               {:ok, result} -> {:cont, [result | acc]}
+               {:error, _} = error -> {:halt, error}
+             end
+           end),
+         do: Enum.reverse(items)
+  end
+
+  defp map(item, fields, target_module) do
+    fields
     |> Enum.reduce(%{}, fn field, acc ->
-      value = Evaluate.evaluate(data, field.expression)
+      value = Evaluate.evaluate(item, field.expression)
       Map.put(acc, field.name, value)
     end)
     |> target_module.new()

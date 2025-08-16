@@ -4,6 +4,7 @@ defmodule Sleeky.FeatureTest do
   alias Blogs.Accounts
   alias Blogs.Accounts.User
   alias Blogs.Accounts.Onboarding
+  alias Blogs.Accounts.Values.UserId
 
   describe "command functions" do
     test "invoke the handler if the command is allowed and schedules events" do
@@ -127,6 +128,9 @@ defmodule Sleeky.FeatureTest do
 
     test "can execute custom queries on read models" do
       assert [item] = Accounts.get_user_ids()
+
+      assert is_struct(item)
+      assert item.__struct__ == UserId
       assert item.user_id
     end
 

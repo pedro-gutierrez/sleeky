@@ -45,6 +45,7 @@ defmodule Blogs.Accounts do
     mappings do
       Blogs.Accounts.Mappings.UserRegisteredFromUser
       Blogs.Accounts.Mappings.UserOnboardedFromOnboarding
+      Blogs.Accounts.Mappings.UserIdFromMap
     end
   end
 end
