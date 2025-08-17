@@ -37,6 +37,17 @@ defmodule Sleeky.QueryBuilderTest do
                " WHERE (((p0.\"published\" = $1) AND (p0.\"locked\" = $2)) AND (p0.\"deleted\" = $3))"
   end
 
+  test "translates filters on lists into the in operator" do
+    sql =
+      @query
+      |> QueryBuilder.filter([
+        {{:post, :published}, :eq, [true, false]}
+      ])
+      |> to_sql()
+
+    assert sql =~ " WHERE (p0.\"published\" = ANY($1)"
+  end
+
   test "supports soring" do
     sql =
       @query

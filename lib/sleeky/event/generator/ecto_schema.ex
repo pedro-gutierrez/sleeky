@@ -10,8 +10,14 @@ defmodule Sleeky.Event.Generator.EctoSchema do
       for field <- event.fields do
         ecto_type = map_type(field.type)
 
-        quote do
-          Ecto.Schema.field(unquote(field.name), unquote(ecto_type))
+        if field.many do
+          quote do
+            Ecto.Schema.field(unquote(field.name), {:array, unquote(ecto_type)})
+          end
+        else
+          quote do
+            Ecto.Schema.field(unquote(field.name), unquote(ecto_type))
+          end
         end
       end
 

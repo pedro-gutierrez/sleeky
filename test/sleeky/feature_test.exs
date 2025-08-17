@@ -2,17 +2,34 @@ defmodule Sleeky.FeatureTest do
   use Sleeky.DataCase
 
   alias Blogs.Accounts
-  alias Blogs.Accounts.User
+  alias Blogs.Accounts.Events.UserRegistered
   alias Blogs.Accounts.Onboarding
+  alias Blogs.Accounts.User
   alias Blogs.Accounts.Values.UserId
 
   describe "command functions" do
-    test "invoke the handler if the command is allowed and schedules events" do
+    test "invoke the handler if the command is allowed" do
       params = %{email: "test@example.com", external_id: uuid(), id: uuid()}
       context = %{current_user: %{roles: [:guest]}}
 
       assert {:ok, _user} = Accounts.register_user(params, context)
-      assert_job_success()
+      refute_event_published(UserRegistered)
+    end
+
+    test "publishes events if explicit conditions are matched" do
+      params = %{email: "test@gmail.com", external_id: uuid(), id: uuid()}
+      context = %{current_user: %{roles: [:guest]}}
+
+      assert {:ok, _user} = Accounts.register_user(params, context)
+      assert_event_published(UserRegistered)
+    end
+
+    test "does not publish events if explicit conditions are matched" do
+      params = %{email: "fake@gmail.com", external_id: uuid(), id: uuid()}
+      context = %{current_user: %{roles: [:guest]}}
+
+      assert {:ok, _user} = Accounts.register_user(params, context)
+      refute_event_published(UserRegistered)
     end
 
     test "accepts value structs as parameters" do
@@ -20,7 +37,7 @@ defmodule Sleeky.FeatureTest do
       context = %{current_user: %{roles: [:guest]}}
 
       assert {:ok, _user} = Accounts.register_user(params, context)
-      assert_job_success()
+      refute_event_published(UserRegistered)
     end
 
     test "accepts keyword lists as parameters" do
@@ -28,7 +45,7 @@ defmodule Sleeky.FeatureTest do
       context = %{current_user: %{roles: [:guest]}}
 
       assert {:ok, _user} = Accounts.register_user(params, context)
-      assert_job_success()
+      refute_event_published(UserRegistered)
     end
 
     test "do not call the handler if the command is not allowed" do
@@ -37,6 +54,8 @@ defmodule Sleeky.FeatureTest do
 
       assert {:error, :unauthorized} == Accounts.register_user(params, context)
       assert 0 == Blogs.Repo.aggregate(Accounts.User, :count)
+
+      refute_event_published(UserRegistered)
     end
 
     test "rollbacks the transaction if the handler fails" do
@@ -45,6 +64,8 @@ defmodule Sleeky.FeatureTest do
 
       assert {:error, :invalid_email} = Accounts.register_user(params, context)
       assert 0 == Blogs.Repo.aggregate(Accounts.User, :count)
+
+      refute_event_published(UserRegistered)
     end
   end
 
@@ -139,6 +160,30 @@ defmodule Sleeky.FeatureTest do
       assert {:ok, o2} = Onboarding.create(id: uuid(), user_id: uuid(), steps_pending: 3)
 
       assert [^o2, ^o1] = Accounts.get_onboardings()
+    end
+
+    test "support lists of strings as parameters" do
+      {:ok, _} =
+        Accounts.User.create(
+          id: uuid(),
+          email: "foo@bar",
+          public: true,
+          external_id: uuid()
+        )
+
+      {:ok, _} =
+        Accounts.User.create(
+          id: uuid(),
+          email: "bar@bar",
+          public: false,
+          external_id: uuid()
+        )
+
+      context = %{current_user: %{roles: [:user]}}
+      params = [emails: ["foo@bar", "bar@bar"]]
+
+      assert users = Accounts.get_users_by_emails(params, context)
+      assert length(users) == 2
     end
   end
 end

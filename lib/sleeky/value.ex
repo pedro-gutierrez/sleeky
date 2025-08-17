@@ -13,7 +13,7 @@ defmodule Sleeky.Value do
 
   defmodule Field do
     @moduledoc false
-    defstruct [:name, :type, :required, :default, :allowed_values]
+    defstruct [:name, :type, :many, :required, :default, :allowed_values]
   end
 
   defstruct [:fields]
@@ -30,8 +30,14 @@ defmodule Sleeky.Value do
       for field <- value.fields do
         ecto_type = map_type(field.type)
 
-        quote do
-          Ecto.Schema.field(unquote(field.name), unquote(ecto_type))
+        if field.many do
+          quote do
+            Ecto.Schema.field(unquote(field.name), {:array, unquote(ecto_type)})
+          end
+        else
+          quote do
+            Ecto.Schema.field(unquote(field.name), unquote(ecto_type))
+          end
         end
       end
 

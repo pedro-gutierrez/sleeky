@@ -129,6 +129,14 @@ defmodule Sleeky.DataCase do
 
       defp to_sql(query), do: to_sql(query, @repo)
 
+      def assert_event_published(event) do
+        assert_enqueued(worker: Sleeky.Job, args: %{event: event})
+      end
+
+      def refute_event_published(event) do
+        refute_enqueued(worker: Sleeky.Job, args: %{event: event})
+      end
+
       defp assert_job_success(count \\ 1) do
         assert_enqueued(worker: Sleeky.Job)
         assert %{success: ^count} = Oban.drain_queue(queue: :default)

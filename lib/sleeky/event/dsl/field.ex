@@ -23,5 +23,6 @@ defmodule Sleeky.Event.Dsl.Field do
     attribute :required, kind: :boolean, required: false, default: true
     attribute :default, kind: :any, required: false
     attribute :in, kind: :list, required: false, default: []
+    attribute :many, kind: :boolean, required: false, default: false
   end
 end

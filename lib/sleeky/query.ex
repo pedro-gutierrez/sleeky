@@ -37,6 +37,7 @@ defmodule Sleeky.Query do
   end
 
   import Ecto.Query
+  import Sleeky.Maps
 
   @doc """
   Returns the feature function name for a query
@@ -165,7 +166,7 @@ defmodule Sleeky.Query do
   """
   def apply_filters(_query, q, params) do
     filters =
-      for {field, value} <- Map.from_struct(params) do
+      for {field, value} <- plain_map(params) do
         {field, :eq, value}
       end
 

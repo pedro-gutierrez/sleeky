@@ -19,6 +19,7 @@ defmodule Sleeky.Event.Parser do
         %Field{
           name: Keyword.fetch!(field_attrs, :name),
           type: Keyword.fetch!(field_attrs, :type),
+          many: Keyword.get(field_attrs, :many, false),
           default: Keyword.get(field_attrs, :default, nil),
           allowed_values: Keyword.get(field_attrs, :in, []),
           required: Keyword.get(field_attrs, :required, true)

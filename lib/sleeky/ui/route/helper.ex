@@ -5,6 +5,8 @@ defmodule Sleeky.Ui.Route.Helper do
 
   import Plug.Conn
 
+  import Sleeky.Maps
+
   @doc """
   Converts the result of a ui action into either an html view or a redirect
 
@@ -28,6 +30,7 @@ defmodule Sleeky.Ui.Route.Helper do
     do: result({:render, "default", model}, conn, params, views)
 
   def result({:render, view, model}, conn, params, views) do
+    model = string_keys(model)
     model = Map.merge(params, model)
 
     render_view(views, view, conn, model, 200)

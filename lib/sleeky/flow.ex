@@ -11,6 +11,8 @@ defmodule Sleeky.Flow do
       Sleeky.Flow.Generator.Metadata
     ]
 
+  import Sleeky.Maps
+
   defstruct [:fun_name, :create_model_fun_name, :feature, :model, :params, :event, :steps]
 
   defmodule Step do
@@ -25,7 +27,7 @@ defmodule Sleeky.Flow do
     feature = flow.feature()
     create_model_fun_name = flow.create_model_fun_name()
     count = flow.steps() |> Enum.count()
-    attrs = params |> to_plain_map() |> Map.put(:steps_pending, count)
+    attrs = params |> plain_map() |> Map.put(:steps_pending, count)
 
     with {:ok, model} <- apply(feature, create_model_fun_name, [attrs]) do
       params = Jason.encode!(params)
@@ -40,9 +42,6 @@ defmodule Sleeky.Flow do
       other -> {:error, {:invalid_result, other}}
     end
   end
-
-  defp to_plain_map(data) when is_struct(data), do: Map.from_struct(data)
-  defp to_plain_map(data) when is_map(data), do: data
 
   @doc """
   Mark a step as completed.

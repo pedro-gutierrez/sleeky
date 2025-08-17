@@ -35,6 +35,8 @@ defmodule Sleeky.Feature do
 
   require Logger
 
+  import Sleeky.Maps
+
   @doc """
   Finds a mapping between two models
   """
@@ -85,7 +87,7 @@ defmodule Sleeky.Feature do
   end
 
   defp do_execute(command, params) do
-    with {:ok, params} <- params |> to_plain_map() |> command.params().validate(),
+    with {:ok, params} <- params |> plain_map() |> command.params().validate(),
          {:ok, result, events} <- command.execute(params),
          :ok <- publish_events(events, command.feature()) do
       {:ok, result}
@@ -93,7 +95,7 @@ defmodule Sleeky.Feature do
   end
 
   defp do_execute(command, params, context) do
-    with {:ok, params} <- params |> to_plain_map() |> command.params().validate(),
+    with {:ok, params} <- params |> plain_map() |> command.params().validate(),
          context <- Map.put(context, :params, params),
          :ok <- allow(command, context),
          {:ok, result, events} <- command.execute(params, context),
@@ -101,10 +103,6 @@ defmodule Sleeky.Feature do
       {:ok, result}
     end
   end
-
-  defp to_plain_map(data) when is_struct(data), do: Map.from_struct(data)
-  defp to_plain_map(data) when is_map(data), do: data
-  defp to_plain_map(data) when is_list(data), do: Map.new(data)
 
   defp allow(command, context) do
     if command.allowed?(context) do
@@ -119,7 +117,7 @@ defmodule Sleeky.Feature do
 
   Events are only published if there are subscriptions for them.
   """
-  def publish_events([], _command), do: :ok
+  def publish_events([], _feature), do: :ok
 
   def publish_events(events, feature) do
     app = feature.app()

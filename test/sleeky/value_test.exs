@@ -2,6 +2,7 @@ defmodule Sleeky.ValueTest do
   use ExUnit.Case
   import Sleeky.ErrorsHelper
 
+  alias Blogs.Accounts.Values.UserEmails
   alias Blogs.Accounts.Values.UserId
 
   describe "values" do
@@ -41,6 +42,22 @@ defmodule Sleeky.ValueTest do
 
       assert {:error, changeset} = UserId.validate(params)
       assert errors_on(changeset) == %{user_id: ["is invalid"]}
+    end
+
+    test "supports many values per field" do
+      emails = ["a@b.com", "b@b.com"]
+      params = %{"emails" => emails}
+
+      assert {:ok, value} = UserEmails.validate(params)
+      assert value.emails == emails
+    end
+
+    test "validates fields with many values" do
+      emails = ["a@b.com", "b@b.com"]
+      params = %{"email" => emails}
+
+      assert {:error, changeset} = UserEmails.validate(params)
+      assert errors_on(changeset) == %{emails: ["can't be blank"]}
     end
   end
 end

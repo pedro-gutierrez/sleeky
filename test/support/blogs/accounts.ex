@@ -20,6 +20,7 @@ defmodule Blogs.Accounts do
       Blogs.Accounts.Queries.GetOnboardings
       Blogs.Accounts.Queries.GetUsers
       Blogs.Accounts.Queries.GetUserByEmail
+      Blogs.Accounts.Queries.GetUsersByEmails
       Blogs.Accounts.Queries.GetUserIds
     end
 

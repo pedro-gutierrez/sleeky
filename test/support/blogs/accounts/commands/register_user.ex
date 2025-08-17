@@ -5,11 +5,13 @@ defmodule Blogs.Accounts.Commands.RegisterUser do
 
   alias Blogs.Accounts.User
   alias Blogs.Accounts.Events.UserRegistered
+  alias Blogs.Accounts.Expressions.IsGmailAccount
+  alias Blogs.Accounts.Expressions.LooksFake
 
   command params: User, atomic: true do
     policy role: :guest
 
-    publish(event: UserRegistered)
+    publish event: UserRegistered, if: IsGmailAccount, unless: LooksFake
   end
 
   def handle(%{email: "foo@bar.com"}, _context), do: {:error, :invalid_email}

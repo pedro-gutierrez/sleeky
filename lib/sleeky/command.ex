@@ -21,6 +21,8 @@ defmodule Sleeky.Command do
     :events
   ]
 
+  import Sleeky.Maps
+
   defmodule Policy do
     @moduledoc false
     defstruct [:role, :scope]
@@ -28,7 +30,7 @@ defmodule Sleeky.Command do
 
   defmodule Event do
     @moduledoc false
-    defstruct [:module, :source, :mapping]
+    defstruct [:module, :source, :mapping, :if, :unless]
   end
 
   def allowed?(command, context) do
@@ -86,12 +88,10 @@ defmodule Sleeky.Command do
   defp maybe_create_events([], _result, _context), do: {:ok, []}
 
   defp maybe_create_events(events, result, context) do
-    result = to_plain_map(result)
-    data = Map.merge(result, context)
-
     with events when is_list(events) <-
            Enum.reduce_while(events, [], fn event, events ->
-             case event.mapping.map(data) do
+             case maybe_create_event(event, result, context) do
+               nil -> {:cont, events}
                {:ok, event} -> {:cont, [event | events]}
                {:error, reason} -> {:halt, {:error, reason}}
              end
@@ -99,6 +99,32 @@ defmodule Sleeky.Command do
          do: {:ok, Enum.reverse(events)}
   end
 
-  defp to_plain_map(data) when is_struct(data), do: Map.from_struct(data)
-  defp to_plain_map(data) when is_map(data), do: data
+  defp maybe_create_event(event, result, context) do
+    if_expr = event.if
+    unless_expr = event.unless
+
+    maybe_create_event(event, result, context, if_expr, unless_expr)
+  end
+
+  defp maybe_create_event(event, result, context, nil, nil),
+    do: create_event(event, result, context)
+
+  defp maybe_create_event(event, result, context, if_expr, nil) do
+    if if_expr.execute(result, context), do: create_event(event, result, context)
+  end
+
+  defp maybe_create_event(event, result, context, nil, unless_expr) do
+    if not unless_expr.execute(result, context), do: create_event(event, result, context)
+  end
+
+  defp maybe_create_event(event, result, context, if_expr, unless_expr) do
+    if not unless_expr.execute(result, context) && if_expr.execute(result, context),
+      do: create_event(event, result, context)
+  end
+
+  defp create_event(event, result, context) do
+    data = result |> plain_map() |> Map.merge(context)
+
+    event.mapping.map(data)
+  end
 end

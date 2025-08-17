@@ -16,7 +16,7 @@ defmodule Sleeky.Event do
 
   defmodule Field do
     @moduledoc false
-    defstruct [:name, :type, :required, :default, :allowed_values]
+    defstruct [:name, :type, :many, :required, :default, :allowed_values]
   end
 
   defstruct [:name, :version, :fields, :feature]

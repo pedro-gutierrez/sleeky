@@ -38,7 +38,16 @@ defmodule Sleeky.Command.Parser do
         mapping = Macro.camelize("#{module_last}_from_#{source_last}")
         mapping = Module.concat([feature, "Mappings", mapping])
 
-        %Event{module: module, mapping: mapping, source: source}
+        if_expr = Keyword.get(attrs, :if)
+        unless_expr = Keyword.get(attrs, :unless)
+
+        %Event{
+          module: module,
+          mapping: mapping,
+          source: source,
+          if: if_expr,
+          unless: unless_expr
+        }
       end
 
     atomic? = Keyword.get(attrs, :atomic, false)

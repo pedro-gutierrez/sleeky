@@ -82,8 +82,16 @@ defmodule Sleeky.QueryBuilder do
 
   defp filter({column, :eq, nil}), do: dynamic([x], is_nil(field(x, ^column)))
 
+  defp filter({{binding, column}, :eq, values}) when is_list(values) do
+    dynamic([{^binding, x}], field(x, ^column) in ^values)
+  end
+
   defp filter({{binding, column}, :eq, value}) do
     dynamic([{^binding, x}], field(x, ^column) == ^value)
+  end
+
+  defp filter({column, :eq, values}) when is_list(values) do
+    dynamic([x], field(x, ^column) in ^values)
   end
 
   defp filter({column, :eq, value}) do
@@ -110,8 +118,16 @@ defmodule Sleeky.QueryBuilder do
     dynamic([x], not is_nil(field(x, ^column)))
   end
 
+  defp filter({{binding, column}, :neq, values}) when is_list(values) do
+    dynamic([{^binding, x}], field(x, ^column) not in ^values)
+  end
+
   defp filter({{binding, column}, :neq, value}) do
     dynamic([{^binding, x}], field(x, ^column) != ^value)
+  end
+
+  defp filter({column, :neq, values}) when is_list(values) do
+    dynamic([x], field(x, ^column) not in ^values)
   end
 
   defp filter({column, :neq, value}) do

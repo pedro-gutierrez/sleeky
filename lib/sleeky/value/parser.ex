@@ -11,6 +11,7 @@ defmodule Sleeky.Value.Parser do
         %Field{
           name: Keyword.fetch!(attrs, :name),
           type: Keyword.fetch!(attrs, :type),
+          many: Keyword.get(attrs, :many, false),
           default: Keyword.get(attrs, :default, nil),
           allowed_values: Keyword.get(attrs, :in, []),
           required: Keyword.get(attrs, :required, true)

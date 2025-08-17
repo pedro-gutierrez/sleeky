@@ -74,7 +74,7 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
           |> Map.take(unquote(attr_names))
           |> collect_ids(attrs, unquote(Macro.escape(parent_fields)))
           |> Sleeky.Feature.Helpers.set_default_values(unquote(Macro.escape(default_values)))
-          |> string_keys()
+          |> Sleeky.Maps.string_keys()
           |> Map.put_new_lazy("id", &Ecto.UUID.generate/0)
           |> unquote(model).create()
         end

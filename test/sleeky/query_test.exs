@@ -1,12 +1,13 @@
 defmodule Sleeky.QueryTest do
   use Sleeky.DataCase
 
-  alias Blogs.Accounts.Onboarding
+  alias Blogs.Accounts.User
 
   alias Blogs.Accounts.Queries.{
     GetOnboardings,
     GetUsers,
     GetUserByEmail,
+    GetUsersByEmails,
     GetUserIds
   }
 
@@ -66,6 +67,16 @@ defmodule Sleeky.QueryTest do
       context = %{}
       assert [item] = GetUserIds.execute(context)
       assert item.user_id
+    end
+  end
+
+  describe "apply_filters/2" do
+    test "maps multivalued values to filters using the in operator" do
+      params = %{email: ["a@b.com", "a@c.com"]}
+      query = GetUsersByEmails.apply_filters(User, params)
+      sql = to_sql(query)
+
+      assert sql =~ "WHERE (u0.\"email\" = ANY($1))"
     end
   end
 end
