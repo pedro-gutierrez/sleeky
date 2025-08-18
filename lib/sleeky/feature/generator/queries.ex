@@ -12,11 +12,12 @@ defmodule Sleeky.Feature.Generator.Queries do
       if params_module != nil do
         quote do
           def unquote(fun_name)(params, context \\ %{}),
-            do: Sleeky.Query.execute(unquote(query), params, context)
+            do: Sleeky.Feature.execute_query(unquote(query), params, context)
         end
       else
         quote do
-          def unquote(fun_name)(context \\ %{}), do: Sleeky.Query.execute(unquote(query), context)
+          def unquote(fun_name)(context \\ %{}),
+            do: Sleeky.Feature.execute_query(unquote(query), context)
         end
       end
     end

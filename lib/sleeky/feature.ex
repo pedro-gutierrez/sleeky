@@ -53,17 +53,17 @@ defmodule Sleeky.Feature do
 
   This function does not take a context, which will disable permission checks
   """
-  def execute(command, params) do
+  def execute_command(command, params) do
     if command.atomic?() do
       repo = command.feature().repo()
 
       repo.transaction(fn ->
-        with {:error, reason} <- do_execute(command, params) do
+        with {:error, reason} <- do_execute_command(command, params) do
           repo.rollback(reason)
         end
       end)
     else
-      do_execute(command, params)
+      do_execute_command(command, params)
     end
   end
 
@@ -72,21 +72,21 @@ defmodule Sleeky.Feature do
 
   This function takes a context, which will trigger checking for permissions based on policies, roles and scopes
   """
-  def execute(command, params, context) do
+  def execute_command(command, params, context) do
     if command.atomic?() do
       repo = command.feature().repo()
 
       repo.transaction(fn ->
-        with {:error, reason} <- do_execute(command, params, context) do
+        with {:error, reason} <- do_execute_command(command, params, context) do
           repo.rollback(reason)
         end
       end)
     else
-      do_execute(command, params, context)
+      do_execute_command(command, params, context)
     end
   end
 
-  defp do_execute(command, params) do
+  defp do_execute_command(command, params) do
     with {:ok, params} <- params |> plain_map() |> command.params().validate(),
          {:ok, result, events} <- command.execute(params),
          :ok <- publish_events(events, command.feature()) do
@@ -94,7 +94,7 @@ defmodule Sleeky.Feature do
     end
   end
 
-  defp do_execute(command, params, context) do
+  defp do_execute_command(command, params, context) do
     with {:ok, params} <- params |> plain_map() |> command.params().validate(),
          context <- Map.put(context, :params, params),
          :ok <- allow(command, context),
@@ -142,4 +142,14 @@ defmodule Sleeky.Feature do
 
     jobs
   end
+
+  @doc """
+  Executes a query that has parameters
+  """
+  def execute_query(query, params, context), do: query.execute(params, context)
+
+  @doc """
+  Executes a query that has no parameters
+  """
+  def execute_query(query, params), do: query.execute(params)
 end

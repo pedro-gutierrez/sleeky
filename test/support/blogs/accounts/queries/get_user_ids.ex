@@ -8,5 +8,5 @@ defmodule Blogs.Accounts.Queries.GetUserIds do
     policy role: :user
   end
 
-  def execute(_context), do: [%{"id" => Ecto.UUID.generate()}]
+  def handle(_context), do: [%{"id" => Ecto.UUID.generate()}]
 end

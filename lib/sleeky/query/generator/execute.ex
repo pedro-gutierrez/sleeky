@@ -5,10 +5,8 @@ defmodule Sleeky.Query.Generator.Execute do
   @impl true
   def generate(_query, _opts) do
     quote do
-      def execute(q, _params, _context), do: q
-      def execute(q, _context), do: q
-
-      defoverridable execute: 2, execute: 3
+      def execute(params, context), do: Sleeky.Query.execute(__MODULE__, params, context)
+      def execute(context), do: Sleeky.Query.execute(__MODULE__, context)
     end
   end
 end

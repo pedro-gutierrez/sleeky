@@ -46,7 +46,7 @@ defmodule Sleeky.CommandTest do
 
   describe "execute/2" do
     test "returns a result and a list of events" do
-      params = %User{id: uuid(), email: "test@example.com", external_id: uuid()}
+      params = %User{id: uuid(), email: "test@gmail.com", external_id: uuid()}
       context = %{}
 
       assert {:ok, user, [event]} = RegisterUser.execute(params, context)

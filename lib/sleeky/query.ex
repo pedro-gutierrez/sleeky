@@ -5,10 +5,11 @@ defmodule Sleeky.Query do
     dsl: Sleeky.Query.Dsl,
     parser: Sleeky.Query.Parser,
     generators: [
-      Sleeky.Query.Generator.Scope,
-      Sleeky.Query.Generator.Metadata,
+      Sleeky.Query.Generator.Apply,
       Sleeky.Query.Generator.Execute,
-      Sleeky.Query.Generator.Apply
+      Sleeky.Query.Generator.Handle,
+      Sleeky.Query.Generator.Metadata,
+      Sleeky.Query.Generator.Scope
     ]
 
   alias Sleeky.QueryBuilder
@@ -101,14 +102,14 @@ defmodule Sleeky.Query do
          context <- Map.put(context, :params, params) do
       if query.custom?() do
         params
-        |> query.execute(context)
+        |> query.handle(context)
         |> maybe_map_result(query)
       else
         context
         |> query.scope()
         |> query.apply_filters(params)
         |> query.apply_sorting()
-        |> query.execute(params, context)
+        |> query.handle(params, context)
         |> call_repo(query, context)
       end
     end
@@ -120,13 +121,13 @@ defmodule Sleeky.Query do
   def execute(query, context) do
     if query.custom?() do
       context
-      |> query.execute()
+      |> query.handle()
       |> maybe_map_result(query)
     else
       context
       |> query.scope()
       |> query.apply_sorting()
-      |> query.execute(context)
+      |> query.handle(context)
       |> call_repo(query, context)
     end
   end

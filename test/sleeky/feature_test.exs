@@ -180,7 +180,7 @@ defmodule Sleeky.FeatureTest do
         )
 
       context = %{current_user: %{roles: [:user]}}
-      params = [emails: ["foo@bar", "bar@bar"]]
+      params = [email: ["foo@bar", "bar@bar"]]
 
       assert users = Accounts.get_users_by_emails(params, context)
       assert length(users) == 2
