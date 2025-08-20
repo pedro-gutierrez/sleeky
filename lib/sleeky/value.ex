@@ -8,7 +8,8 @@ defmodule Sleeky.Value do
     dsl: Sleeky.Value.Dsl,
     generators: [
       Sleeky.Value.Generator.Functions,
-      Sleeky.Value.Generator.Metadata
+      Sleeky.Value.Generator.Metadata,
+      Sleeky.Value.Generator.Field
     ]
 
   defmodule Field do
@@ -99,5 +100,17 @@ defmodule Sleeky.Value do
     params = Map.new(params)
 
     validate(value, params)
+  end
+
+  @doc """
+  Returns a field metadata as a model attribute
+
+  This is so that values can be inspected with the evaluate module
+  """
+  def field(value, name) do
+    case value.attributes() |> Map.get(name) do
+      nil -> {:error, :field_not_found}
+      attr -> {:ok, attr}
+    end
   end
 end

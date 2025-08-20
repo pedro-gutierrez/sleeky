@@ -20,6 +20,11 @@ defmodule Sleeky.ValueTest do
       assert {:ok, value} = UserId.decode("{ \"user_id\": \"123\"}")
       assert value == %UserId{user_id: "123"}
     end
+
+    test "can be introspected" do
+      assert {:ok, _} = UserId.field(:user_id)
+      assert {:ok, _} = UserId.field("user_id")
+    end
   end
 
   describe "validate/1" do
@@ -46,18 +51,17 @@ defmodule Sleeky.ValueTest do
 
     test "supports many values per field" do
       emails = ["a@b.com", "b@b.com"]
-      params = %{"emails" => emails}
+      params = %{"email" => emails}
 
       assert {:ok, value} = UserEmails.validate(params)
-      assert value.emails == emails
+      assert value.email == emails
     end
 
     test "validates fields with many values" do
-      emails = ["a@b.com", "b@b.com"]
-      params = %{"email" => emails}
+      params = %{"email" => nil}
 
       assert {:error, changeset} = UserEmails.validate(params)
-      assert errors_on(changeset) == %{emails: ["can't be blank"]}
+      assert errors_on(changeset) == %{email: ["can't be blank"]}
     end
   end
 end
