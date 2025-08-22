@@ -13,6 +13,24 @@ defmodule Sleeky.ModelTest do
   end
 
   describe "create/1" do
+    test "allows timestamps to be manually modified" do
+      two_days_ago = DateTime.utc_now() |> DateTime.add(-2 * 24 * 3600, :second)
+
+      assert {:ok, user} =
+               User.create(
+                 id: uuid(),
+                 email: "foo@bar",
+                 external_id: uuid(),
+                 public: true,
+                 inserted_at: two_days_ago,
+                 updated_at: two_days_ago
+               )
+
+      assert {:ok, user} = User.fetch(user.id)
+      assert user.inserted_at == two_days_ago
+      assert user.updated_at == two_days_ago
+    end
+
     test "detects conflicts" do
       attrs = [
         id: Ecto.UUID.generate(),

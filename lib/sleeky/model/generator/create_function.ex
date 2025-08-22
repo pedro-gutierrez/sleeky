@@ -72,8 +72,6 @@ defmodule Sleeky.Model.Generator.CreateFunction do
 
   defp on_conflict_opts(%OnConflict{strategy: :merge, fields: fields, except: except})
        when length(except) > 0 do
-    fields = Enum.map(fields, & &1.name)
-
     [on_conflict: {:replace_all_except, except}, conflict_target: fields, returning: true]
   end
 
