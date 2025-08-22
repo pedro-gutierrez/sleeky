@@ -4,8 +4,9 @@ defmodule Blogs.Accounts do
 
   feature do
     models do
-      Blogs.Accounts.User
+      Blogs.Accounts.Credential
       Blogs.Accounts.Onboarding
+      Blogs.Accounts.User
     end
 
     commands do

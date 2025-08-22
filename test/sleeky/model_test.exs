@@ -50,6 +50,34 @@ defmodule Sleeky.ModelTest do
       assert onboarding.steps_pending == 0
       assert onboarding.id == attrs[:id]
     end
+
+    test "merges records when the unique key involves a parent relation" do
+      assert {:ok, user} =
+               Blogs.Accounts.create_user(email: "foo@bar", external_id: uuid(), public: true)
+
+      assert {:ok, cred1} =
+               Accounts.create_credential(
+                 user: user,
+                 name: "password",
+                 value: "foo",
+                 enabled: true
+               )
+
+      assert {:ok, cred2} =
+               Accounts.create_credential(
+                 user: user,
+                 name: "password",
+                 value: "bar",
+                 enabled: false
+               )
+
+      assert cred2.id == cred1.id
+      assert cred2.name == "password"
+      assert cred2.value == "bar"
+      refute cred2.enabled
+
+      assert {:ok, ^cred2} = Blogs.Accounts.Credential.fetch(cred1.id)
+    end
   end
 
   describe "create_many/1" do

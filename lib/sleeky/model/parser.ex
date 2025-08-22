@@ -181,7 +181,15 @@ defmodule Sleeky.Model.Parser do
 
         on_conflict =
           with %OnConflict{} = on_conflict <- on_conflict(opts, field_names) do
-            %{on_conflict | fields: fields}
+            field_names =
+              for name <- field_names do
+                case Enum.find(model.relations, &(&1.name == name)) do
+                  nil -> name
+                  relation -> relation.column_name
+                end
+              end
+
+            %{on_conflict | fields: field_names}
           end
 
         %Key{
