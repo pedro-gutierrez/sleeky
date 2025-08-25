@@ -74,7 +74,7 @@ defmodule Sleeky.Command do
   def execute(command, params, context) do
     with {:ok, result} <- execute_command(command, params, context),
          {:ok, events} <-
-           maybe_create_events(command.events(), result, context) do
+           maybe_create_events(command.feature(), command.events(), result, context) do
       {:ok, result, events}
     end
   end
@@ -85,12 +85,12 @@ defmodule Sleeky.Command do
     end
   end
 
-  defp maybe_create_events([], _result, _context), do: {:ok, []}
+  defp maybe_create_events(_feature, [], _result, _context), do: {:ok, []}
 
-  defp maybe_create_events(events, result, context) do
+  defp maybe_create_events(feature, events, result, context) do
     with events when is_list(events) <-
            Enum.reduce_while(events, [], fn event, events ->
-             case maybe_create_event(event, result, context) do
+             case maybe_create_event(feature, event, result, context) do
                nil -> {:cont, events}
                {:ok, event} -> {:cont, [event | events]}
                {:error, reason} -> {:halt, {:error, reason}}
@@ -99,32 +99,32 @@ defmodule Sleeky.Command do
          do: {:ok, Enum.reverse(events)}
   end
 
-  defp maybe_create_event(event, result, context) do
+  defp maybe_create_event(feature, event, result, context) do
     if_expr = event.if
     unless_expr = event.unless
 
-    maybe_create_event(event, result, context, if_expr, unless_expr)
+    maybe_create_event(feature, event, result, context, if_expr, unless_expr)
   end
 
-  defp maybe_create_event(event, result, context, nil, nil),
-    do: create_event(event, result, context)
+  defp maybe_create_event(feature, event, result, context, nil, nil),
+    do: create_event(feature, event, result, context)
 
-  defp maybe_create_event(event, result, context, if_expr, nil) do
-    if if_expr.execute(result, context), do: create_event(event, result, context)
+  defp maybe_create_event(feature, event, result, context, if_expr, nil) do
+    if if_expr.execute(result, context), do: create_event(feature, event, result, context)
   end
 
-  defp maybe_create_event(event, result, context, nil, unless_expr) do
-    if not unless_expr.execute(result, context), do: create_event(event, result, context)
+  defp maybe_create_event(feature, event, result, context, nil, unless_expr) do
+    if not unless_expr.execute(result, context), do: create_event(feature, event, result, context)
   end
 
-  defp maybe_create_event(event, result, context, if_expr, unless_expr) do
+  defp maybe_create_event(feature, event, result, context, if_expr, unless_expr) do
     if not unless_expr.execute(result, context) && if_expr.execute(result, context),
-      do: create_event(event, result, context)
+      do: create_event(feature, event, result, context)
   end
 
-  defp create_event(event, result, context) do
+  defp create_event(feature, event, result, context) do
     data = result |> plain_map() |> Map.merge(context)
 
-    event.mapping.map(data)
+    feature.map(event.source, event.module, data)
   end
 end

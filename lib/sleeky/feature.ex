@@ -10,7 +10,7 @@ defmodule Sleeky.Feature do
       Sleeky.Feature.Generator.Metadata,
       Sleeky.Feature.Generator.Roles,
       Sleeky.Feature.Generator.Graph,
-      Sleeky.Feature.Generator.Helpers,
+      Sleeky.Feature.Generator.Map,
       Sleeky.Feature.Generator.CreateFunctions,
       Sleeky.Feature.Generator.UpdateFunctions,
       Sleeky.Feature.Generator.Commands,
@@ -38,14 +38,30 @@ defmodule Sleeky.Feature do
   import Sleeky.Maps
 
   @doc """
-  Finds a mapping between two models
+  Map the input value, using a configured mapping or a generic one
   """
-  def mapping!(feature, from, to) do
-    with nil <-
-           feature.mappings()
-           |> Enum.find(&(&1.from() == from && &1.to() == to)) do
-      raise "No mapping from #{inspect(from)} to #{inspect(to)} in feature #{inspect(feature)}"
+  def map(feature, from, to, input) do
+    mapping = feature.mappings() |> Enum.find(&(&1.from() == from && &1.to() == to))
+
+    case mapping do
+      nil -> map(input, to)
+      mapping -> mapping.map(input)
     end
+  end
+
+  defp map(input, to) when is_map(input) do
+    input |> plain_map() |> to.new()
+  end
+
+  defp map(input, to) when is_list(input) do
+    with items when is_list(items) <-
+           Enum.reduce_while(input, [], fn item, acc ->
+             case map(item, to) do
+               {:ok, item} -> {:cont, [item | acc]}
+               {:error, _} = error -> {:halt, error}
+             end
+           end),
+         do: {:ok, Enum.reverse(items)}
   end
 
   @doc """

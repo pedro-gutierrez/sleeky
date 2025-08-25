@@ -42,7 +42,7 @@ defmodule Sleeky.Mapping do
                {:error, _} = error -> {:halt, error}
              end
            end),
-         do: Enum.reverse(items)
+         do: {:ok, Enum.reverse(items)}
   end
 
   defp map(item, fields, target_module) do

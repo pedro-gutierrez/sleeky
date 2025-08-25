@@ -6,6 +6,7 @@ defmodule Sleeky.FeatureTest do
   alias Blogs.Accounts.Onboarding
   alias Blogs.Accounts.User
   alias Blogs.Accounts.Values.UserId
+  alias Blogs.Accounts.Values.UserEmail
 
   describe "command functions" do
     test "invoke the handler if the command is allowed" do
@@ -184,6 +185,52 @@ defmodule Sleeky.FeatureTest do
 
       assert users = Accounts.get_users_by_emails(params, context)
       assert length(users) == 2
+    end
+  end
+
+  describe "map/3" do
+    test "maps input to output value using mappings" do
+      input = %{id: "1"}
+      assert {:ok, user_id} = Accounts.map(Map, UserId, input)
+      assert user_id.__struct__ == UserId
+      assert user_id.user_id == "1"
+    end
+
+    test "maps multiple items when using mappings" do
+      inputs = [%{id: "1"}, %{id: "2"}]
+      assert {:ok, [user_id1, user_id2]} = Accounts.map(Map, UserId, inputs)
+      assert user_id1.__struct__ == UserId
+      assert user_id1.user_id == "1"
+      assert user_id2.__struct__ == UserId
+      assert user_id2.user_id == "2"
+    end
+
+    test "validates the output when using mappings" do
+      input = %{id: 1}
+      assert {:error, reason} = Accounts.map(Map, UserId, input)
+      assert errors_on(reason) == %{user_id: ["is invalid"]}
+    end
+
+    test "maps input to output value also when not using mappings" do
+      input = %{email: "foo@bar"}
+      assert {:ok, user_email} = Accounts.map(Map, UserEmail, input)
+      assert user_email.__struct__ == UserEmail
+      assert user_email.email == "foo@bar"
+    end
+
+    test "maps multiple inputs when not using mappings" do
+      inputs = [%{email: "foo@bar"}, %{email: "bar@bar"}]
+      assert {:ok, [user_email1, user_email2]} = Accounts.map(Map, UserEmail, inputs)
+      assert user_email1.__struct__ == UserEmail
+      assert user_email1.email == "foo@bar"
+      assert user_email2.__struct__ == UserEmail
+      assert user_email2.email == "bar@bar"
+    end
+
+    test "validate the output even if a mapping is not defined" do
+      input = %{email: 1}
+      assert {:error, reason} = Accounts.map(Map, UserEmail, input)
+      assert errors_on(reason) == %{email: ["is invalid"]}
     end
   end
 end

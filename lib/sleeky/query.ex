@@ -104,6 +104,7 @@ defmodule Sleeky.Query do
         params
         |> query.handle(context)
         |> maybe_map_result(query)
+        |> maybe_unwrap_result(query)
       else
         context
         |> query.scope()
@@ -123,6 +124,7 @@ defmodule Sleeky.Query do
       context
       |> query.handle()
       |> maybe_map_result(query)
+      |> maybe_unwrap_result(query)
     else
       context
       |> query.scope()
@@ -156,11 +158,10 @@ defmodule Sleeky.Query do
     end
   end
 
-  defp map_result(item, query, model) do
-    mapping = query.feature().mapping!(Map, model)
+  defp map_result(item, query, model), do: query.feature().map(Map, model, item)
 
-    mapping.map(item)
-  end
+  defp maybe_unwrap_result({:ok, items}, _query) when is_list(items), do: items
+  defp maybe_unwrap_result(other, _query), do: other
 
   @doc """
   Builds a query by taking the parameters and adding them as filters

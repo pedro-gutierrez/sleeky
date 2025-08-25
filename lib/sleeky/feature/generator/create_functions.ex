@@ -18,7 +18,7 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
       children_action_fun_name = String.to_atom("create_#{model_name}_children")
 
       fun_with_map_args =
-        quote do
+        quote location: :keep do
           def unquote(action_fun_name)(attrs, context \\ %{})
 
           def unquote(action_fun_name)(attrs, context) when is_map(attrs) do
@@ -37,7 +37,7 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
         end
 
       fun_with_kw_args =
-        quote do
+        quote location: :keep do
           def unquote(action_fun_name)(attrs, context) when is_list(attrs) do
             attrs
             |> Map.new()
@@ -68,7 +68,7 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
           {attr.name, attr.default}
         end
 
-      quote do
+      quote location: :keep do
         defp unquote(action_fun_name)(attrs, context) do
           attrs
           |> Map.take(unquote(attr_names))
@@ -91,7 +91,7 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
         for rel when not rel.computed? <- model.children(),
             do: {rel.name, rel.inverse.name, String.to_atom("create_#{rel.target.name}")}
 
-      quote do
+      quote location: :keep do
         defp unquote(action_fun_name)(model, attrs, context) do
           context = Map.put(context, unquote(model_name), model)
 
@@ -101,7 +101,7 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
               children when is_list(children) ->
                 Enum.map(children, &{Map.put(&1, inverse_name, model), create_fun_name})
 
-              nil ->
+              _ ->
                 []
             end
           end)
@@ -123,7 +123,7 @@ defmodule Sleeky.Feature.Generator.CreateFunctions do
       single_fun_name = String.to_atom("create_#{model.name()}")
       bulk_fun_name = String.to_atom("create_#{model.plural()}")
 
-      quote do
+      quote location: :keep do
         def unquote(bulk_fun_name)(items, context \\ %{}) when is_list(items) do
           repo = repo()
 

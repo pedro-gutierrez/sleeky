@@ -6,6 +6,7 @@ defmodule Sleeky.Feature.Generator.Metadata do
   def generate(feature, _) do
     quote do
       import Ecto.Query
+      import Sleeky.Feature.Helpers
 
       @repo unquote(feature.repo)
 

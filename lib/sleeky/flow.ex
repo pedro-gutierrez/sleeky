@@ -49,10 +49,9 @@ defmodule Sleeky.Flow do
   def step_completed(flow, id, step) do
     with 0 <- decrement_steps_pending(flow, id),
          model <- flow.model(),
-         event = flow.event(),
-         mapping = flow.feature().mapping!(model, event),
+         event <- flow.event(),
          {:ok, input} <- model.fetch(id),
-         {:ok, event} <- mapping.map(input) do
+         {:ok, event} <- flow.feature().map(model, event, input) do
       Sleeky.Feature.publish_events([event], step.feature())
     else
       n when n > 0 -> :ok
