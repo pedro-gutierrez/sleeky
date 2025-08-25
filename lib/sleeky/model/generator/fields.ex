@@ -11,7 +11,9 @@ defmodule Sleeky.Model.Generator.FieldNames do
 
     parents = Enum.filter(model.relations, &(&1.kind == :parent))
 
-    fields_on_insert = Enum.map(attrs, & &1.name) ++ Enum.map(parents, & &1.column_name)
+    fields_on_insert =
+      Enum.map(attrs, & &1.name) ++
+        Enum.map(parents, & &1.column_name) ++ [:inserted_at, :updated_at]
 
     fields_on_update = fields_on_insert
 

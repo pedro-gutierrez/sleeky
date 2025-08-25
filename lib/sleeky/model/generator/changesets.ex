@@ -5,10 +5,28 @@ defmodule Sleeky.Model.Generator.Changesets do
   @impl true
   def generate(model, _) do
     [
+      validate_changeset(model),
       insert_changeset(model),
       update_changeset(model),
       delete_changeset(model)
     ]
+  end
+
+  defp validate_changeset(model) do
+    inclusion_validations = inclusion_validations(model)
+    uuid_validations = uuid_validations(model)
+
+    quote do
+      def validate_changeset(attrs) do
+        changes =
+          %__MODULE__{}
+          |> cast(attrs, @fields_on_insert)
+          |> validate_required(@required_fields)
+
+        unquote_splicing(uuid_validations)
+        unquote_splicing(inclusion_validations)
+      end
+    end
   end
 
   defp insert_changeset(model) do

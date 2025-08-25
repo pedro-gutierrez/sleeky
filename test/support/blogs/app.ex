@@ -2,7 +2,7 @@ defmodule Blogs.App do
   @moduledoc false
   use Sleeky.App, otp_app: :sleeky
 
-  app do
+  app roles: "current_user.roles" do
     features do
       Blogs.Accounts
       Blogs.Notifications

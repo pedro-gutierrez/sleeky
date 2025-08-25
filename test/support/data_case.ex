@@ -5,6 +5,7 @@ defmodule Sleeky.DataCase do
     config = Application.fetch_env!(:sleeky, Sleeky)
     repo = Keyword.fetch!(config, :repo)
     endpoint = Keyword.fetch!(config, :endpoint)
+    opts = Keyword.put_new(opts, :async, false)
 
     quote do
       @repo unquote(repo)
@@ -12,10 +13,13 @@ defmodule Sleeky.DataCase do
       @router @endpoint.router()
 
       use ExUnit.Case, unquote(opts)
+      use Oban.Testing, repo: @repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
+      import Sleeky.ErrorsHelper
+      import Sleeky.SqlHelper
       import Sleeky.Fixtures
       import Plug.Test
       import Plug.Conn
@@ -28,25 +32,12 @@ defmodule Sleeky.DataCase do
         start_supervised!(@repo)
         start_supervised!(@endpoint)
 
+        oban_config = Application.fetch_env!(:sleeky, Oban)
+        start_supervised!({Oban, oban_config})
+
         pid = Sandbox.start_owner!(@repo, shared: not tags[:async])
         on_exit(fn -> Sandbox.stop_owner(pid) end)
         :ok
-      end
-
-      @doc """
-      A helper that transforms changeset errors into a map of messages.
-
-          assert {:error, changeset} = Accounts.create_user(%{password: "short"})
-          assert "password is too short" in errors_on(changeset).password
-          assert %{password: ["password is too short"]} = errors_on(changeset)
-
-      """
-      def errors_on(changeset) do
-        Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
-          Regex.replace(~r"%{(\w+)}", message, fn _, key ->
-            opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-          end)
-        end)
       end
 
       defp get(path, opts \\ []), do: route(:get, path, headers: headers(opts))
@@ -136,34 +127,19 @@ defmodule Sleeky.DataCase do
       defp maybe_auth_header(headers, token),
         do: Map.put(headers, "authorization", "Bearer " <> token)
 
-      @doc """
-      Convert the given givne into its generated sql
-      """
-      def to_sql(query) do
-        {sql, _params} = @repo.to_sql(:all, query)
-        sql
+      defp to_sql(query), do: to_sql(query, @repo)
+
+      def assert_event_published(event) do
+        assert_enqueued(worker: Sleeky.Job, args: %{event: event})
       end
 
-      @doc """
-      Asserts that the given query matches the given string
-      """
-      def assert_sql(sql, fragments) do
-        for fragment <- fragments do
-          assert sql =~ fragment
-        end
-
-        sql
+      def refute_event_published(event) do
+        refute_enqueued(worker: Sleeky.Job, args: %{event: event})
       end
 
-      @doc """
-      Asserts that the given query does not match the given string
-      """
-      def refute_sql(sql, fragments) do
-        for fragment <- fragments do
-          refute sql =~ fragment
-        end
-
-        sql
+      defp assert_job_success(count \\ 1) do
+        assert_enqueued(worker: Sleeky.Job)
+        assert %{success: ^count} = Oban.drain_queue(queue: :default)
       end
     end
   end

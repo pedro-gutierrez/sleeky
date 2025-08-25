@@ -37,6 +37,47 @@ defmodule Sleeky.QueryBuilderTest do
                " WHERE (((p0.\"published\" = $1) AND (p0.\"locked\" = $2)) AND (p0.\"deleted\" = $3))"
   end
 
+  test "translates filters on lists into the in operator" do
+    sql =
+      @query
+      |> QueryBuilder.filter([
+        {{:post, :published}, :eq, [true, false]}
+      ])
+      |> to_sql()
+
+    assert sql =~ " WHERE (p0.\"published\" = ANY($1)"
+  end
+
+  test "supports soring" do
+    sql =
+      @query
+      |> QueryBuilder.sort([
+        {{:post, :id}, :asc},
+        {{:post, :inserted}, :desc}
+      ])
+      |> to_sql()
+
+    assert sql =~ "ORDER BY p0.\"id\", p0.\"inserted\" DESC"
+  end
+
+  test "also works without aliases" do
+    sql =
+      Post
+      |> QueryBuilder.filter([
+        {:published, :eq, true},
+        {:locked, :eq, true},
+        {:deleted, :eq, true}
+      ])
+      |> QueryBuilder.sort([
+        {:id, :asc},
+        {:inserted, :desc}
+      ])
+      |> to_sql()
+
+    assert sql ==
+             "SELECT p0.\"id\", p0.\"title\", p0.\"published_at\", p0.\"locked\", p0.\"published\", p0.\"deleted\", p0.\"blog_id\", p0.\"author_id\", p0.\"inserted_at\", p0.\"updated_at\" FROM \"publishing\".\"posts\" AS p0 WHERE (((p0.\"published\" = $1) AND (p0.\"locked\" = $2)) AND (p0.\"deleted\" = $3)) ORDER BY p0.\"id\", p0.\"inserted\" DESC"
+  end
+
   test "combines 'and' and 'or'" do
     sql =
       @query

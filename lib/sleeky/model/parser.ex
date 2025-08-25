@@ -24,6 +24,7 @@ defmodule Sleeky.Model.Parser do
     |> with_keys(definition)
     |> with_actions(definition)
     |> with_primary_key()
+    |> with_timestamps()
   end
 
   defp model(caller, attrs) do
@@ -179,8 +180,16 @@ defmodule Sleeky.Model.Parser do
         name = field_names |> Enum.join("_") |> String.to_atom()
 
         on_conflict =
-          with %OnConflict{} = on_conflict <- on_conflict(opts) do
-            %{on_conflict | fields: fields}
+          with %OnConflict{} = on_conflict <- on_conflict(opts, field_names) do
+            field_names =
+              for name <- field_names do
+                case Enum.find(model.relations, &(&1.name == name)) do
+                  nil -> name
+                  relation -> relation.column_name
+                end
+              end
+
+            %{on_conflict | fields: field_names}
           end
 
         %Key{
@@ -257,9 +266,9 @@ defmodule Sleeky.Model.Parser do
 
   defp action_tasks(_), do: nil
 
-  defp on_conflict([{:on_conflict, opts, _}]) do
-    strategy = Keyword.fetch!(opts, :name)
-    except = Keyword.get(opts, :except, [:id])
+  defp on_conflict([{:on_conflict, opts, _}], field_names) do
+    strategy = Keyword.fetch!(opts, :strategy)
+    except = opts[:except] || [:id | field_names]
 
     %OnConflict{
       strategy: strategy,
@@ -267,7 +276,7 @@ defmodule Sleeky.Model.Parser do
     }
   end
 
-  defp on_conflict(_), do: nil
+  defp on_conflict(_, _), do: nil
 
   defp scope(name) when is_atom(name), do: name
   defp scope(scopes) when is_list(scopes), do: Enum.map(scopes, &scope/1)
@@ -295,8 +304,34 @@ defmodule Sleeky.Model.Parser do
     mutable?: false
   }
 
+  @inserted_at %Attribute{
+    name: :inserted_at,
+    kind: :datetime,
+    ecto_type: :utc_datetime,
+    storage: :utc_datetime,
+    column_name: :inserted_at,
+    primary_key?: false,
+    mutable?: false
+  }
+
+  @updated_at %Attribute{
+    name: :updated_at,
+    kind: :datetime,
+    ecto_type: :utc_datetime,
+    storage: :utc_datetime,
+    column_name: :updated_at,
+    primary_key?: false,
+    mutable?: true
+  }
+
   defp with_primary_key(model) do
     %{model | primary_key: @primary_key, attributes: [@primary_key | model.attributes]}
+  end
+
+  defp with_timestamps(model) do
+    attributes = model.attributes ++ [@inserted_at, @updated_at]
+
+    %{model | attributes: attributes}
   end
 
   defp ensure_same_feature!(from, to, kind) do

@@ -39,12 +39,6 @@ defmodule Sleeky.Feature.Helpers do
     end)
   end
 
-  def string_keys(map) do
-    for {key, value} <- map, into: %{} do
-      {to_string(key), value}
-    end
-  end
-
   def tasks_to_execute(_, _, %{skip_tasks: true}), do: []
 
   def tasks_to_execute(tasks, model, _context) do
